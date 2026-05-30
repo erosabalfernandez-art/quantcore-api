@@ -1,0 +1,2360 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Samtrader Pro Suite</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+<script src="https://cdn.jsdelivr.net/npm/papaparse@5/papaparse.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+*{font-family:'Inter',sans-serif;box-sizing:border-box;}
+body{background:#0B0F17;color:#E2E8F0;margin:0;}
+.mono{font-family:'JetBrains Mono',monospace;}
+.glass-card{background:rgba(19,26,38,0.85);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid rgba(30,41,59,0.6);transition:all .2s ease;}
+.glass-card:hover{border-color:rgba(16,185,129,0.4);box-shadow:0 8px 32px rgba(0,0,0,0.4);}
+.glass-nav{background:rgba(11,15,23,0.85);backdrop-filter:blur(16px);border-bottom:1px solid rgba(30,41,59,0.6);}
+.btn-green{background:#10B981;color:#fff;border:none;cursor:pointer;transition:all .2s;}
+.btn-green:hover{background:#059669;box-shadow:0 4px 15px rgba(16,185,129,0.3);}
+.btn-blue{background:#3B82F6;color:#fff;border:none;cursor:pointer;transition:all .2s;}
+.btn-blue:hover{background:#2563EB;box-shadow:0 4px 15px rgba(59,130,246,0.3);}
+.btn-purple{background:#8B5CF6;color:#fff;border:none;cursor:pointer;transition:all .2s;}
+.btn-purple:hover{background:#7C3AED;}
+.btn-red{background:#EF4444;color:#fff;border:none;cursor:pointer;transition:all .2s;}
+.btn-red:hover{background:#DC2626;}
+.btn-outline{background:transparent;color:#94A3B8;border:1px solid rgba(30,41,59,0.8);cursor:pointer;transition:all .2s;}
+.btn-outline:hover{border-color:#10B981;color:#10B981;}
+.btn-ghost{background:none;border:none;cursor:pointer;color:#94A3B8;transition:all .2s;}
+.btn-ghost:hover{color:#E2E8F0;}
+.input-dark{background:rgba(11,15,23,0.6);border:1px solid rgba(30,41,59,0.8);color:#E2E8F0;transition:all .2s;}
+.input-dark:focus{outline:none;border-color:#10B981;box-shadow:0 0 0 3px rgba(16,185,129,0.1);}
+.input-dark::placeholder{color:#475569;}
+.input-dark:disabled{opacity:.5;cursor:not-allowed;background:rgba(30,41,59,0.3);}
+.nav-item{padding:10px 14px;border-radius:8px;cursor:pointer;display:flex;align-items:center;gap:10px;color:#94A3B8;font-size:13px;font-weight:500;transition:all .15s;border:none;background:none;width:100%;text-align:left;}
+.nav-item:hover{background:rgba(30,41,59,0.6);color:#E2E8F0;}
+.nav-item.active{background:rgba(16,185,129,0.1);color:#10B981;border-right:2px solid #10B981;}
+.badge-gratis{background:rgba(148,163,184,.15);color:#94A3B8;}
+.badge-premium{background:rgba(59,130,246,.15);color:#3B82F6;}
+.badge-elite{background:rgba(139,92,246,.15);color:#8B5CF6;}
+.badge-block{background:rgba(239,68,68,.15);color:#EF4444;}
+.toast-container{position:fixed;top:20px;right:20px;z-index:9999;display:flex;flex-direction:column;gap:8px;}
+.toast{padding:14px 20px;border-radius:10px;font-size:13px;font-weight:500;max-width:340px;animation:slideIn .3s ease;backdrop-filter:blur(12px);}
+.toast-success{background:rgba(16,185,129,.2);border:1px solid rgba(16,185,129,.4);color:#10B981;}
+.toast-error{background:rgba(239,68,68,.2);border:1px solid rgba(239,68,68,.4);color:#EF4444;}
+.toast-info{background:rgba(59,130,246,.2);border:1px solid rgba(59,130,246,.4);color:#3B82F6;}
+@keyframes slideIn{from{transform:translateX(100%);opacity:0;}to{transform:translateX(0);opacity:1;}}
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(4px);z-index:500;display:flex;align-items:center;justify-content:center;padding:16px;}
+.modal-box{background:#131A26;border:1px solid rgba(30,41,59,0.8);border-radius:16px;padding:28px;width:100%;max-width:520px;max-height:90vh;overflow-y:auto;animation:modalIn .2s ease;}
+.modal-box-lg{max-width:720px;}
+@keyframes modalIn{from{transform:scale(.95);opacity:0;}to{transform:scale(1);opacity:1;}}
+.table-row{border-bottom:1px solid rgba(30,41,59,0.5);}
+.table-row:hover{background:rgba(30,41,59,0.3);}
+::-webkit-scrollbar{width:5px;height:5px;}
+::-webkit-scrollbar-track{background:#0B0F17;}
+::-webkit-scrollbar-thumb{background:#1E293B;border-radius:3px;}
+.chat-bubble{position:fixed;bottom:24px;right:24px;z-index:400;width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,#10B981,#059669);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(16,185,129,0.4);transition:all .2s;}
+.chat-bubble:hover{transform:scale(1.1);box-shadow:0 6px 28px rgba(16,185,129,0.5);}
+.chat-unread{position:absolute;top:-2px;right:-2px;width:16px;height:16px;border-radius:50%;background:#EF4444;font-size:9px;font-weight:700;color:#fff;display:flex;align-items:center;justify-content:center;border:2px solid #0B0F17;}
+.chat-msg-user{background:rgba(16,185,129,0.15);border:1px solid rgba(16,185,129,0.2);margin-left:auto;border-radius:12px 12px 4px 12px;}
+.chat-msg-admin{background:rgba(30,41,59,0.8);border:1px solid rgba(30,41,59,0.9);margin-right:auto;border-radius:12px 12px 12px 4px;}
+.plan-card{background:rgba(19,26,38,0.85);border:1px solid rgba(30,41,59,0.6);border-radius:16px;padding:24px;transition:all .3s;cursor:default;}
+.plan-card:hover{border-color:rgba(16,185,129,0.4);box-shadow:0 8px 32px rgba(0,0,0,0.4);}
+.plan-card.featured{border-color:rgba(16,185,129,0.5);box-shadow:0 0 40px rgba(16,185,129,0.1);}
+.metric-card{position:relative;overflow:hidden;}
+.metric-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,#10B981,transparent);opacity:0;transition:opacity .3s;}
+.metric-card:hover::before{opacity:1;}
+.hidden{display:none!important;}
+select.input-dark option{background:#131A26;color:#E2E8F0;}
+.profit{color:#10B981;}
+.loss{color:#EF4444;}
+</style>
+</head>
+<body>
+
+<!-- Toast -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- ═══════════════════════════════════════════════════════
+     AUTH SCREEN
+═══════════════════════════════════════════════════════ -->
+<div id="authScreen" class="min-h-screen flex items-center justify-center p-4" style="background:radial-gradient(ellipse at 20% 50%,rgba(16,185,129,.06) 0%,transparent 50%),radial-gradient(ellipse at 80% 20%,rgba(59,130,246,.06) 0%,transparent 50%),#0B0F17">
+  <div class="w-full max-w-md">
+    <div class="text-center mb-8">
+      <div class="inline-flex items-center gap-3 mb-2">
+        <div style="background:linear-gradient(135deg,#10B981,#059669);border-radius:10px;padding:8px;display:flex;align-items:center;justify-content:center;">
+          <svg width="22" height="22" fill="none" stroke="white" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
+        </div>
+        <span class="text-2xl font-bold tracking-tight">Samtrader Pro</span>
+      </div>
+      <p class="text-sm" style="color:#94A3B8;">Suite profesional para traders de MetaTrader 5</p>
+    </div>
+    <div class="glass-card rounded-2xl p-8">
+      <div class="flex rounded-xl overflow-hidden mb-6" style="background:rgba(11,15,23,.6);padding:4px;">
+        <button id="tabLogin" onclick="showTab('login')" class="flex-1 py-2.5 text-sm font-semibold rounded-lg transition-all" style="background:#131A26;color:#E2E8F0;">Iniciar Sesión</button>
+        <button id="tabRegister" onclick="showTab('register')" class="flex-1 py-2.5 text-sm font-semibold rounded-lg transition-all" style="color:#94A3B8;">Registrarse</button>
+      </div>
+      <div id="formLogin">
+        <div class="space-y-4">
+          <div><label class="block text-sm font-medium mb-1.5" style="color:#94A3B8;">Email</label><input id="loginEmail" type="email" placeholder="tu@email.com" class="input-dark w-full px-4 py-3 rounded-xl text-sm"/></div>
+          <div><label class="block text-sm font-medium mb-1.5" style="color:#94A3B8;">Contraseña</label><input id="loginPassword" type="password" placeholder="••••••••" class="input-dark w-full px-4 py-3 rounded-xl text-sm"/></div>
+          <button onclick="handleLogin()" class="btn-green w-full py-3 rounded-xl text-sm font-semibold">Entrar a la plataforma</button>
+          <button onclick="handleForgotPassword()" class="w-full text-center text-xs btn-ghost py-1">¿Olvidaste tu contraseña?</button>
+        </div>
+      </div>
+      <div id="formRegister" class="hidden">
+        <div class="space-y-4">
+          <div><label class="block text-sm font-medium mb-1.5" style="color:#94A3B8;">Nombre completo</label><input id="regNombre" type="text" placeholder="Tu nombre" class="input-dark w-full px-4 py-3 rounded-xl text-sm"/></div>
+          <div><label class="block text-sm font-medium mb-1.5" style="color:#94A3B8;">Email</label><input id="regEmail" type="email" placeholder="tu@email.com" class="input-dark w-full px-4 py-3 rounded-xl text-sm"/></div>
+          <div><label class="block text-sm font-medium mb-1.5" style="color:#94A3B8;">Contraseña</label><input id="regPassword" type="password" placeholder="Mínimo 8 caracteres" class="input-dark w-full px-4 py-3 rounded-xl text-sm"/></div>
+          <button onclick="handleRegister()" class="btn-green w-full py-3 rounded-xl text-sm font-semibold">Crear cuenta</button>
+        </div>
+      </div>
+    </div>
+    <p class="text-center text-xs mt-4" style="color:#475569;">Al registrarte aceptas los Términos de uso y Política de privacidad</p>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════
+     MAIN APP
+═══════════════════════════════════════════════════════ -->
+<div id="mainApp" class="hidden min-h-screen flex flex-col">
+
+  <!-- TOP NAV -->
+  <nav class="glass-nav sticky top-0 z-50 flex items-center justify-between px-5 py-3">
+    <div class="flex items-center gap-3">
+      <div style="background:linear-gradient(135deg,#10B981,#059669);border-radius:8px;padding:6px;display:flex;align-items:center;justify-content:center;">
+        <svg width="16" height="16" fill="none" stroke="white" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
+      </div>
+      <span class="text-base font-bold tracking-tight">Samtrader Pro</span>
+      <span class="text-xs px-2 py-0.5 rounded-full font-bold" style="background:rgba(16,185,129,.15);color:#10B981;">SUITE</span>
+    </div>
+    <div class="relative">
+      <button onclick="toggleUserMenu()" class="flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-white/5 transition-all">
+        <div id="userAvatar" class="w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold" style="background:linear-gradient(135deg,#10B981,#3B82F6);">J</div>
+        <div class="hidden md:block text-left">
+          <p id="navUserName" class="text-sm font-semibold leading-tight">Cargando...</p>
+          <p id="navUserPlan" class="text-xs" style="color:#10B981;">Gratis</p>
+        </div>
+        <svg width="12" height="12" fill="none" stroke="#94A3B8" stroke-width="2" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
+      </button>
+      <div id="userMenu" class="hidden absolute right-0 top-full mt-2 w-52 rounded-xl shadow-2xl" style="background:#131A26;border:1px solid rgba(30,41,59,0.8);z-index:200;">
+        <div class="p-3 border-b" style="border-color:rgba(30,41,59,.6);">
+          <p id="menuUserEmail" class="text-xs" style="color:#94A3B8;">email@ejemplo.com</p>
+        </div>
+        <div class="p-2">
+          <button onclick="showSection('perfil');closeUserMenu()" class="w-full text-left px-3 py-2 rounded-lg text-sm hover:bg-white/5 flex items-center gap-2" style="color:#E2E8F0;background:none;border:none;cursor:pointer;">
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Mi Perfil
+          </button>
+          <button onclick="handleLogout()" class="w-full text-left px-3 py-2 rounded-lg text-sm hover:bg-red-500/10 flex items-center gap-2" style="color:#EF4444;background:none;border:none;cursor:pointer;">
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>Cerrar sesión
+          </button>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- BODY -->
+  <div class="flex flex-1 overflow-hidden">
+
+    <!-- SIDEBAR -->
+    <aside class="w-56 flex-shrink-0 border-r p-3 flex flex-col gap-0.5 overflow-y-auto" style="background:#0B0F17;border-color:rgba(30,41,59,.5);">
+      <p class="text-xs font-semibold uppercase tracking-wider px-3 py-2 mb-1" style="color:#475569;">Principal</p>
+      <button class="nav-item active" id="nav-dashboard" onclick="showSection('dashboard')">
+        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>Dashboard
+      </button>
+      <button class="nav-item" id="nav-diario" onclick="showSection('diario')">
+        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>Diario
+      </button>
+      <button class="nav-item" id="nav-planes" onclick="showSection('planes')">
+        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>Planes & Pagos
+      </button>
+      <button class="nav-item" id="nav-perfil" onclick="showSection('perfil')">
+        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Mi Perfil
+      </button>
+      <button class="nav-item hidden" id="nav-admin" onclick="showSection('admin')">
+        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>Admin Panel
+      </button>
+
+            <!-- Herramientas adicionales -->
+      <p class="text-xs font-semibold uppercase tracking-wider px-3 py-2 mt-1" style="color:#475569;font-size:10px;">Herramientas</p>
+      <button class="nav-item" id="nav-calculadora" onclick="showSection('calculadora')">
+        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>Calculadora
+      </button>
+      <button class="nav-item" id="nav-noticias" onclick="showSection('noticias')">
+        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>Noticias
+      </button>
+      <button class="nav-item" id="nav-referidos" onclick="showSection('referidos')">
+        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>Referidos
+      </button>
+      <button class="nav-item" id="nav-logros" onclick="showSection('logros')">
+        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/></svg>Logros
+      </button>
+      <button class="nav-item" id="nav-descargas" onclick="showSection('descargas')">
+        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>EAs &amp; Descargas
+      </button>
+
+      <!-- Token box -->
+      <div class="mt-auto pt-4 p-3 rounded-xl" style="background:rgba(16,185,129,.05);border:1px solid rgba(16,185,129,.2);">
+        <p class="text-xs font-semibold mb-1" style="color:#10B981;">Token MT5</p>
+        <p id="sidebarToken" class="text-xs mono break-all" style="color:#94A3B8;">—</p>
+        <button onclick="copyToken()" class="mt-2 text-xs px-2 py-1 rounded-lg w-full" style="background:rgba(16,185,129,.15);color:#10B981;border:none;cursor:pointer;">Copiar Token</button>
+      </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="flex-1 overflow-y-auto p-5">
+
+      <!-- ══════════ DASHBOARD ══════════ -->
+      <div id="section-dashboard">
+        <div class="mb-5">
+          <h1 class="text-xl font-bold">Dashboard</h1>
+          <p class="text-xs mt-0.5" style="color:#94A3B8;">Resumen de tu actividad de trading</p>
+        </div>
+
+        <!-- KPI Cards -->
+        <div class="grid grid-cols-2 lg:grid-cols-5 gap-3 mb-5">
+          <div class="glass-card metric-card rounded-xl p-4">
+            <p class="text-xs font-semibold uppercase tracking-wider mb-2" style="color:#94A3B8;">Win Rate</p>
+            <p id="kpiWinRate" class="text-2xl font-bold" style="color:#10B981;">—%</p>
+          </div>
+          <div class="glass-card metric-card rounded-xl p-4">
+            <p class="text-xs font-semibold uppercase tracking-wider mb-2" style="color:#94A3B8;">Beneficio Neto</p>
+            <p id="kpiNetProfit" class="text-2xl font-bold">—</p>
+          </div>
+          <div class="glass-card metric-card rounded-xl p-4">
+            <p class="text-xs font-semibold uppercase tracking-wider mb-2" style="color:#94A3B8;">Factor Beneficio</p>
+            <p id="kpiProfitFactor" class="text-2xl font-bold" style="color:#3B82F6;">—</p>
+          </div>
+          <div class="glass-card metric-card rounded-xl p-4">
+            <p class="text-xs font-semibold uppercase tracking-wider mb-2" style="color:#94A3B8;">Max Drawdown</p>
+            <p id="kpiDrawdown" class="text-2xl font-bold" style="color:#EF4444;">—%</p>
+          </div>
+          <div class="glass-card metric-card rounded-xl p-4">
+            <p class="text-xs font-semibold uppercase tracking-wider mb-2" style="color:#94A3B8;">Total Trades</p>
+            <p id="kpiTotal" class="text-2xl font-bold" style="color:#8B5CF6;">0</p>
+          </div>
+        </div>
+
+        <!-- Charts Row -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-5">
+          <div class="glass-card rounded-xl p-5 lg:col-span-2">
+            <h3 class="text-sm font-semibold mb-4">Curva de Capital</h3>
+            <div style="height:220px;"><canvas id="equityChart"></canvas></div>
+          </div>
+          <div class="glass-card rounded-xl p-5">
+            <h3 class="text-sm font-semibold mb-4">Rendimiento por Activo</h3>
+            <div id="assetPerf" style="font-size:12px;color:#94A3B8;">Sin datos aún. Importa trades desde el Diario.</div>
+          </div>
+        </div>
+
+        <!-- EAs Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div class="glass-card rounded-xl p-4" style="border-color:rgba(59,130,246,.2);">
+            <div class="flex items-center gap-3 mb-2"><div class="p-2 rounded-lg" style="background:rgba(59,130,246,.1);"><svg width="14" height="14" fill="none" stroke="#3B82F6" stroke-width="2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div><div><p class="font-semibold text-sm">Risk Manager Pro</p><p class="text-xs" style="color:#3B82F6;">v13.5</p></div></div>
+            <p class="text-xs" style="color:#94A3B8;">Lotaje automático, Prop Firm mode, Auto Breakeven, Trailing Stop.</p>
+          </div>
+          <div class="glass-card rounded-xl p-4" style="border-color:rgba(16,185,129,.2);">
+            <div class="flex items-center gap-3 mb-2"><div class="p-2 rounded-lg" style="background:rgba(16,185,129,.1);"><svg width="14" height="14" fill="none" stroke="#10B981" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/></svg></div><div><p class="font-semibold text-sm">Auto-Journaling</p><p class="text-xs" style="color:#10B981;">v2.13</p></div></div>
+            <p class="text-xs" style="color:#94A3B8;">Captura automática con screenshots HD y sincronización en tiempo real.</p>
+          </div>
+          <div class="glass-card rounded-xl p-4" style="border-color:rgba(139,92,246,.2);">
+            <div class="flex items-center gap-3 mb-2"><div class="p-2 rounded-lg" style="background:rgba(139,92,246,.1);"><svg width="14" height="14" fill="none" stroke="#8B5CF6" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></div><div><p class="font-semibold text-sm">Backtest Simulator</p><p class="text-xs" style="color:#8B5CF6;">v4.2</p></div></div>
+            <p class="text-xs" style="color:#94A3B8;">Simulador histórico vela a vela con TP/SL arrastrables.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══════════ DIARIO ══════════ -->
+      <div id="section-diario" class="hidden">
+        <div class="mb-5 flex items-start justify-between gap-3 flex-wrap">
+          <div><h1 class="text-xl font-bold">Diario de Trading</h1><p class="text-xs mt-0.5" style="color:#94A3B8;">Tus operaciones se guardan localmente en este navegador</p></div>
+          <div class="flex gap-2 flex-wrap">
+            <button onclick="document.getElementById('csvFileInput').click()" class="btn-blue text-xs px-3 py-2 rounded-lg font-medium">⬆ Importar CSV/HTML</button>
+            <input type="file" id="csvFileInput" accept=".csv,.html,.htm" class="hidden" onchange="importFile(event)"/>
+            <button onclick="exportCSV()" class="btn-outline text-xs px-3 py-2 rounded-lg font-medium">⬇ Exportar CSV</button>
+            <button onclick="exportJSON()" class="btn-outline text-xs px-3 py-2 rounded-lg font-medium">⬇ Respaldo JSON</button>
+            <button onclick="document.getElementById('jsonImportInput').click()" class="btn-outline text-xs px-3 py-2 rounded-lg font-medium">⬆ Importar JSON</button>
+            <input type="file" id="jsonImportInput" accept=".json" class="hidden" onchange="importJSON(event)"/>
+            <button onclick="openAddTradeModal()" class="btn-green text-xs px-3 py-2 rounded-lg font-medium">+ Añadir Trade</button>
+          </div>
+        </div>
+
+        <!-- Filters -->
+        <div class="glass-card rounded-xl p-4 mb-4 flex gap-3 flex-wrap items-end">
+          <div>
+            <label class="block text-xs mb-1" style="color:#94A3B8;">Activo</label>
+            <input id="filterActivo" oninput="renderJournal()" placeholder="EURUSD..." class="input-dark px-3 py-2 rounded-lg text-xs" style="width:120px;"/>
+          </div>
+          <div>
+            <label class="block text-xs mb-1" style="color:#94A3B8;">Resultado</label>
+            <select id="filterResult" onchange="renderJournal()" class="input-dark px-3 py-2 rounded-lg text-xs">
+              <option value="all">Todos</option>
+              <option value="win">Ganadoras</option>
+              <option value="loss">Perdedoras</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs mb-1" style="color:#94A3B8;">Desde</label>
+            <input id="filterFrom" type="date" onchange="renderJournal()" class="input-dark px-3 py-2 rounded-lg text-xs"/>
+          </div>
+          <div>
+            <label class="block text-xs mb-1" style="color:#94A3B8;">Hasta</label>
+            <input id="filterTo" type="date" onchange="renderJournal()" class="input-dark px-3 py-2 rounded-lg text-xs"/>
+          </div>
+          <button onclick="clearFilters()" class="btn-ghost text-xs px-2 py-2">✕ Limpiar</button>
+        </div>
+
+        <div class="glass-card rounded-xl overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full text-xs">
+              <thead><tr style="border-bottom:1px solid rgba(30,41,59,.5);">
+                <th class="text-left px-4 py-3 font-semibold uppercase tracking-wider" style="color:#475569;">Fecha</th>
+                <th class="text-left px-4 py-3 font-semibold uppercase tracking-wider" style="color:#475569;">Activo</th>
+                <th class="text-left px-4 py-3 font-semibold uppercase tracking-wider" style="color:#475569;">Tipo</th>
+                <th class="text-right px-4 py-3 font-semibold uppercase tracking-wider" style="color:#475569;">Lotes</th>
+                <th class="text-right px-4 py-3 font-semibold uppercase tracking-wider" style="color:#475569;">Entrada</th>
+                <th class="text-right px-4 py-3 font-semibold uppercase tracking-wider" style="color:#475569;">Salida</th>
+                <th class="text-right px-4 py-3 font-semibold uppercase tracking-wider" style="color:#475569;">Pips</th>
+                <th class="text-right px-4 py-3 font-semibold uppercase tracking-wider" style="color:#475569;">USD</th>
+                <th class="text-center px-4 py-3 font-semibold uppercase tracking-wider" style="color:#475569;">📷</th>
+                <th class="text-right px-4 py-3" style="color:#475569;"></th>
+              </tr></thead>
+              <tbody id="journalTableBody">
+                <tr><td colspan="10" class="text-center py-12" style="color:#475569;">No hay trades. Importa un CSV o añade manualmente.</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <!-- Pagination -->
+          <div class="flex items-center justify-between px-4 py-3 border-t" style="border-color:rgba(30,41,59,.5);">
+            <span id="journalPageInfo" class="text-xs" style="color:#475569;">—</span>
+            <div class="flex gap-2">
+              <button onclick="journalPage(-1)" class="btn-outline text-xs px-3 py-1.5 rounded-lg">← Ant</button>
+              <button onclick="journalPage(1)" class="btn-outline text-xs px-3 py-1.5 rounded-lg">Sig →</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══════════ PLANES & PAGOS ══════════ -->
+      <div id="section-planes" class="hidden">
+        <div class="mb-5"><h1 class="text-xl font-bold">Planes & Pagos</h1><p class="text-xs mt-0.5" style="color:#94A3B8;">Elige tu plan y notifica tu pago al administrador</p></div>
+
+        <!-- Plan Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-8">
+          <!-- Gratis -->
+          <div class="plan-card">
+            <div class="text-xs font-bold uppercase tracking-wider mb-3" style="color:#94A3B8;">GRATIS</div>
+            <div class="text-3xl font-bold mb-1">$0<span class="text-sm font-normal" style="color:#94A3B8;">/mes</span></div>
+            <p class="text-xs mb-5" style="color:#94A3B8;">Para empezar</p>
+            <ul class="space-y-2 text-xs" style="color:#94A3B8;">
+              <li class="flex items-center gap-2"><span style="color:#10B981;">✓</span> Diario local básico</li>
+              <li class="flex items-center gap-2"><span style="color:#10B981;">✓</span> Token de licencia</li>
+              <li class="flex items-center gap-2"><span style="color:#10B981;">✓</span> Acceso a los 3 EAs</li>
+              <li class="flex items-center gap-2"><span style="color:#EF4444;">✕</span> Exportar PDF</li>
+              <li class="flex items-center gap-2"><span style="color:#EF4444;">✕</span> Soporte prioritario</li>
+            </ul>
+          </div>
+          <!-- Premium -->
+          <div class="plan-card featured">
+            <div class="text-xs font-bold uppercase tracking-wider mb-3" style="color:#3B82F6;">⭐ PREMIUM</div>
+            <div class="text-3xl font-bold mb-1" style="color:#3B82F6;">$29<span class="text-sm font-normal" style="color:#94A3B8;">/mes</span></div>
+            <p class="text-xs mb-5" style="color:#94A3B8;">Para traders activos</p>
+            <ul class="space-y-2 text-xs" style="color:#94A3B8;">
+              <li class="flex items-center gap-2"><span style="color:#10B981;">✓</span> Todo lo de Gratis</li>
+              <li class="flex items-center gap-2"><span style="color:#10B981;">✓</span> Exportar CSV y JSON</li>
+              <li class="flex items-center gap-2"><span style="color:#10B981;">✓</span> Métricas avanzadas</li>
+              <li class="flex items-center gap-2"><span style="color:#10B981;">✓</span> Soporte por chat</li>
+              <li class="flex items-center gap-2"><span style="color:#EF4444;">✕</span> Exportar PDF</li>
+            </ul>
+            <button onclick="openPayModal('premium')" class="btn-blue w-full py-2 rounded-xl text-sm font-semibold mt-5">Contratar Premium</button>
+          </div>
+          <!-- Elite -->
+          <div class="plan-card" style="border-color:rgba(139,92,246,.4);">
+            <div class="text-xs font-bold uppercase tracking-wider mb-3" style="color:#8B5CF6;">👑 ELITE</div>
+            <div class="text-3xl font-bold mb-1" style="color:#8B5CF6;">$59<span class="text-sm font-normal" style="color:#94A3B8;">/mes</span></div>
+            <p class="text-xs mb-5" style="color:#94A3B8;">Para profesionales</p>
+            <ul class="space-y-2 text-xs" style="color:#94A3B8;">
+              <li class="flex items-center gap-2"><span style="color:#10B981;">✓</span> Todo lo de Premium</li>
+              <li class="flex items-center gap-2"><span style="color:#10B981;">✓</span> Exportar PDF</li>
+              <li class="flex items-center gap-2"><span style="color:#10B981;">✓</span> Análisis IA (próx.)</li>
+              <li class="flex items-center gap-2"><span style="color:#10B981;">✓</span> Soporte VIP 24/7</li>
+              <li class="flex items-center gap-2"><span style="color:#10B981;">✓</span> Acceso anticipado</li>
+            </ul>
+            <button onclick="openPayModal('elite')" class="btn-purple w-full py-2 rounded-xl text-sm font-semibold mt-5">Contratar Elite</button>
+          </div>
+        </div>
+
+        <!-- Payment Methods Info -->
+        <div class="glass-card rounded-xl p-6">
+          <h3 class="font-semibold mb-4 text-sm">Métodos de Pago Aceptados</h3>
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-xs">
+            <div class="p-4 rounded-xl text-center" style="background:rgba(30,41,59,.4);">
+              <div class="text-2xl mb-2">🏦</div>
+              <p class="font-semibold">PIX</p>
+              <p style="color:#94A3B8;" id="infoPixKey">Ver instrucciones en el modal</p>
+            </div>
+            <div class="p-4 rounded-xl text-center" style="background:rgba(30,41,59,.4);">
+              <div class="text-2xl mb-2">💰</div>
+              <p class="font-semibold">PayPal</p>
+              <p style="color:#94A3B8;" id="infoPaypalEmail">Ver instrucciones en el modal</p>
+            </div>
+            <div class="p-4 rounded-xl text-center" style="background:rgba(30,41,59,.4);">
+              <div class="text-2xl mb-2">🔷</div>
+              <p class="font-semibold">USDT (TRC20)</p>
+              <p style="color:#94A3B8;" id="infoUsdtWallet">Ver instrucciones en el modal</p>
+            </div>
+            <div class="p-4 rounded-xl text-center" style="background:rgba(30,41,59,.4);">
+              <div class="text-2xl mb-2">🔵</div>
+              <p class="font-semibold">USDC</p>
+              <p style="color:#94A3B8;">Misma dirección USDT</p>
+            </div>
+          </div>
+          <div class="mt-4 p-3 rounded-xl text-xs" style="background:rgba(59,130,246,.08);border:1px solid rgba(59,130,246,.2);color:#94A3B8;">
+            ⚠️ Tras realizar el pago, usa el botón "Contratar" del plan deseado para notificar al administrador con tu comprobante. El admin verificará y activará tu plan en menos de 24 horas.
+          </div>
+        </div>
+      </div>
+
+      <!-- ══════════ PERFIL ══════════ -->
+      <div id="section-perfil" class="hidden">
+        <div class="mb-5"><h1 class="text-xl font-bold">Mi Perfil</h1><p class="text-xs mt-0.5" style="color:#94A3B8;">Gestiona tu información y configuración</p></div>
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+          <div class="lg:col-span-2 space-y-4">
+            <div class="glass-card rounded-xl p-5">
+              <h3 class="font-semibold text-sm mb-4">Información Personal</h3>
+              <div class="space-y-4">
+                <div><label class="block text-xs font-medium mb-1.5" style="color:#94A3B8;">Nombre completo</label><input id="profileNombre" type="text" class="input-dark w-full px-4 py-3 rounded-xl text-sm"/></div>
+                <div><label class="block text-xs font-medium mb-1.5" style="color:#94A3B8;">Email</label><input id="profileEmail" type="email" class="input-dark w-full px-4 py-3 rounded-xl text-sm" disabled/></div>
+                <div><label class="block text-xs font-medium mb-1.5" style="color:#94A3B8;">Cuenta MT5 <span style="color:#475569;">(Solo el admin puede modificar)</span></label><input id="profileMt5" type="text" class="input-dark w-full px-4 py-3 rounded-xl text-sm" disabled placeholder="Asignada por administrador"/></div>
+                <div><label class="block text-xs font-medium mb-1.5" style="color:#94A3B8;">Servidor MT5</label><input id="profileServidor" type="text" class="input-dark w-full px-4 py-3 rounded-xl text-sm" disabled placeholder="Asignado por administrador"/></div>
+              </div>
+            </div>
+            <div class="glass-card rounded-xl p-5">
+              <h3 class="font-semibold text-sm mb-4">Activos de Trading</h3>
+              <textarea id="profileActivos" rows="2" class="input-dark w-full px-4 py-3 rounded-xl text-sm resize-none" placeholder="EURUSD, GBPUSD, Volatility 75 Index"></textarea>
+              <button onclick="saveProfile()" class="btn-green px-5 py-2.5 rounded-xl text-sm font-semibold mt-3">Guardar cambios</button>
+            </div>
+          </div>
+          <div class="space-y-4">
+            <div class="glass-card rounded-xl p-4" style="border-color:rgba(16,185,129,.2);">
+              <h3 class="font-semibold text-sm mb-3 flex items-center gap-2"><svg width="14" height="14" fill="none" stroke="#10B981" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>Token de Licencia</h3>
+              <p id="profileToken" class="text-xs mono p-3 rounded-xl break-all" style="background:rgba(11,15,23,.8);color:#10B981;border:1px solid rgba(16,185,129,.2);">—</p>
+              <button onclick="copyToken()" class="btn-outline w-full py-2 rounded-xl text-xs mt-2">Copiar Token</button>
+            </div>
+            <div class="glass-card rounded-xl p-4">
+              <h3 class="font-semibold text-sm mb-2" style="color:#94A3B8;">Estado del Plan</h3>
+              <p id="profilePlanBadge" class="font-bold capitalize" style="color:#10B981;">Gratis</p>
+              <p id="profilePlanExp" class="text-xs mt-1" style="color:#475569;">Actualiza tu plan para más funciones</p>
+              <p id="profileFechaReg" class="text-xs mt-2" style="color:#475569;">—</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══════════ ADMIN ══════════ -->
+      <div id="section-admin" class="hidden">
+        <div class="mb-5 flex items-center gap-3">
+          <span class="text-xs px-2 py-1 rounded-lg font-bold" style="background:rgba(239,68,68,.15);color:#EF4444;">ADMIN</span>
+          <div><h1 class="text-xl font-bold">Panel de Administración</h1><p class="text-xs" style="color:#94A3B8;">Control total de usuarios, licencias y membresías</p></div>
+        </div>
+
+        <!-- Admin Tabs -->
+        <div class="flex gap-2 mb-5 flex-wrap">
+          <button onclick="showAdminTab('usuarios')" id="adminTab-usuarios" class="px-4 py-2 rounded-xl text-xs font-semibold" style="background:rgba(16,185,129,.15);color:#10B981;border:1px solid rgba(16,185,129,.3);">👥 Usuarios</button>
+          <button onclick="showAdminTab('membresia')" id="adminTab-membresia" class="px-4 py-2 rounded-xl text-xs font-semibold btn-outline">🎁 Membresía</button>
+          <button onclick="showAdminTab('pagos')" id="adminTab-pagos" class="px-4 py-2 rounded-xl text-xs font-semibold btn-outline">💳 Pagos</button>
+          <button onclick="showAdminTab('chats')" id="adminTab-chats" class="px-4 py-2 rounded-xl text-xs font-semibold btn-outline">💬 Chats <span id="chatUnreadBadge" class="hidden ml-1 px-1.5 py-0.5 rounded-full text-xs font-bold" style="background:#EF4444;color:#fff;">0</span></button>
+          <button onclick="showAdminTab('licencias')" id="adminTab-licencias" class="px-4 py-2 rounded-xl text-xs font-semibold btn-outline">&#128273; Licencias EA</button>
+          <button onclick="showAdminTab('logslic')" id="adminTab-logslic" class="px-4 py-2 rounded-xl text-xs font-semibold btn-outline">&#128203; Logs</button>
+        </div>
+
+        <!-- Tab: Usuarios -->
+        <div id="adminContent-usuarios">
+          <div class="glass-card rounded-xl overflow-hidden">
+            <div class="p-4 border-b flex items-center gap-3" style="border-color:rgba(30,41,59,.5);">
+              <input id="adminSearch" oninput="filterUsers()" placeholder="Buscar por nombre..." class="input-dark flex-1 px-3 py-2 rounded-lg text-xs"/>
+              <button onclick="loadAllUsers()" class="btn-blue text-xs px-3 py-2 rounded-lg font-medium">↺ Actualizar</button>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="w-full text-xs">
+                <thead><tr style="border-bottom:1px solid rgba(30,41,59,.5);">
+                  <th class="text-left px-4 py-3 font-semibold uppercase tracking-wider" style="color:#475569;">Usuario</th>
+                  <th class="text-left px-4 py-3 font-semibold uppercase tracking-wider" style="color:#475569;">Plan</th>
+                  <th class="text-left px-4 py-3 font-semibold uppercase tracking-wider" style="color:#475569;">Cuenta MT5</th>
+                  <th class="text-left px-4 py-3 font-semibold uppercase tracking-wider" style="color:#475569;">Estado</th>
+                  <th class="text-left px-4 py-3 font-semibold uppercase tracking-wider" style="color:#475569;">Registro</th>
+                  <th class="text-right px-4 py-3" style="color:#475569;">Acciones</th>
+                </tr></thead>
+                <tbody id="adminUsersTable"><tr><td colspan="6" class="text-center py-10" style="color:#475569;">Cargando...</td></tr></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab: Membresía -->
+        <div id="adminContent-membresia" class="hidden">
+          <div class="glass-card rounded-xl p-5 max-w-lg">
+            <h3 class="font-semibold text-sm mb-5">Otorgar Membresía Gratis</h3>
+            <div class="space-y-4">
+              <div><label class="block text-xs font-medium mb-1.5" style="color:#94A3B8;">Usuario</label><select id="membresiaUserId" class="input-dark w-full px-4 py-3 rounded-xl text-sm"><option>Cargando...</option></select></div>
+              <div><label class="block text-xs font-medium mb-1.5" style="color:#94A3B8;">Plan</label><select id="membresiaPlan" class="input-dark w-full px-4 py-3 rounded-xl text-sm"><option value="premium">Premium</option><option value="elite">Elite</option><option value="gratis">Gratis (bajar)</option></select></div>
+              <div><label class="block text-xs font-medium mb-1.5" style="color:#94A3B8;">Duración</label><select id="membresiaDuration" class="input-dark w-full px-4 py-3 rounded-xl text-sm"><option value="1">1 mes</option><option value="3">3 meses</option><option value="6">6 meses</option><option value="12">12 meses</option><option value="0">Permanente</option></select></div>
+              <button onclick="grantMembership()" class="btn-green w-full py-2.5 rounded-xl text-sm font-semibold">✓ Otorgar Membresía</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab: Pagos -->
+        <div id="adminContent-pagos" class="hidden">
+          <div class="glass-card rounded-xl overflow-hidden">
+            <div class="p-4 border-b flex items-center justify-between" style="border-color:rgba(30,41,59,.5);">
+              <h3 class="font-semibold text-sm">Solicitudes Pendientes</h3>
+              <button onclick="loadPagos()" class="btn-blue text-xs px-3 py-2 rounded-lg">↺ Actualizar</button>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="w-full text-xs">
+                <thead><tr style="border-bottom:1px solid rgba(30,41,59,.5);">
+                  <th class="text-left px-4 py-3 font-semibold uppercase tracking-wider" style="color:#475569;">Usuario</th>
+                  <th class="text-left px-4 py-3 font-semibold uppercase tracking-wider" style="color:#475569;">Método</th>
+                  <th class="text-left px-4 py-3 font-semibold uppercase tracking-wider" style="color:#475569;">Monto</th>
+                  <th class="text-left px-4 py-3 font-semibold uppercase tracking-wider" style="color:#475569;">Plan</th>
+                  <th class="text-left px-4 py-3 font-semibold uppercase tracking-wider" style="color:#475569;">Fecha</th>
+                  <th class="text-right px-4 py-3" style="color:#475569;">Acción</th>
+                </tr></thead>
+                <tbody id="pagosTable"><tr><td colspan="6" class="text-center py-10" style="color:#475569;">Cargando...</td></tr></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab: Chats -->
+        <div id="adminContent-chats" class="hidden">
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-4" style="height:520px;">
+            <div class="glass-card rounded-xl overflow-hidden flex flex-col">
+              <div class="p-3 border-b font-semibold text-xs" style="border-color:rgba(30,41,59,.5);">Conversaciones</div>
+              <div id="adminConvList" class="flex-1 overflow-y-auto" style="font-size:12px;color:#94A3B8;padding:8px;">Cargando...</div>
+            </div>
+            <div class="lg:col-span-2 glass-card rounded-xl overflow-hidden flex flex-col">
+              <div id="adminChatHeader" class="p-3 border-b text-xs font-semibold" style="border-color:rgba(30,41,59,.5);">Selecciona una conversación</div>
+              <div id="adminChatMessages" class="flex-1 overflow-y-auto p-3 space-y-2" style="font-size:12px;color:#94A3B8;">—</div>
+              <div class="p-3 border-t flex gap-2" style="border-color:rgba(30,41,59,.5);">
+                <input id="adminChatInput" class="input-dark flex-1 px-3 py-2 rounded-lg text-xs" placeholder="Escribe respuesta..." onkeydown="if(event.key==='Enter')sendAdminMessage()"/>
+                <button onclick="sendAdminMessage()" class="btn-green px-3 py-2 rounded-lg text-xs font-medium">Enviar</button>
+              </div>
+            </div>
+          </div>
+
+        <!-- Tab: Licencias EA -->
+        <div id="adminContent-licencias" class="hidden">
+          <div class="glass-card rounded-xl overflow-hidden">
+            <div class="p-4 border-b flex items-center justify-between" style="border-color:rgba(30,41,59,.5);">
+              <h3 class="font-semibold text-sm">&#128273; Licencias EA Activas</h3>
+              <button onclick="loadLicencias()" class="btn-blue text-xs px-3 py-2 rounded-lg">&#8634; Actualizar</button>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="w-full text-xs">
+                <thead><tr style="border-bottom:1px solid rgba(30,41,59,.5);">
+                  <th class="text-left px-4 py-3 font-semibold uppercase tracking-wider" style="color:#475569;">Usuario</th>
+                  <th class="text-left px-4 py-3 font-semibold uppercase tracking-wider" style="color:#475569;">EA Tipo</th>
+                  <th class="text-left px-4 py-3 font-semibold uppercase tracking-wider" style="color:#475569;">Cuenta MT5</th>
+                  <th class="text-left px-4 py-3 font-semibold uppercase tracking-wider" style="color:#475569;">&#218;lt. Heartbeat</th>
+                  <th class="text-left px-4 py-3 font-semibold uppercase tracking-wider" style="color:#475569;">Estado</th>
+                  <th class="text-right px-4 py-3" style="color:#475569;">Acc.</th>
+                </tr></thead>
+                <tbody id="licenciasTable"><tr><td colspan="6" class="text-center py-10" style="color:#475569;">Haz clic en Actualizar</td></tr></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab: Logs Licencias -->
+        <div id="adminContent-logslic" class="hidden">
+          <div class="glass-card rounded-xl overflow-hidden">
+            <div class="p-4 border-b flex items-center justify-between" style="border-color:rgba(30,41,59,.5);">
+              <h3 class="font-semibold text-sm">&#128203; Logs de Validaci&#243;n (&#250;ltimos 100)</h3>
+              <button onclick="loadLogsLic()" class="btn-blue text-xs px-3 py-2 rounded-lg">&#8634; Actualizar</button>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="w-full text-xs">
+                <thead><tr style="border-bottom:1px solid rgba(30,41,59,.5);">
+                  <th class="text-left px-4 py-3 font-semibold uppercase tracking-wider" style="color:#475569;">Fecha</th>
+                  <th class="text-left px-4 py-3 font-semibold uppercase tracking-wider" style="color:#475569;">Token</th>
+                  <th class="text-left px-4 py-3 font-semibold uppercase tracking-wider" style="color:#475569;">EA</th>
+                  <th class="text-left px-4 py-3 font-semibold uppercase tracking-wider" style="color:#475569;">Cuenta</th>
+                  <th class="text-left px-4 py-3 font-semibold uppercase tracking-wider" style="color:#475569;">&#201;xito</th>
+                  <th class="text-left px-4 py-3 font-semibold uppercase tracking-wider" style="color:#475569;">Motivo</th>
+                </tr></thead>
+                <tbody id="logsLicTable"><tr><td colspan="6" class="text-center py-10" style="color:#475569;">Haz clic en Actualizar</td></tr></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+      <!-- ═══════════ CALCULADORA DE RIESGO ═══════════ -->
+      <div id="section-calculadora" class="hidden">
+        <div class="mb-5">
+          <h1 class="text-xl font-bold">&#129518; Calculadora de Riesgo</h1>
+          <p class="text-xs mt-0.5" style="color:#94A3B8;">Calcula el lotaje &#243;ptimo seg&#250;n tu riesgo</p>
+        </div>
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+          <div class="glass-card rounded-xl p-5">
+            <h3 class="font-semibold text-sm mb-4">Par&#225;metros</h3>
+            <div class="space-y-4">
+              <div>
+                <label class="block text-xs font-medium mb-1.5" style="color:#94A3B8;">Balance de la cuenta ($)</label>
+                <input id="calcBalance" type="number" value="10000" class="input-dark w-full px-4 py-3 rounded-xl text-sm" oninput="calculateRisk()"/>
+              </div>
+              <div>
+                <label class="block text-xs font-medium mb-1.5" style="color:#94A3B8;">Riesgo (%)</label>
+                <div class="flex gap-2 mb-2">
+                  <button onclick="setRiskPct(0.5)" class="btn-outline text-xs px-3 py-1.5 rounded-lg">0.5%</button>
+                  <button onclick="setRiskPct(1)" class="btn-outline text-xs px-3 py-1.5 rounded-lg">1%</button>
+                  <button onclick="setRiskPct(2)" class="btn-outline text-xs px-3 py-1.5 rounded-lg">2%</button>
+                </div>
+                <input id="calcRisk" type="number" value="1" step="0.1" min="0.1" max="10" class="input-dark w-full px-4 py-3 rounded-xl text-sm" oninput="calculateRisk()"/>
+              </div>
+              <div class="grid grid-cols-2 gap-3">
+                <div>
+                  <label class="block text-xs font-medium mb-1.5" style="color:#94A3B8;">Precio Entrada</label>
+                  <input id="calcEntry" type="number" value="1.08000" step="0.00001" class="input-dark w-full px-4 py-3 rounded-xl text-sm" oninput="calculateRisk()"/>
+                </div>
+                <div>
+                  <label class="block text-xs font-medium mb-1.5" style="color:#94A3B8;">Stop Loss</label>
+                  <input id="calcSL" type="number" value="1.07800" step="0.00001" class="input-dark w-full px-4 py-3 rounded-xl text-sm" oninput="calculateRisk()"/>
+                </div>
+              </div>
+              <div>
+                <label class="block text-xs font-medium mb-1.5" style="color:#94A3B8;">Tipo de instrumento</label>
+                <select id="calcInstrument" class="input-dark w-full px-4 py-3 rounded-xl text-sm" onchange="calculateRisk()">
+                  <option value="forex">Forex (par de divisas)</option>
+                  <option value="indices">&#205;ndices (US500, NAS100)</option>
+                  <option value="gold">Oro / XAUUSD</option>
+                  <option value="crypto">Cripto (BTCUSD)</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-xs font-medium mb-1.5" style="color:#94A3B8;">Take Profit (opcional)</label>
+                <input id="calcTP" type="number" value="1.08400" step="0.00001" class="input-dark w-full px-4 py-3 rounded-xl text-sm" oninput="calculateRisk()"/>
+              </div>
+            </div>
+          </div>
+          <div class="space-y-4">
+            <div class="glass-card rounded-xl p-5">
+              <h3 class="font-semibold text-sm mb-4">Resultado</h3>
+              <div class="space-y-3">
+                <div class="flex justify-between items-center p-3 rounded-xl" style="background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.2);">
+                  <span class="text-xs" style="color:#94A3B8;">Lotaje recomendado</span>
+                  <span id="calcResultLot" class="font-bold text-base" style="color:#10B981;">— lotes</span>
+                </div>
+                <div class="flex justify-between items-center p-3 rounded-xl" style="background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);">
+                  <span class="text-xs" style="color:#94A3B8;">Riesgo en dinero</span>
+                  <span id="calcResultRisk" class="font-bold" style="color:#EF4444;">— USD</span>
+                </div>
+                <div class="flex justify-between items-center p-3 rounded-xl" style="background:rgba(96,165,250,.08);border:1px solid rgba(96,165,250,.2);">
+                  <span class="text-xs" style="color:#94A3B8;">Beneficio potencial</span>
+                  <span id="calcResultReward" class="font-bold" style="color:#60A5FA;">— USD</span>
+                </div>
+                <div class="flex justify-between items-center p-3 rounded-xl" style="background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.2);">
+                  <span class="text-xs" style="color:#94A3B8;">Ratio R:B</span>
+                  <span id="calcResultRR" class="font-bold" style="color:#FBBF24;">1 : —</span>
+                </div>
+                <div class="flex justify-between items-center p-3 rounded-xl" style="background:rgba(139,92,246,.08);border:1px solid rgba(139,92,246,.2);">
+                  <span class="text-xs" style="color:#94A3B8;">Pips de SL</span>
+                  <span id="calcResultPips" class="font-bold" style="color:#8B5CF6;">— pips</span>
+                </div>
+              </div>
+              <button onclick="saveRiskCalc()" class="btn-green w-full mt-4 py-2.5 rounded-xl text-sm font-semibold">&#128190; Guardar en historial</button>
+            </div>
+            <div class="glass-card rounded-xl p-5">
+              <h3 class="font-semibold text-sm mb-3">Historial</h3>
+              <div id="calcHistory" class="space-y-2 text-xs" style="color:#94A3B8;max-height:200px;overflow-y:auto;">Sin historial guardado</div>
+              <button onclick="clearRiskHistory()" class="btn-outline w-full mt-3 py-2 rounded-xl text-xs">Limpiar historial</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══════════ CALENDARIO DE NOTICIAS ═══════════ -->
+      <div id="section-noticias" class="hidden">
+        <div class="mb-5">
+          <h1 class="text-xl font-bold">&#128240; Calendario de Noticias</h1>
+          <p class="text-xs mt-0.5" style="color:#94A3B8;">Noticias econ&#243;micas y sesiones de mercado en tiempo real</p>
+        </div>
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-5">
+          <div class="glass-card rounded-xl p-4 text-center">
+            <div class="text-xs font-semibold mb-1" style="color:#94A3B8;">&#127482;&#127480; Nueva York</div>
+            <div id="clock-ny" class="text-lg font-bold mono" style="color:#10B981;">--:--</div>
+            <div id="status-ny" class="text-xs mt-1" style="color:#475569;">—</div>
+          </div>
+          <div class="glass-card rounded-xl p-4 text-center">
+            <div class="text-xs font-semibold mb-1" style="color:#94A3B8;">&#127468;&#127463; Londres</div>
+            <div id="clock-ldn" class="text-lg font-bold mono" style="color:#60A5FA;">--:--</div>
+            <div id="status-ldn" class="text-xs mt-1" style="color:#475569;">—</div>
+          </div>
+          <div class="glass-card rounded-xl p-4 text-center">
+            <div class="text-xs font-semibold mb-1" style="color:#94A3B8;">&#127471;&#127477; Tokio</div>
+            <div id="clock-tok" class="text-lg font-bold mono" style="color:#FBBF24;">--:--</div>
+            <div id="status-tok" class="text-xs mt-1" style="color:#475569;">—</div>
+          </div>
+          <div class="glass-card rounded-xl p-4 text-center">
+            <div class="text-xs font-semibold mb-1" style="color:#94A3B8;">&#127462;&#127482; S&#237;dney</div>
+            <div id="clock-syd" class="text-lg font-bold mono" style="color:#F472B6;">--:--</div>
+            <div id="status-syd" class="text-xs mt-1" style="color:#475569;">—</div>
+          </div>
+        </div>
+        <div class="glass-card rounded-xl overflow-hidden">
+          <div class="p-4 border-b flex items-center gap-3 flex-wrap" style="border-color:rgba(30,41,59,.5);">
+            <h3 class="font-semibold text-sm flex-1">Eventos de la semana</h3>
+            <div class="flex gap-2">
+              <span class="text-xs px-2 py-1 rounded-lg font-bold" style="background:rgba(239,68,68,.15);color:#EF4444;">&#128308; Alto</span>
+              <span class="text-xs px-2 py-1 rounded-lg font-bold" style="background:rgba(251,191,36,.15);color:#FBBF24;">&#128993; Medio</span>
+              <span class="text-xs px-2 py-1 rounded-lg font-bold" style="background:rgba(96,165,250,.15);color:#60A5FA;">&#128309; Bajo</span>
+            </div>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-xs">
+              <thead><tr style="border-bottom:1px solid rgba(30,41,59,.5);">
+                <th class="text-left px-4 py-3 font-semibold uppercase tracking-wider" style="color:#475569;">D&#237;a / Hora UTC</th>
+                <th class="text-left px-4 py-3 font-semibold uppercase tracking-wider" style="color:#475569;">Pa&#237;s</th>
+                <th class="text-left px-4 py-3 font-semibold uppercase tracking-wider" style="color:#475569;">Evento</th>
+                <th class="text-left px-4 py-3 font-semibold uppercase tracking-wider" style="color:#475569;">Impacto</th>
+                <th class="text-left px-4 py-3 font-semibold uppercase tracking-wider" style="color:#475569;">Anterior</th>
+                <th class="text-left px-4 py-3 font-semibold uppercase tracking-wider" style="color:#475569;">Previsto</th>
+              </tr></thead>
+              <tbody id="newsTable"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══════════ REFERIDOS ═══════════ -->
+      <div id="section-referidos" class="hidden">
+        <div class="mb-5">
+          <h1 class="text-xl font-bold">&#128101; Sistema de Referidos</h1>
+          <p class="text-xs mt-0.5" style="color:#94A3B8;">Invita amigos y gana comisiones por cada suscripci&#243;n</p>
+        </div>
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-5 mb-5">
+          <div class="glass-card rounded-xl p-5 text-center">
+            <div class="text-3xl font-bold mb-1" id="refClicks" style="color:#10B981;">0</div>
+            <div class="text-xs" style="color:#94A3B8;">Clics en tu enlace</div>
+          </div>
+          <div class="glass-card rounded-xl p-5 text-center">
+            <div class="text-3xl font-bold mb-1" id="refConversiones" style="color:#60A5FA;">0</div>
+            <div class="text-xs" style="color:#94A3B8;">Conversiones</div>
+          </div>
+          <div class="glass-card rounded-xl p-5 text-center">
+            <div class="text-3xl font-bold mb-1" id="refComisiones" style="color:#FBBF24;">$0</div>
+            <div class="text-xs" style="color:#94A3B8;">Comisiones acumuladas</div>
+          </div>
+        </div>
+        <div class="glass-card rounded-xl p-5 mb-5">
+          <h3 class="font-semibold text-sm mb-4">Tu enlace de referido</h3>
+          <div class="flex gap-3">
+            <input id="refLink" readonly class="input-dark flex-1 px-4 py-3 rounded-xl text-sm mono" value="Inicia sesi&#243;n para ver tu enlace"/>
+            <button onclick="copyRefLink()" class="btn-blue px-4 py-3 rounded-xl text-sm font-semibold">&#128203; Copiar</button>
+          </div>
+        </div>
+        <div class="glass-card rounded-xl p-5">
+          <h3 class="font-semibold text-sm mb-4">&#128176; Comisiones por plan</h3>
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+            <div class="p-4 rounded-xl text-center" style="background:rgba(30,41,59,.5);">
+              <div class="text-xs font-semibold mb-2" style="color:#94A3B8;">Plan Gratis</div>
+              <div class="text-2xl font-bold" style="color:#10B981;">5%</div>
+              <div class="text-xs mt-1" style="color:#475569;">por referido Premium</div>
+            </div>
+            <div class="p-4 rounded-xl text-center" style="background:rgba(59,130,246,.08);border:1px solid rgba(59,130,246,.2);">
+              <div class="text-xs font-semibold mb-2" style="color:#60A5FA;">Plan Premium</div>
+              <div class="text-2xl font-bold" style="color:#60A5FA;">10%</div>
+              <div class="text-xs mt-1" style="color:#475569;">por referido Premium/Elite</div>
+            </div>
+            <div class="p-4 rounded-xl text-center" style="background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.2);">
+              <div class="text-xs font-semibold mb-2" style="color:#FBBF24;">Plan Elite</div>
+              <div class="text-2xl font-bold" style="color:#FBBF24;">15%</div>
+              <div class="text-xs mt-1" style="color:#475569;">por referido de cualquier plan</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══════════ LOGROS ═══════════ -->
+      <div id="section-logros" class="hidden">
+        <div class="mb-5">
+          <h1 class="text-xl font-bold">&#127942; Logros</h1>
+          <p class="text-xs mt-0.5" style="color:#94A3B8;">Desbloquea insignias cumpliendo objetivos de trading</p>
+        </div>
+        <div id="logrosGrid" class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-5"></div>
+        <div class="glass-card rounded-xl p-5">
+          <h3 class="font-semibold text-sm mb-3">Progreso general</h3>
+          <div class="flex items-center gap-3">
+            <div class="flex-1 h-3 rounded-full" style="background:rgba(30,41,59,.8);">
+              <div id="logrosProgress" class="h-3 rounded-full" style="background:#10B981;width:0%;transition:width .5s;"></div>
+            </div>
+            <span id="logrosCount" class="text-xs font-semibold" style="color:#10B981;">0/8</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══════════ EAs & DESCARGAS ═══════════ -->
+      <div id="section-descargas" class="hidden">
+        <div class="mb-5">
+          <h1 class="text-xl font-bold">&#128229; EAs &amp; Descargas</h1>
+          <p class="text-xs mt-0.5" style="color:#94A3B8;">Descarga tus Expert Advisors y configura tu token</p>
+        </div>
+        <div class="glass-card rounded-xl p-5 mb-5" style="background:rgba(16,185,129,.05);border:1px solid rgba(16,185,129,.2);">
+          <div class="flex items-center justify-between gap-4">
+            <div class="flex-1">
+              <p class="text-xs font-semibold mb-1" style="color:#10B981;">Tu Token de Licencia</p>
+              <p id="descargasToken" class="text-sm mono font-bold" style="color:#fff;">Cargando...</p>
+            </div>
+            <button onclick="copyDescargasToken()" class="btn-green px-4 py-2 rounded-xl text-sm font-semibold flex-shrink-0">&#128203; Copiar</button>
+          </div>
+        </div>
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-5 mb-5">
+          <div class="glass-card rounded-xl p-5">
+            <div class="flex items-center gap-3 mb-4">
+              <div class="w-10 h-10 rounded-xl flex items-center justify-center text-xl" style="background:rgba(16,185,129,.15);">&#128737;</div>
+              <div><h3 class="font-semibold text-sm">Risk Manager Pro</h3><p class="text-xs" style="color:#94A3B8;">v13.5 — Premium &amp; Elite</p></div>
+            </div>
+            <p class="text-xs mb-4" style="color:#94A3B8;">Panel visual, breakeven autom&#225;tico, trailing stop y protecci&#243;n Prop Firm.</p>
+            <div class="space-y-1.5 text-xs mb-4" style="color:#475569;">
+              <div>&#10003; Auto Breakeven &amp; Trailing</div>
+              <div>&#10003; Calculadora de riesgo visual</div>
+              <div>&#10003; Protecci&#243;n Prop Firm</div>
+              <div>&#10003; Ejecuci&#243;n directa desde panel</div>
+            </div>
+            <div id="dl-btn-riskmanager"></div>
+          </div>
+          <div class="glass-card rounded-xl p-5">
+            <div class="flex items-center gap-3 mb-4">
+              <div class="w-10 h-10 rounded-xl flex items-center justify-center text-xl" style="background:rgba(96,165,250,.15);">&#128214;</div>
+              <div><h3 class="font-semibold text-sm">Auto-Journaling Pro</h3><p class="text-xs" style="color:#94A3B8;">v2.13 — Premium &amp; Elite</p></div>
+            </div>
+            <p class="text-xs mb-4" style="color:#94A3B8;">Captura y registra cada operaci&#243;n autom&#225;ticamente con screenshots.</p>
+            <div class="space-y-1.5 text-xs mb-4" style="color:#475569;">
+              <div>&#10003; Captura en apertura y cierre</div>
+              <div>&#10003; Dos temporalidades por trade</div>
+              <div>&#10003; Modo cuenta completa</div>
+            </div>
+            <div id="dl-btn-autojournaling"></div>
+          </div>
+          <div class="glass-card rounded-xl p-5">
+            <div class="flex items-center gap-3 mb-4">
+              <div class="w-10 h-10 rounded-xl flex items-center justify-center text-xl" style="background:rgba(139,92,246,.15);">&#128202;</div>
+              <div><h3 class="font-semibold text-sm">Backtest Simulator Pro</h3><p class="text-xs" style="color:#94A3B8;">v4.2 — Solo Elite</p></div>
+            </div>
+            <p class="text-xs mb-4" style="color:#94A3B8;">Simula trades virtuales sobre gr&#225;ficos hist&#243;ricos con interfaz estilo TV.</p>
+            <div class="space-y-1.5 text-xs mb-4" style="color:#475569;">
+              <div>&#10003; Posiciones virtuales ilimitadas</div>
+              <div>&#10003; Estad&#237;sticas en tiempo real</div>
+              <div>&#10003; Zonas TP/SL visuales</div>
+            </div>
+            <div id="dl-btn-backtest"></div>
+          </div>
+        </div>
+        <div class="glass-card rounded-xl p-5" style="background:rgba(251,191,36,.04);border:1px solid rgba(251,191,36,.15);">
+          <h3 class="font-semibold text-sm mb-3" style="color:#FBBF24;">&#9888; Instalaci&#243;n paso a paso</h3>
+          <ol class="space-y-2 text-xs" style="color:#94A3B8;">
+            <li><b style="color:#FBBF24;">1.</b> Copia tu token de licencia de arriba.</li>
+            <li><b style="color:#FBBF24;">2.</b> En MT5: <code style="color:#10B981;">Herramientas → Opciones → Expert Advisors</code> → activa WebRequest y a&#241;ade la URL de tu servidor Vercel.</li>
+            <li><b style="color:#FBBF24;">3.</b> Descarga el .mq5 y col&#243;calo en <code style="color:#10B981;">MQL5/Experts/</code></li>
+            <li><b style="color:#FBBF24;">4.</b> Compila con MetaEditor (F7).</li>
+            <li><b style="color:#FBBF24;">5.</b> Arrastra al gr&#225;fico, pega tu token en <code style="color:#10B981;">Licencia_Token</code> y pon tu URL de Vercel en <code style="color:#10B981;">ApiUrl</code>.</li>
+          </ol>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- Footer -->
+  <footer class="border-t px-5 py-3 flex items-center justify-between text-xs" style="color:#475569;border-color:rgba(30,41,59,.5);background:#0B0F17;">
+    <span>© 2026 Samtrader Pro Suite</span>
+    <div class="flex gap-4"><a href="#" onclick="return false" style="color:#475569;">Términos</a><a href="#" onclick="return false" style="color:#475569;">Privacidad</a><a href="#" onclick="return false" style="color:#475569;">Contacto</a></div>
+  </footer>
+</div>
+
+<!-- ═══════════ FLOATING CHAT BUBBLE ═══════════ -->
+<button class="chat-bubble hidden" id="chatBubble" onclick="toggleChatModal()">
+  <svg width="22" height="22" fill="none" stroke="white" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+  <span class="chat-unread hidden" id="chatUnreadDot">0</span>
+</button>
+
+<!-- ═══════════ MODALS ═══════════ -->
+
+<!-- Modal: MT5 -->
+<div id="modalMt5" class="modal-bg hidden">
+  <div class="modal-box">
+    <div class="flex items-center justify-between mb-5"><h3 class="text-base font-bold">Editar Cuenta MT5</h3><button onclick="closeModal('modalMt5')" class="btn-ghost"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>
+    <input type="hidden" id="editMt5UserId"/>
+    <div class="space-y-4">
+      <div><label class="block text-xs font-medium mb-1.5" style="color:#94A3B8;">Número de Cuenta</label><input id="editMt5Cuenta" class="input-dark w-full px-4 py-3 rounded-xl text-sm" placeholder="8473922"/></div>
+      <div><label class="block text-xs font-medium mb-1.5" style="color:#94A3B8;">Servidor</label><input id="editMt5Servidor" class="input-dark w-full px-4 py-3 rounded-xl text-sm" placeholder="ICMarkets-Live01"/></div>
+      <div class="flex gap-3 pt-2"><button onclick="closeModal('modalMt5')" class="btn-outline flex-1 py-2.5 rounded-xl text-sm">Cancelar</button><button onclick="saveMt5()" class="btn-green flex-1 py-2.5 rounded-xl text-sm font-semibold">Guardar</button></div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Chat (usuario) -->
+<div id="modalChat" class="modal-bg hidden">
+  <div class="modal-box modal-box-lg" style="height:560px;display:flex;flex-direction:column;padding:0;">
+    <div class="flex items-center justify-between p-4 border-b" style="border-color:rgba(30,41,59,.5);">
+      <h3 class="font-semibold text-sm">Chat con Soporte</h3>
+      <button onclick="closeModal('modalChat')" class="btn-ghost"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <div id="chatMessages" class="flex-1 overflow-y-auto p-4 space-y-3" style="font-size:13px;"></div>
+    <div class="p-4 border-t flex gap-2" style="border-color:rgba(30,41,59,.5);">
+      <input id="chatInput" class="input-dark flex-1 px-3 py-2.5 rounded-xl text-sm" placeholder="Escribe un mensaje..." onkeydown="if(event.key==='Enter')sendUserMessage()"/>
+      <label class="btn-outline px-3 py-2 rounded-xl text-xs cursor-pointer flex items-center" title="Adjuntar imagen">
+        📎<input type="file" accept="image/*" class="hidden" onchange="attachChatImage(event)"/>
+      </label>
+      <button onclick="sendUserMessage()" class="btn-green px-4 py-2.5 rounded-xl text-sm font-semibold">→</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Pago -->
+<div id="modalPago" class="modal-bg hidden">
+  <div class="modal-box">
+    <div class="flex items-center justify-between mb-5"><h3 class="text-base font-bold">Notificar Pago</h3><button onclick="closeModal('modalPago')" class="btn-ghost"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>
+    <div id="pagoInstrucciones" class="p-3 rounded-xl mb-4 text-xs" style="background:rgba(59,130,246,.08);border:1px solid rgba(59,130,246,.2);color:#94A3B8;"></div>
+    <input type="hidden" id="pagoSelectedPlan"/>
+    <div class="space-y-4">
+      <div>
+        <label class="block text-xs font-medium mb-1.5" style="color:#94A3B8;">Método de Pago</label>
+        <select id="pagoMetodo" onchange="updatePayInstructions()" class="input-dark w-full px-4 py-3 rounded-xl text-sm">
+          <option value="pix">PIX</option>
+          <option value="paypal">PayPal</option>
+          <option value="usdt">USDT (TRC20)</option>
+          <option value="usdc">USDC</option>
+        </select>
+      </div>
+      <div><label class="block text-xs font-medium mb-1.5" style="color:#94A3B8;">Monto Pagado (USD)</label><input id="pagoMonto" type="number" placeholder="29" class="input-dark w-full px-4 py-3 rounded-xl text-sm"/></div>
+      <div><label class="block text-xs font-medium mb-1.5" style="color:#94A3B8;">ID de Transacción (opcional)</label><input id="pagoTxId" class="input-dark w-full px-4 py-3 rounded-xl text-sm mono" placeholder="Ref, hash, comprobante..."/></div>
+      <div class="flex gap-3 pt-2"><button onclick="closeModal('modalPago')" class="btn-outline flex-1 py-2.5 rounded-xl text-sm">Cancelar</button><button onclick="submitPago()" class="btn-green flex-1 py-2.5 rounded-xl text-sm font-semibold">Enviar Notificación</button></div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Add Trade -->
+<div id="modalAddTrade" class="modal-bg hidden">
+  <div class="modal-box modal-box-lg">
+    <div class="flex items-center justify-between mb-5"><h3 class="text-base font-bold">Añadir Trade Manual</h3><button onclick="closeModal('modalAddTrade')" class="btn-ghost"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>
+    <div class="grid grid-cols-2 gap-4">
+      <div><label class="block text-xs font-medium mb-1.5" style="color:#94A3B8;">Fecha/Hora</label><input id="trFecha" type="datetime-local" class="input-dark w-full px-3 py-2.5 rounded-xl text-sm"/></div>
+      <div><label class="block text-xs font-medium mb-1.5" style="color:#94A3B8;">Activo</label><input id="trActivo" placeholder="EURUSD" class="input-dark w-full px-3 py-2.5 rounded-xl text-sm mono"/></div>
+      <div><label class="block text-xs font-medium mb-1.5" style="color:#94A3B8;">Tipo</label><select id="trTipo" class="input-dark w-full px-3 py-2.5 rounded-xl text-sm"><option value="Compra">Compra (BUY)</option><option value="Venta">Venta (SELL)</option></select></div>
+      <div><label class="block text-xs font-medium mb-1.5" style="color:#94A3B8;">Lotes</label><input id="trLotes" type="number" step="0.01" placeholder="0.01" class="input-dark w-full px-3 py-2.5 rounded-xl text-sm mono"/></div>
+      <div><label class="block text-xs font-medium mb-1.5" style="color:#94A3B8;">Precio Entrada</label><input id="trEntrada" type="number" step="0.00001" class="input-dark w-full px-3 py-2.5 rounded-xl text-sm mono"/></div>
+      <div><label class="block text-xs font-medium mb-1.5" style="color:#94A3B8;">Precio Salida</label><input id="trSalida" type="number" step="0.00001" class="input-dark w-full px-3 py-2.5 rounded-xl text-sm mono"/></div>
+      <div><label class="block text-xs font-medium mb-1.5" style="color:#94A3B8;">Resultado (USD)</label><input id="trUSD" type="number" step="0.01" placeholder="25.00" class="input-dark w-full px-3 py-2.5 rounded-xl text-sm mono"/></div>
+      <div><label class="block text-xs font-medium mb-1.5" style="color:#94A3B8;">Pips</label><input id="trPips" type="number" step="0.1" class="input-dark w-full px-3 py-2.5 rounded-xl text-sm mono"/></div>
+      <div class="col-span-2"><label class="block text-xs font-medium mb-1.5" style="color:#94A3B8;">Notas</label><textarea id="trNotas" rows="2" class="input-dark w-full px-3 py-2.5 rounded-xl text-sm resize-none" placeholder="Contexto del mercado, razón de entrada..."></textarea></div>
+    </div>
+    <div class="flex gap-3 pt-4"><button onclick="closeModal('modalAddTrade')" class="btn-outline flex-1 py-2.5 rounded-xl text-sm">Cancelar</button><button onclick="saveManualTrade()" class="btn-green flex-1 py-2.5 rounded-xl text-sm font-semibold">Guardar Trade</button></div>
+  </div>
+</div>
+
+<!-- Modal: Trade Detail -->
+<div id="modalTradeDetail" class="modal-bg hidden">
+  <div class="modal-box modal-box-lg">
+    <div class="flex items-center justify-between mb-5">
+      <h3 class="text-base font-bold" id="tradeDetailTitle">Detalle del Trade</h3>
+      <button onclick="closeModal('modalTradeDetail')" class="btn-ghost"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <div id="tradeDetailContent"></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════
+     JAVASCRIPT
+═══════════════════════════════════════════════════════ -->
+<script>
+// ──────────────────────────────────────────────
+// CONFIGURACIÓN — reemplaza con tus credenciales
+// ──────────────────────────────────────────────
+const SUPABASE_URL = 'https://raznmwztnucismwjaetc.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJhem5td3p0bnVjaXNtd2phZXRjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAxNDg2NDMsImV4cCI6MjA5NTcyNDY0M30.PRF0zgiHnsXWb-2vt801Mf3Sl2a-o8BBJXD19aCEjpM';
+
+// Datos de pago — edita estos valores con los tuyos
+const PAYMENT_INFO = {
+  pix: 'tu_clave_pix@email.com',
+  paypal: 'tu_paypal@email.com',
+  usdt: 'TXxxxxxxxxxxxxxxxxxxxxxxxxxxxxx (TRC20)',
+  usdc: 'TXxxxxxxxxxxxxxxxxxxxxxxxxxxxxx (TRC20)',
+};
+
+const { createClient } = supabase;
+const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+// ──────────────────────────────────────────────
+// ESTADO GLOBAL
+// ──────────────────────────────────────────────
+let currentUser = null, currentPerfil = null, isAdmin = false;
+let allUsersCache = [];
+let equityChart = null;
+let journalTrades = [], journalPageSize = 20;
+let chatPollInterval = null, chatConvId = null, adminSelectedConvId = null;
+let lastMsgTimestamp = null;
+
+// ──────────────────────────────────────────────
+// INDEXEDDB — Trading Journal
+// ──────────────────────────────────────────────
+const DB_NAME = 'samtrader_journal', DB_VER = 1, STORE = 'trades';
+let idbDB = null;
+
+function openIDB() {
+  return new Promise((res, rej) => {
+    const req = indexedDB.open(DB_NAME, DB_VER);
+    req.onupgradeneeded = e => e.target.result.createObjectStore(STORE, { keyPath: 'id' });
+    req.onsuccess = e => { idbDB = e.target.result; res(idbDB); };
+    req.onerror = e => rej(e);
+  });
+}
+function idbGetAll() {
+  return new Promise((res, rej) => {
+    const tx = idbDB.transaction(STORE, 'readonly');
+    const req = tx.objectStore(STORE).getAll();
+    req.onsuccess = () => res(req.result);
+    req.onerror = e => rej(e);
+  });
+}
+function idbPut(trade) {
+  return new Promise((res, rej) => {
+    const tx = idbDB.transaction(STORE, 'readwrite');
+    const req = tx.objectStore(STORE).put(trade);
+    req.onsuccess = () => res();
+    req.onerror = e => rej(e);
+  });
+}
+function idbDelete(id) {
+  return new Promise((res, rej) => {
+    const tx = idbDB.transaction(STORE, 'readwrite');
+    const req = tx.objectStore(STORE).delete(id);
+    req.onsuccess = () => res();
+    req.onerror = e => rej(e);
+  });
+}
+function idbClear() {
+  return new Promise((res, rej) => {
+    const tx = idbDB.transaction(STORE, 'readwrite');
+    const req = tx.objectStore(STORE).clear();
+    req.onsuccess = () => res();
+    req.onerror = e => rej(e);
+  });
+}
+
+// ──────────────────────────────────────────────
+// TOAST
+// ──────────────────────────────────────────────
+function toast(msg, type='info', ms=4000) {
+  const c = document.getElementById('toastContainer');
+  const el = document.createElement('div');
+  el.className = `toast toast-${type}`;
+  el.innerHTML = `<span>${type==='success'?'✓':type==='error'?'✕':'ℹ'} ${msg}</span>`;
+  c.appendChild(el);
+  setTimeout(()=>{ el.style.opacity='0'; el.style.transform='translateX(100%)'; el.style.transition='all .3s'; setTimeout(()=>el.remove(),300); }, ms);
+}
+
+// ──────────────────────────────────────────────
+// AUTH TABS
+// ──────────────────────────────────────────────
+function showTab(tab) {
+  const isL = tab==='login';
+  document.getElementById('formLogin').classList.toggle('hidden',!isL);
+  document.getElementById('formRegister').classList.toggle('hidden',isL);
+  document.getElementById('tabLogin').style.cssText = isL ? 'background:#131A26;color:#E2E8F0;' : 'background:transparent;color:#94A3B8;';
+  document.getElementById('tabRegister').style.cssText = !isL ? 'background:#131A26;color:#E2E8F0;' : 'background:transparent;color:#94A3B8;';
+}
+
+// ──────────────────────────────────────────────
+// AUTH ACTIONS
+// ──────────────────────────────────────────────
+async function handleLogin() {
+  const email = document.getElementById('loginEmail').value.trim();
+  const pass = document.getElementById('loginPassword').value;
+  if (!email||!pass) return toast('Rellena todos los campos','error');
+  const {data,error} = await sb.auth.signInWithPassword({email,password:pass});
+  if (error) return toast(error.message,'error');
+  const {data:p} = await sb.from('perfiles').select('bloqueado').eq('id',data.user.id).single();
+  if (p?.bloqueado) { await sb.auth.signOut(); return toast('Cuenta suspendida. Contacta soporte.','error',6000); }
+}
+
+async function handleRegister() {
+  const nombre = document.getElementById('regNombre').value.trim();
+  const email = document.getElementById('regEmail').value.trim();
+  const pass = document.getElementById('regPassword').value;
+  if (!nombre||!email||!pass) return toast('Rellena todos los campos','error');
+  if (pass.length<8) return toast('Contraseña mínimo 8 caracteres','error');
+  const {data,error} = await sb.auth.signUp({email,password:pass,options:{data:{nombre}}});
+  if (error) return toast(error.message,'error');
+  if (!data.session) toast('Revisa tu email para confirmar la cuenta','info',7000);
+  else toast('¡Bienvenido a Samtrader Pro!','success');
+}
+
+async function handleForgotPassword() {
+  const email = document.getElementById('loginEmail').value.trim();
+  if (!email) return toast('Escribe tu email primero','error');
+  const {error} = await sb.auth.resetPasswordForEmail(email,{redirectTo:location.href});
+  if (error) return toast(error.message,'error');
+  toast('Email de recuperación enviado','success');
+}
+
+async function handleLogout() {
+  stopChatPolling();
+  await sb.auth.signOut();
+  currentUser=null; currentPerfil=null; isAdmin=false; allUsersCache=[];
+  closeUserMenu();
+  document.getElementById('chatBubble').classList.add('hidden');
+}
+
+// ──────────────────────────────────────────────
+// SESSION
+// ──────────────────────────────────────────────
+sb.auth.onAuthStateChange(async(event,session)=>{
+  if (session?.user) {
+    currentUser = session.user;
+    await openIDB();
+    await loadUserProfile();
+    document.getElementById('authScreen').classList.add('hidden');
+    document.getElementById('mainApp').classList.remove('hidden');
+    document.getElementById('chatBubble').classList.remove('hidden');
+    loadJournal();
+    startChatPolling();
+    updateDashboardMetrics();
+  } else {
+    document.getElementById('mainApp').classList.add('hidden');
+    document.getElementById('authScreen').classList.remove('hidden');
+    document.getElementById('chatBubble').classList.add('hidden');
+  }
+});
+
+// ──────────────────────────────────────────────
+// LOAD PROFILE
+// ──────────────────────────────────────────────
+async function loadUserProfile() {
+  const {data:p,error} = await sb.from('perfiles').select('*').eq('id',currentUser.id).single();
+  if (error) return;
+  currentPerfil = p;
+  if (p.bloqueado) { await sb.auth.signOut(); toast('Tu cuenta ha sido suspendida.','error',6000); return; }
+  const {data:adminRow} = await sb.from('admins').select('user_id').eq('user_id',currentUser.id).single();
+  isAdmin = !!adminRow;
+
+  const nombre = p.nombre || currentUser.email;
+  document.getElementById('userAvatar').textContent = nombre.charAt(0).toUpperCase();
+  document.getElementById('navUserName').textContent = nombre;
+  document.getElementById('navUserPlan').textContent = 'Plan '+cap(p.plan);
+  document.getElementById('menuUserEmail').textContent = currentUser.email;
+  document.getElementById('sidebarToken').textContent = p.token_licencia||'—';
+  document.getElementById('profileNombre').value = p.nombre||'';
+  document.getElementById('profileEmail').value = currentUser.email;
+  document.getElementById('profileMt5').value = p.mt5_cuenta||'';
+  document.getElementById('profileServidor').value = p.mt5_servidor||'';
+  document.getElementById('profileActivos').value = p.activos_manuales||'';
+  document.getElementById('profileToken').textContent = p.token_licencia||'—';
+  document.getElementById('profilePlanBadge').textContent = cap(p.plan);
+  document.getElementById('profilePlanBadge').style.color = p.plan==='elite'?'#8B5CF6':p.plan==='premium'?'#3B82F6':'#10B981';
+  document.getElementById('profileFechaReg').textContent = p.fecha_registro?'Registro: '+new Date(p.fecha_registro).toLocaleDateString('es-ES'):'—';
+  document.getElementById('profilePlanExp').textContent = p.fecha_expiracion_plan?'Válido hasta: '+new Date(p.fecha_expiracion_plan).toLocaleDateString('es-ES'):p.plan!=='gratis'?'Membresía permanente':'Actualiza tu plan para más funciones';
+  document.getElementById('kpiNetProfit'); // will be updated by journal metrics
+
+  if (isAdmin) {
+    document.getElementById('nav-admin').classList.remove('hidden');
+    loadAllUsers(); loadMembresiaUserSelect(); loadPagos(); loadAdminConversations();
+  }
+}
+
+async function saveProfile() {
+  if (!currentUser) return;
+  const nombre = document.getElementById('profileNombre').value.trim();
+  const activos = document.getElementById('profileActivos').value.trim();
+  const {error} = await sb.from('perfiles').update({nombre,activos_manuales:activos}).eq('id',currentUser.id);
+  if (error) return toast('Error: '+error.message,'error');
+  toast('Perfil guardado','success');
+  document.getElementById('navUserName').textContent = nombre;
+  document.getElementById('userAvatar').textContent = nombre.charAt(0).toUpperCase();
+  if (currentPerfil) currentPerfil.nombre = nombre;
+}
+
+// ──────────────────────────────────────────────
+// NAVIGATION
+// ──────────────────────────────────────────────
+function showSection(s) {
+  ['dashboard','diario','planes','perfil','admin'].forEach(sec=>{
+    document.getElementById('section-'+sec).classList.toggle('hidden',sec!==s);
+    const n = document.getElementById('nav-'+sec);
+    if (n) n.classList.toggle('active',sec===s);
+  });
+  closeUserMenu();
+  if (s==='diario') renderJournal();
+  if (s==='admin'&&isAdmin) { loadAllUsers(); loadMembresiaUserSelect(); }
+  if (s==='dashboard') updateDashboardMetrics();
+}
+
+// ──────────────────────────────────────────────
+// JOURNAL — IndexedDB
+// ──────────────────────────────────────────────
+async function loadJournal() {
+  journalTrades = await idbGetAll();
+  journalTrades.sort((a,b)=>new Date(b.fecha)-new Date(a.fecha));
+  updateDashboardMetrics();
+}
+
+function getFilteredTrades() {
+  const fa = document.getElementById('filterActivo')?.value.trim().toUpperCase();
+  const fr = document.getElementById('filterResult')?.value;
+  const from = document.getElementById('filterFrom')?.value;
+  const to = document.getElementById('filterTo')?.value;
+  return journalTrades.filter(t=>{
+    if (fa && !t.activo.toUpperCase().includes(fa)) return false;
+    if (fr==='win' && t.resultadoUSD<=0) return false;
+    if (fr==='loss' && t.resultadoUSD>=0) return false;
+    if (from && new Date(t.fecha)<new Date(from)) return false;
+    if (to && new Date(t.fecha)>new Date(to+'T23:59:59')) return false;
+    return true;
+  });
+}
+
+let currentJournalPage = 0;
+function journalPage(dir) { currentJournalPage = Math.max(0,currentJournalPage+dir); renderJournal(); }
+function clearFilters() { ['filterActivo','filterFrom','filterTo'].forEach(id=>{ if(document.getElementById(id)) document.getElementById(id).value=''; }); document.getElementById('filterResult').value='all'; currentJournalPage=0; renderJournal(); }
+
+function renderJournal() {
+  const filtered = getFilteredTrades();
+  const total = filtered.length;
+  const start = currentJournalPage*journalPageSize;
+  const page = filtered.slice(start, start+journalPageSize);
+  const tb = document.getElementById('journalTableBody');
+  if (!page.length) { tb.innerHTML=`<tr><td colspan="10" class="text-center py-12" style="color:#475569;">No hay trades con estos filtros.</td></tr>`; }
+  else tb.innerHTML = page.map(t=>{
+    const isWin = t.resultadoUSD>=0;
+    const pnl = (t.resultadoUSD>=0?'+':'')+t.resultadoUSD.toFixed(2);
+    const date = new Date(t.fecha).toLocaleString('es-ES',{day:'2-digit',month:'2-digit',year:'2-digit',hour:'2-digit',minute:'2-digit'});
+    return `<tr class="table-row cursor-pointer" onclick="openTradeDetail('${t.id}')">
+      <td class="px-4 py-3 mono" style="color:#94A3B8;white-space:nowrap;">${date}</td>
+      <td class="px-4 py-3 font-semibold mono">${esc(t.activo)}</td>
+      <td class="px-4 py-3"><span class="px-2 py-0.5 rounded-full text-xs font-semibold" style="${t.tipo==='Compra'?'background:rgba(16,185,129,.15);color:#10B981;':'background:rgba(239,68,68,.15);color:#EF4444;'}">${esc(t.tipo)}</span></td>
+      <td class="px-4 py-3 text-right mono">${t.lotes?.toFixed(2)||'—'}</td>
+      <td class="px-4 py-3 text-right mono">${t.precioEntrada?.toFixed(5)||'—'}</td>
+      <td class="px-4 py-3 text-right mono">${t.precioSalida?.toFixed(5)||'—'}</td>
+      <td class="px-4 py-3 text-right mono ${isWin?'profit':'loss'}">${t.pips>0?'+':''+(t.pips||0)}</td>
+      <td class="px-4 py-3 text-right font-semibold mono ${isWin?'profit':'loss'}">${pnl}</td>
+      <td class="px-4 py-3 text-center">${t.capturaURL?'<span title="Ver captura">📷</span>':'<span style="color:#475569;">—</span>'}</td>
+      <td class="px-4 py-3 text-right"><button onclick="event.stopPropagation();deleteTrade('${t.id}')" class="btn-ghost text-xs" style="color:#EF4444;" title="Eliminar">✕</button></td>
+    </tr>`;
+  }).join('');
+  document.getElementById('journalPageInfo').textContent = total ? `Mostrando ${start+1}-${Math.min(start+journalPageSize,total)} de ${total} trades` : 'Sin trades';
+}
+
+async function deleteTrade(id) {
+  if (!confirm('¿Eliminar este trade?')) return;
+  await idbDelete(id);
+  await loadJournal();
+  renderJournal();
+  toast('Trade eliminado','info');
+}
+
+function openAddTradeModal() {
+  const now = new Date();
+  const local = new Date(now-now.getTimezoneOffset()*60000).toISOString().slice(0,16);
+  document.getElementById('trFecha').value = local;
+  document.getElementById('modalAddTrade').classList.remove('hidden');
+}
+
+async function saveManualTrade() {
+  const trade = {
+    id: crypto.randomUUID(),
+    fecha: document.getElementById('trFecha').value || new Date().toISOString(),
+    activo: document.getElementById('trActivo').value.trim().toUpperCase() || 'EURUSD',
+    tipo: document.getElementById('trTipo').value,
+    lotes: parseFloat(document.getElementById('trLotes').value)||0,
+    precioEntrada: parseFloat(document.getElementById('trEntrada').value)||0,
+    precioSalida: parseFloat(document.getElementById('trSalida').value)||0,
+    resultadoUSD: parseFloat(document.getElementById('trUSD').value)||0,
+    pips: parseFloat(document.getElementById('trPips').value)||0,
+    capturaURL: null,
+    notas: document.getElementById('trNotas').value,
+  };
+  await idbPut(trade);
+  await loadJournal();
+  renderJournal();
+  closeModal('modalAddTrade');
+  toast('Trade guardado','success');
+}
+
+function openTradeDetail(id) {
+  const t = journalTrades.find(x=>x.id===id);
+  if (!t) return;
+  const isWin = t.resultadoUSD>=0;
+  document.getElementById('tradeDetailTitle').textContent = `${t.activo} — ${t.tipo}`;
+  document.getElementById('tradeDetailContent').innerHTML = `
+    <div class="grid grid-cols-2 gap-3 text-sm mb-4">
+      ${[['Fecha',new Date(t.fecha).toLocaleString('es-ES')],['Activo',t.activo],['Tipo',t.tipo],['Lotes',t.lotes?.toFixed(2)||'—'],['Precio Entrada',t.precioEntrada?.toFixed(5)||'—'],['Precio Salida',t.precioSalida?.toFixed(5)||'—'],['Pips',(t.pips>0?'+':'')+t.pips],['Resultado USD',(isWin?'+':'')+t.resultadoUSD?.toFixed(2)]].map(([l,v])=>`
+      <div class="p-3 rounded-xl" style="background:rgba(30,41,59,.3);">
+        <p class="text-xs" style="color:#94A3B8;">${l}</p>
+        <p class="font-semibold mono mt-0.5 ${l==='Resultado USD'?isWin?'profit':'loss':''}">${v}</p>
+      </div>`).join('')}
+    </div>
+    ${t.capturaURL?`<img src="${t.capturaURL}" class="rounded-xl w-full mb-3" style="max-height:300px;object-fit:cover;"/>`:
+    `<label class="flex items-center justify-center gap-2 p-6 rounded-xl border border-dashed cursor-pointer hover:border-green-500 transition-colors text-xs" style="border-color:rgba(30,41,59,.8);color:#94A3B8;">
+      📷 Adjuntar captura de pantalla
+      <input type="file" accept="image/*" class="hidden" onchange="attachTradeCapture(event,'${t.id}')"/>
+    </label>`}
+    ${t.notas?`<div class="p-3 rounded-xl mt-3 text-sm" style="background:rgba(30,41,59,.3);color:#94A3B8;"><span style="color:#475569;">Notas:</span> ${esc(t.notas)}</div>`:''}
+  `;
+  document.getElementById('modalTradeDetail').classList.remove('hidden');
+}
+
+async function attachTradeCapture(event, tradeId) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = async(e) => {
+    const t = journalTrades.find(x=>x.id===tradeId);
+    if (!t) return;
+    t.capturaURL = e.target.result;
+    await idbPut(t);
+    await loadJournal();
+    openTradeDetail(tradeId);
+    toast('Captura adjuntada','success');
+  };
+  reader.readAsDataURL(file);
+}
+
+// ──────────────────────────────────────────────
+// IMPORT / EXPORT
+// ──────────────────────────────────────────────
+function importFile(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const name = file.name.toLowerCase();
+  if (name.endsWith('.csv')) {
+    Papa.parse(file,{ header:true, skipEmptyLines:true, complete: async(res)=>{
+      let count=0;
+      for (const row of res.data) {
+        const t = parseCSVRow(row);
+        if (t) { await idbPut(t); count++; }
+      }
+      await loadJournal(); renderJournal(); toast(`Importados ${count} trades desde CSV`,'success');
+    }});
+  } else if (name.endsWith('.html')||name.endsWith('.htm')) {
+    const reader = new FileReader();
+    reader.onload = async(e) => {
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(e.target.result,'text/html');
+      const rows = doc.querySelectorAll('table tr');
+      let count=0;
+      for (let i=1;i<rows.length;i++) {
+        const cells = [...rows[i].querySelectorAll('td')].map(c=>c.textContent.trim());
+        if (cells.length>=6) {
+          const t = {
+            id: crypto.randomUUID(),
+            fecha: cells[0]||new Date().toISOString(),
+            activo: (cells[1]||'EURUSD').toUpperCase(),
+            tipo: (cells[2]||'').toLowerCase().includes('buy')||cells[2]==='0'?'Compra':'Venta',
+            lotes: parseFloat(cells[3])||0,
+            precioEntrada: parseFloat(cells[4])||0,
+            precioSalida: parseFloat(cells[5])||0,
+            resultadoUSD: parseFloat(cells[6])||0,
+            pips: parseFloat(cells[7])||0,
+            capturaURL: null, notas: ''
+          };
+          await idbPut(t); count++;
+        }
+      }
+      await loadJournal(); renderJournal(); toast(`Importados ${count} trades desde HTML`,'success');
+    };
+    reader.readAsText(file);
+  }
+  event.target.value='';
+}
+
+function parseCSVRow(row) {
+  const keys = Object.keys(row).map(k=>k.toLowerCase().trim());
+  const get = (...names) => { for(const n of names){ const k=keys.find(k=>k.includes(n)); if(k!==undefined) return row[Object.keys(row)[keys.indexOf(k)]]; } return ''; };
+  const resultado = parseFloat(get('profit','resultado','pnl','ganancia','result'))||0;
+  const activo = (get('symbol','activo','pair','instrumento')||'').toUpperCase()||'EURUSD';
+  if (!activo) return null;
+  return {
+    id: crypto.randomUUID(),
+    fecha: get('time','fecha','date','open time','apertura')||new Date().toISOString(),
+    activo,
+    tipo: (get('type','tipo','direction','side')+'').toLowerCase().includes('buy')||get('type','tipo')=='0'?'Compra':'Venta',
+    lotes: parseFloat(get('volume','lots','lotes','size'))||0,
+    precioEntrada: parseFloat(get('open price','precio entrada','price','entry','open'))||0,
+    precioSalida: parseFloat(get('close price','precio salida','close','exit'))||0,
+    resultadoUSD: resultado,
+    pips: parseFloat(get('pips','points'))||0,
+    capturaURL: null, notas: get('comment','notas','notes')||''
+  };
+}
+
+function exportCSV() {
+  if (!journalTrades.length) return toast('No hay trades para exportar','error');
+  const headers = ['id','fecha','activo','tipo','lotes','precioEntrada','precioSalida','resultadoUSD','pips','notas'];
+  const csv = [headers.join(','), ...journalTrades.map(t=>headers.map(h=>JSON.stringify(t[h]??'')).join(','))].join('\n');
+  downloadFile('samtrader_journal.csv', csv, 'text/csv');
+  toast('CSV exportado','success');
+}
+
+function exportJSON() {
+  if (!journalTrades.length) return toast('No hay trades para exportar','error');
+  const data = journalTrades.map(t=>({...t, capturaURL: t.capturaURL?'[imagen]':null}));
+  downloadFile('samtrader_respaldo.json', JSON.stringify(data,null,2), 'application/json');
+  toast('Respaldo JSON exportado','success');
+}
+
+function importJSON(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = async(e) => {
+    try {
+      const data = JSON.parse(e.target.result);
+      if (!Array.isArray(data)) return toast('Archivo JSON inválido','error');
+      await idbClear();
+      for (const t of data) { if (!t.id) t.id=crypto.randomUUID(); await idbPut(t); }
+      await loadJournal(); renderJournal(); toast(`${data.length} trades importados`,'success');
+    } catch(err) { toast('Error al leer JSON','error'); }
+  };
+  reader.readAsText(file);
+  event.target.value='';
+}
+
+function downloadFile(name, content, mime) {
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([content],{type:mime}));
+  a.download = name; a.click(); URL.revokeObjectURL(a.href);
+}
+
+// ──────────────────────────────────────────────
+// DASHBOARD METRICS
+// ──────────────────────────────────────────────
+function updateDashboardMetrics() {
+  if (!journalTrades.length) {
+    ['kpiWinRate','kpiNetProfit','kpiProfitFactor','kpiDrawdown','kpiTotal'].forEach(id=>{ const el=document.getElementById(id); if(el) el.textContent=id==='kpiTotal'?'0':'—'; });
+    renderEquityChart([]); renderAssetPerf([]);
+    return;
+  }
+  const trades = journalTrades.filter(t=>t.resultadoUSD!==undefined);
+  const total = trades.length;
+  const wins = trades.filter(t=>t.resultadoUSD>0);
+  const losses = trades.filter(t=>t.resultadoUSD<0);
+  const winRate = total>0?(wins.length/total*100).toFixed(1):0;
+  const netProfit = trades.reduce((s,t)=>s+(t.resultadoUSD||0),0);
+  const grossProfit = wins.reduce((s,t)=>s+t.resultadoUSD,0);
+  const grossLoss = Math.abs(losses.reduce((s,t)=>s+t.resultadoUSD,0));
+  const pf = grossLoss>0?(grossProfit/grossLoss).toFixed(2):grossProfit>0?'∞':'0';
+
+  // Max Drawdown
+  let peak=0, maxDD=0, running=0;
+  for (const t of [...trades].sort((a,b)=>new Date(a.fecha)-new Date(b.fecha))) {
+    running+=t.resultadoUSD; if(running>peak) peak=running;
+    const dd = peak>0?(peak-running)/peak*100:0; if(dd>maxDD) maxDD=dd;
+  }
+
+  const np = document.getElementById('kpiNetProfit');
+  document.getElementById('kpiWinRate').textContent = winRate+'%';
+  if(np){ np.textContent=(netProfit>=0?'+':'')+netProfit.toFixed(2)+' USD'; np.className='text-2xl font-bold '+(netProfit>=0?'profit':'loss'); }
+  document.getElementById('kpiProfitFactor').textContent = pf;
+  document.getElementById('kpiDrawdown').textContent = maxDD.toFixed(1)+'%';
+  document.getElementById('kpiTotal').textContent = total;
+
+  // Equity curve
+  const sorted = [...trades].sort((a,b)=>new Date(a.fecha)-new Date(b.fecha));
+  let eq=0; const equity = sorted.map(t=>{ eq+=t.resultadoUSD; return {x:new Date(t.fecha).toLocaleDateString('es-ES'),y:parseFloat(eq.toFixed(2))}; });
+  renderEquityChart(equity);
+  renderAssetPerf(trades);
+}
+
+function renderEquityChart(data) {
+  const ctx = document.getElementById('equityChart');
+  if (!ctx) return;
+  if (equityChart) equityChart.destroy();
+  if (!data.length) return;
+  equityChart = new Chart(ctx,{
+    type:'line',
+    data:{
+      labels: data.map(d=>d.x),
+      datasets:[{
+        label:'Equity',data:data.map(d=>d.y),
+        borderColor:'#10B981',backgroundColor:'rgba(16,185,129,.08)',
+        fill:true,tension:.3,pointRadius:0,borderWidth:2
+      }]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{mode:'index',intersect:false,backgroundColor:'#131A26',borderColor:'rgba(30,41,59,.8)',borderWidth:1}},
+      scales:{
+        x:{grid:{color:'rgba(30,41,59,.4)'},ticks:{color:'#475569',maxTicksLimit:8,font:{size:10}}},
+        y:{grid:{color:'rgba(30,41,59,.4)'},ticks:{color:'#475569',font:{size:10},callback:v=>'$'+v}}
+      }
+    }
+  });
+}
+
+function renderAssetPerf(trades) {
+  const el = document.getElementById('assetPerf');
+  if (!el) return;
+  if (!trades.length) { el.innerHTML='<p style="color:#475569;font-size:12px;">Sin datos aún.</p>'; return; }
+  const map = {};
+  for (const t of trades) {
+    if (!map[t.activo]) map[t.activo]={total:0,wins:0,pnl:0};
+    map[t.activo].total++; if(t.resultadoUSD>0) map[t.activo].wins++; map[t.activo].pnl+=t.resultadoUSD;
+  }
+  const sorted = Object.entries(map).sort((a,b)=>b[1].total-a[1].total).slice(0,8);
+  el.innerHTML = sorted.map(([a,d])=>{
+    const wr = (d.wins/d.total*100).toFixed(0);
+    const pnlColor = d.pnl>=0?'#10B981':'#EF4444';
+    return `<div class="flex items-center justify-between py-2 border-b" style="border-color:rgba(30,41,59,.4);">
+      <span class="mono font-semibold text-xs">${a}</span>
+      <span class="text-xs" style="color:#94A3B8;">${d.total} trades</span>
+      <span class="text-xs font-semibold" style="color:${pnlColor};">${d.pnl>=0?'+':''+(d.pnl).toFixed(0)} $</span>
+      <span class="text-xs px-2 py-0.5 rounded-full font-bold" style="background:rgba(16,185,129,.1);color:#10B981;">${wr}%</span>
+    </div>`;
+  }).join('');
+}
+
+// ──────────────────────────────────────────────
+// PAYMENTS
+// ──────────────────────────────────────────────
+function openPayModal(plan) {
+  document.getElementById('pagoSelectedPlan').value = plan;
+  updatePayInstructions();
+  document.getElementById('modalPago').classList.remove('hidden');
+}
+
+function updatePayInstructions() {
+  const method = document.getElementById('pagoMetodo').value;
+  const info = {
+    pix: `🏦 <strong>PIX:</strong> ${PAYMENT_INFO.pix}`,
+    paypal: `💰 <strong>PayPal:</strong> ${PAYMENT_INFO.paypal}`,
+    usdt: `🔷 <strong>USDT TRC20:</strong> <span class="mono">${PAYMENT_INFO.usdt}</span>`,
+    usdc: `🔵 <strong>USDC:</strong> <span class="mono">${PAYMENT_INFO.usdc}</span>`,
+  };
+  document.getElementById('pagoInstrucciones').innerHTML = `Envía el pago a: ${info[method]||''}<br/><span style="color:#475569;">Luego completa los datos abajo y notifica al administrador.</span>`;
+}
+
+async function submitPago() {
+  if (!currentUser) return;
+  const plan = document.getElementById('pagoSelectedPlan').value;
+  const metodo = document.getElementById('pagoMetodo').value;
+  const monto = parseFloat(document.getElementById('pagoMonto').value)||0;
+  const txId = document.getElementById('pagoTxId').value.trim();
+  if (!monto) return toast('Ingresa el monto pagado','error');
+  const {error} = await sb.from('pagos_manuales').insert({usuario_id:currentUser.id,metodo,monto_usd:monto,transaccion_id:txId||null,plan_solicitado:plan});
+  if (error) return toast('Error: '+error.message,'error');
+  closeModal('modalPago');
+  toast('Notificación enviada. El admin verificará en menos de 24h.','success',6000);
+  // Auto-send chat message to admin
+  await createOrGetConversation();
+  if (chatConvId) sendMessage('admin',`📋 He realizado un pago de $${monto} USD via ${metodo.toUpperCase()} para el plan ${plan.toUpperCase()}. ID: ${txId||'N/A'}. Por favor verifícalo.`);
+}
+
+// ──────────────────────────────────────────────
+// ADMIN ACTIONS
+// ──────────────────────────────────────────────
+async function loadAllUsers() {
+  if (!isAdmin) return;
+  const {data,error} = await sb.from('perfiles').select('*').order('fecha_registro',{ascending:false});
+  if (error) return toast('Error cargando usuarios','error');
+  allUsersCache = data||[];
+  renderUsersTable(allUsersCache);
+  loadMembresiaUserSelect();
+}
+
+function renderUsersTable(users) {
+  const tb = document.getElementById('adminUsersTable');
+  if (!users?.length) { tb.innerHTML=`<tr><td colspan="6" class="text-center py-10" style="color:#475569;">Sin usuarios</td></tr>`; return; }
+  tb.innerHTML = users.map(u=>`
+    <tr class="table-row">
+      <td class="px-4 py-3">
+        <div class="flex items-center gap-2">
+          <div class="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold" style="background:linear-gradient(135deg,#10B981,#3B82F6);">${(u.nombre||'?').charAt(0).toUpperCase()}</div>
+          <div><p class="font-medium text-xs">${esc(u.nombre||'—')}</p><p class="text-xs" style="color:#475569;">${esc(u.id.slice(0,10))}…</p></div>
+        </div>
+      </td>
+      <td class="px-4 py-3"><span class="text-xs px-2 py-0.5 rounded-full font-semibold badge-${u.plan}">${cap(u.plan)}</span></td>
+      <td class="px-4 py-3 mono text-xs" style="color:#94A3B8;">${esc(u.mt5_cuenta||'—')}</td>
+      <td class="px-4 py-3">${u.bloqueado?'<span class="text-xs px-2 py-0.5 rounded-full font-semibold badge-block">Baneado</span>':'<span class="text-xs px-2 py-0.5 rounded-full font-semibold" style="background:rgba(16,185,129,.1);color:#10B981;">Activo</span>'}</td>
+      <td class="px-4 py-3 text-xs" style="color:#94A3B8;">${u.fecha_registro?new Date(u.fecha_registro).toLocaleDateString('es-ES'):'—'}</td>
+      <td class="px-4 py-3">
+        <div class="flex items-center justify-end gap-1.5">
+          <button onclick="openMt5Modal('${u.id}','${escA(u.mt5_cuenta||'')}','${escA(u.mt5_servidor||'')}')" class="btn-blue text-xs px-2 py-1 rounded-lg">MT5</button>
+          ${u.bloqueado
+            ?`<button onclick="toggleBan('${u.id}',false)" class="btn-green text-xs px-2 py-1 rounded-lg">✓</button>`
+            :`<button onclick="toggleBan('${u.id}',true)" class="btn-red text-xs px-2 py-1 rounded-lg">Ban</button>`}
+        </div>
+      </td>
+    </tr>`).join('');
+}
+
+function filterUsers() {
+  const q = document.getElementById('adminSearch').value.toLowerCase();
+  renderUsersTable(q ? allUsersCache.filter(u=>(u.nombre||'').toLowerCase().includes(q)||(u.id||'').toLowerCase().includes(q)) : allUsersCache);
+}
+
+function loadMembresiaUserSelect() {
+  const sel = document.getElementById('membresiaUserId');
+  sel.innerHTML = allUsersCache.length ? allUsersCache.map(u=>`<option value="${u.id}">${esc(u.nombre||u.id.slice(0,10))} — ${cap(u.plan)}</option>`).join('') : '<option>Sin usuarios</option>';
+}
+
+async function grantMembership() {
+  const userId = document.getElementById('membresiaUserId').value;
+  const plan = document.getElementById('membresiaPlan').value;
+  const dur = parseInt(document.getElementById('membresiaDuration').value);
+  if (!userId) return toast('Selecciona un usuario','error');
+  let fecha_exp = null;
+  if (dur>0) { const d=new Date(); d.setMonth(d.getMonth()+dur); fecha_exp=d.toISOString(); }
+  const {error} = await sb.from('perfiles').update({plan,fecha_expiracion_plan:fecha_exp}).eq('id',userId);
+  if (error) return toast('Error: '+error.message,'error');
+  toast(`Plan ${cap(plan)} otorgado`,'success');
+  loadAllUsers();
+}
+
+async function loadPagos() {
+  if (!isAdmin) return;
+  const {data,error} = await sb.from('pagos_manuales').select('*,perfiles(nombre)').eq('estado','pendiente').order('fecha_solicitud',{ascending:false});
+  const tb = document.getElementById('pagosTable');
+  if (error) { tb.innerHTML=`<tr><td colspan="6" class="text-center py-8" style="color:#EF4444;">Error al cargar</td></tr>`; return; }
+  if (!data?.length) { tb.innerHTML=`<tr><td colspan="6" class="text-center py-10" style="color:#475569;">Sin solicitudes pendientes</td></tr>`; return; }
+  tb.innerHTML = data.map(p=>`
+    <tr class="table-row">
+      <td class="px-4 py-3 text-xs">${esc(p.perfiles?.nombre||p.usuario_id?.slice(0,10))}</td>
+      <td class="px-4 py-3"><span class="text-xs px-2 py-0.5 rounded-full" style="background:rgba(59,130,246,.15);color:#3B82F6;">${(p.metodo||'').toUpperCase()}</span></td>
+      <td class="px-4 py-3 font-semibold mono text-xs profit">$${p.monto_usd||0}</td>
+      <td class="px-4 py-3 text-xs capitalize">${esc(p.plan_solicitado||'—')}</td>
+      <td class="px-4 py-3 text-xs" style="color:#94A3B8;">${p.fecha_solicitud?new Date(p.fecha_solicitud).toLocaleDateString('es-ES'):'—'}</td>
+      <td class="px-4 py-3 text-right"><button onclick="verifyPago(${p.id})" class="btn-green text-xs px-3 py-1 rounded-lg font-medium">✓ Verificar</button></td>
+    </tr>`).join('');
+}
+
+async function verifyPago(id) {
+  const {error} = await sb.from('pagos_manuales').update({estado:'verificado'}).eq('id',id);
+  if (error) return toast('Error: '+error.message,'error');
+  toast('Pago verificado. Recuerda otorgar la membresía manualmente.','success',5000);
+  loadPagos();
+}
+
+function openMt5Modal(uid,cuenta,servidor) {
+  document.getElementById('editMt5UserId').value=uid;
+  document.getElementById('editMt5Cuenta').value=cuenta;
+  document.getElementById('editMt5Servidor').value=servidor;
+  document.getElementById('modalMt5').classList.remove('hidden');
+}
+
+async function saveMt5() {
+  const uid = document.getElementById('editMt5UserId').value;
+  const {error} = await sb.from('perfiles').update({mt5_cuenta:document.getElementById('editMt5Cuenta').value.trim(),mt5_servidor:document.getElementById('editMt5Servidor').value.trim()}).eq('id',uid);
+  if (error) return toast('Error: '+error.message,'error');
+  toast('Cuenta MT5 actualizada','success');
+  closeModal('modalMt5'); loadAllUsers();
+}
+
+async function toggleBan(uid,ban) {
+  if (ban&&!confirm('¿Banear a este usuario?')) return;
+  const {error} = await sb.from('perfiles').update({bloqueado:ban}).eq('id',uid);
+  if (error) return toast('Error: '+error.message,'error');
+  toast(ban?'Usuario baneado':'Usuario desbaneado',ban?'error':'success');
+  loadAllUsers();
+}
+
+function showAdminTab(tab) {
+  ['usuarios','membresia','pagos','chats','licencias','logslic'].forEach(t=>{
+    document.getElementById('adminContent-'+t).classList.toggle('hidden',t!==tab);
+    const btn = document.getElementById('adminTab-'+t);
+    btn.style.cssText = t===tab ? 'background:rgba(16,185,129,.15);color:#10B981;border:1px solid rgba(16,185,129,.3);' : '';
+    if (t!==tab) btn.className='px-4 py-2 rounded-xl text-xs font-semibold btn-outline';
+  });
+  if (tab==='pagos') loadPagos();
+  if (tab==='chats') loadAdminConversations();
+  if (tab==='membresia') loadMembresiaUserSelect();
+  if (tab==='licencias') loadLicencias();
+  if (tab==='logslic') loadLogsLic();
+}
+
+// ──────────────────────────────────────────────
+// LICENCIAS EA — Admin
+// ──────────────────────────────────────────────
+async function loadLicencias() {
+  const tb = document.getElementById('licenciasTable');
+  if (!tb) return;
+  tb.innerHTML = '<tr><td colspan="6" class="text-center py-8" style="color:#94A3B8;">Cargando...</td></tr>';
+  const { data, error } = await sb
+    .from('vista_licencias_admin')
+    .select('*')
+    .order('ultimo_heartbeat', { ascending: false });
+  if (error) {
+    tb.innerHTML = '<tr><td colspan="6" class="text-center py-8 text-red-400">Error: '+esc(error.message)+'</td></tr>';
+    return;
+  }
+  if (!data || !data.length) {
+    tb.innerHTML = '<tr><td colspan="6" class="text-center py-8" style="color:#94A3B8;">Sin licencias activas</td></tr>';
+    return;
+  }
+  const now = Date.now();
+  tb.innerHTML = data.map(l => {
+    const hb     = l.ultimo_heartbeat ? new Date(l.ultimo_heartbeat) : null;
+    const minAgo = hb ? Math.round((now - hb.getTime()) / 60000) : null;
+    const online = minAgo !== null && minAgo < 75;
+    const hbStr  = hb ? hb.toLocaleString('es-ES',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}) : '—';
+    const estadoBadge = l.activo
+      ? (online ? '<span style="color:#10B981;font-weight:700;">● Online</span>'
+                : '<span style="color:#F59E0B;font-weight:700;">○ Inactivo</span>')
+      : '<span style="color:#EF4444;font-weight:700;">✕ Revocada</span>';
+    const accionBtn = l.activo
+      ? '<button onclick="toggleLicencia('+l.id+',false)" class="btn-ghost text-xs font-medium" style="color:#EF4444;" title="Revocar">&#10005; Revocar</button>'
+      : '<button onclick="toggleLicencia('+l.id+',true)"  class="btn-ghost text-xs font-medium" style="color:#10B981;" title="Reactivar">&#8634; Reactivar</button>';
+    return '<tr class="table-row">'
+      +'<td class="px-4 py-3">'+esc(l.nombre||'—')+'<br><span style="color:#475569;font-size:10px;">'+esc(l.email||'—')+'</span></td>'
+      +'<td class="px-4 py-3"><span class="px-2 py-0.5 rounded-full text-xs font-semibold" style="background:rgba(59,130,246,.15);color:#3B82F6;">'+esc(l.ea_tipo)+'</span></td>'
+      +'<td class="px-4 py-3 mono">'+esc(l.mt5_account)+'</td>'
+      +'<td class="px-4 py-3">'+hbStr+'<br><span style="color:#475569;font-size:10px;">'+(minAgo!==null?minAgo+' min atrás':'—')+'</span></td>'
+      +'<td class="px-4 py-3">'+estadoBadge+'</td>'
+      +'<td class="px-4 py-3 text-right">'+accionBtn+'</td>'
+      +'</tr>';
+  }).join('');
+}
+
+async function toggleLicencia(id, activar) {
+  const accion = activar ? 'reactivar' : 'revocar';
+  if (!confirm('Confirmar '+accion+' la licencia #'+id+'?')) return;
+  const { error } = await sb.from('licencias_ea').update({ activo: activar }).eq('id', id);
+  if (error) return toast('Error: '+error.message, 'error');
+  toast('Licencia '+(activar?'reactivada':'revocada'), 'success');
+  loadLicencias();
+}
+
+async function loadLogsLic() {
+  const tb = document.getElementById('logsLicTable');
+  if (!tb) return;
+  tb.innerHTML = '<tr><td colspan="6" class="text-center py-8" style="color:#94A3B8;">Cargando...</td></tr>';
+  const { data, error } = await sb
+    .from('logs_licencias')
+    .select('fecha, token_usado, ea_tipo, mt5_account, exito, motivo')
+    .order('fecha', { ascending: false })
+    .limit(100);
+  if (error) {
+    tb.innerHTML = '<tr><td colspan="6" class="text-center py-8 text-red-400">Error: '+esc(error.message)+'</td></tr>';
+    return;
+  }
+  if (!data || !data.length) {
+    tb.innerHTML = '<tr><td colspan="6" class="text-center py-8" style="color:#94A3B8;">Sin logs</td></tr>';
+    return;
+  }
+  tb.innerHTML = data.map(l => {
+    const fecha = l.fecha ? new Date(l.fecha).toLocaleString('es-ES',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}) : '—';
+    const token = (l.token_usado||'—').substring(0,8)+'…';
+    return '<tr class="table-row">'
+      +'<td class="px-4 py-3 mono" style="white-space:nowrap;">'+fecha+'</td>'
+      +'<td class="px-4 py-3 mono" title="'+esc(l.token_usado||'')+'">'+esc(token)+'</td>'
+      +'<td class="px-4 py-3">'+esc(l.ea_tipo||'—')+'</td>'
+      +'<td class="px-4 py-3 mono">'+esc(l.mt5_account||'—')+'</td>'
+      +'<td class="px-4 py-3">'+(l.exito?'<span style="color:#10B981;font-weight:700;">&#10003; S&#237;</span>':'<span style="color:#EF4444;font-weight:700;">&#10005; No</span>')+'</td>'
+      +'<td class="px-4 py-3" style="color:#94A3B8;">'+esc(l.motivo||'—')+'</td>'
+      +'</tr>';
+  }).join('');
+}
+
+
+// ──────────────────────────────────────────────
+// CHAT SYSTEM
+// ──────────────────────────────────────────────
+async function createOrGetConversation() {
+  if (!currentUser) return null;
+  const {data,error} = await sb.from('conversaciones').select('id').eq('usuario_id',currentUser.id).single();
+  if (data) { chatConvId=data.id; return data.id; }
+  const {data:newConv,error:e2} = await sb.from('conversaciones').insert({usuario_id:currentUser.id}).select('id').single();
+  if (newConv) { chatConvId=newConv.id; return newConv.id; }
+  return null;
+}
+
+async function loadChatMessages(convId) {
+  const {data} = await sb.from('mensajes').select('*').eq('conversacion_id',convId).order('enviado_en',{ascending:true});
+  return data||[];
+}
+
+function renderChatMessages(msgs, containerId='chatMessages') {
+  const c = document.getElementById(containerId);
+  if (!c) return;
+  c.innerHTML = msgs.map(m=>{
+    const isMe = m.remitente_id===currentUser?.id;
+    const time = new Date(m.enviado_en).toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'});
+    return `<div class="flex ${isMe?'justify-end':'justify-start'}">
+      <div class="${isMe?'chat-msg-user':'chat-msg-admin'} p-3 max-w-xs" style="max-width:75%;">
+        ${m.imagen_url?`<img src="${esc(m.imagen_url)}" class="rounded-lg mb-1 max-h-32 object-cover"/>`:'' }
+        <p style="font-size:13px;">${esc(m.mensaje||'')}</p>
+        <p style="font-size:10px;color:#475569;margin-top:4px;text-align:${isMe?'right':'left'};">${time}</p>
+      </div>
+    </div>`;
+  }).join('');
+  c.scrollTop = c.scrollHeight;
+}
+
+async function toggleChatModal() {
+  const modal = document.getElementById('modalChat');
+  if (modal.classList.contains('hidden')) {
+    modal.classList.remove('hidden');
+    const convId = await createOrGetConversation();
+    if (convId) {
+      const msgs = await loadChatMessages(convId);
+      renderChatMessages(msgs);
+      lastMsgTimestamp = msgs.length ? msgs[msgs.length-1].enviado_en : null;
+      // Mark admin messages as read
+      await sb.from('mensajes').update({leido:true}).eq('conversacion_id',convId).eq('remitente_tipo','admin').eq('leido',false);
+      updateChatUnreadBadge(0);
+    }
+  } else {
+    modal.classList.add('hidden');
+  }
+}
+
+async function sendUserMessage() {
+  const input = document.getElementById('chatInput');
+  const text = input.value.trim();
+  if (!text && !pendingChatImage) return;
+  const convId = await createOrGetConversation();
+  if (!convId) return toast('Error al obtener conversación','error');
+
+  let imagen_url = null;
+  if (pendingChatImage) {
+    const fn = `chat/${currentUser.id}/${Date.now()}.jpg`;
+    const {data:upData} = await sb.storage.from('chat-images').upload(fn,pendingChatImage,{upsert:true});
+    if (upData) { const {data:url}=sb.storage.from('chat-images').getPublicUrl(fn); imagen_url=url.publicUrl; }
+    pendingChatImage=null;
+  }
+
+  const {error} = await sb.from('mensajes').insert({conversacion_id:convId,remitente_id:currentUser.id,remitente_tipo:'user',mensaje:text||'[imagen]',imagen_url});
+  if (error) return toast('Error: '+error.message,'error');
+  await sb.from('conversaciones').update({ultimo_mensaje_en:new Date().toISOString()}).eq('id',convId);
+  input.value='';
+  const msgs = await loadChatMessages(convId);
+  renderChatMessages(msgs);
+}
+
+let pendingChatImage = null;
+function attachChatImage(event) { pendingChatImage = event.target.files[0]; if(pendingChatImage) toast('Imagen lista, envía el mensaje','info'); }
+
+async function sendMessage(tipo, texto) {
+  const convId = chatConvId;
+  if (!convId) return;
+  await sb.from('mensajes').insert({conversacion_id:convId,remitente_id:currentUser.id,remitente_tipo:tipo==='admin'?'admin':'user',mensaje:texto});
+}
+
+function startChatPolling() {
+  stopChatPolling();
+  chatPollInterval = setInterval(async()=>{
+    if (!currentUser||!chatConvId) { await createOrGetConversation(); return; }
+    if (!chatConvId) return;
+    const {data} = await sb.from('mensajes').select('*').eq('conversacion_id',chatConvId).eq('remitente_tipo','admin').eq('leido',false);
+    if (data?.length) {
+      document.getElementById('chatUnreadDot').textContent=data.length;
+      document.getElementById('chatUnreadDot').classList.remove('hidden');
+      if (!document.getElementById('modalChat').classList.contains('hidden')) {
+        const msgs=await loadChatMessages(chatConvId); renderChatMessages(msgs);
+        await sb.from('mensajes').update({leido:true}).eq('conversacion_id',chatConvId).eq('remitente_tipo','admin').eq('leido',false);
+        updateChatUnreadBadge(0);
+      }
+    } else { updateChatUnreadBadge(0); }
+  },10000);
+}
+
+function stopChatPolling() { if(chatPollInterval){clearInterval(chatPollInterval);chatPollInterval=null;} }
+function updateChatUnreadBadge(n) { document.getElementById('chatUnreadDot').textContent=n; document.getElementById('chatUnreadDot').classList.toggle('hidden',n<=0); }
+
+// Admin chat
+async function loadAdminConversations() {
+  if (!isAdmin) return;
+  const {data} = await sb.from('conversaciones').select('*,perfiles!conversaciones_usuario_id_fkey(nombre)').order('ultimo_mensaje_en',{ascending:false,nullsFirst:false});
+  const c = document.getElementById('adminConvList');
+  if (!data?.length) { c.innerHTML='<p style="padding:12px;color:#475569;">Sin conversaciones</p>'; return; }
+
+  // Unread count per conv
+  const {data:unread} = await sb.from('mensajes').select('conversacion_id').eq('leido',false).eq('remitente_tipo','user');
+  const unreadMap = {};
+  (unread||[]).forEach(m=>{ unreadMap[m.conversacion_id]=(unreadMap[m.conversacion_id]||0)+1; });
+  const total = Object.values(unreadMap).reduce((s,v)=>s+v,0);
+  document.getElementById('chatUnreadBadge').textContent=total;
+  document.getElementById('chatUnreadBadge').classList.toggle('hidden',total<=0);
+
+  c.innerHTML = data.map(conv=>{
+    const un = unreadMap[conv.id]||0;
+    return `<div onclick="openAdminConv('${conv.id}','${escA(conv.perfiles?.nombre||'Usuario')}')" class="p-3 rounded-xl cursor-pointer hover:bg-white/5 transition-all" style="border-bottom:1px solid rgba(30,41,59,.4);">
+      <div class="flex items-center justify-between">
+        <span class="font-semibold" style="font-size:12px;">${esc(conv.perfiles?.nombre||'—')}</span>
+        ${un?`<span class="px-1.5 py-0.5 rounded-full text-xs font-bold" style="background:#EF4444;color:#fff;">${un}</span>`:''}
+      </div>
+      <p style="font-size:11px;color:#475569;">${conv.ultimo_mensaje_en?new Date(conv.ultimo_mensaje_en).toLocaleString('es-ES'):'Sin mensajes'}</p>
+    </div>`;
+  }).join('');
+}
+
+async function openAdminConv(convId, nombre) {
+  adminSelectedConvId = convId;
+  document.getElementById('adminChatHeader').textContent = '💬 '+nombre;
+  const msgs = await loadChatMessages(convId);
+  renderChatMessages(msgs, 'adminChatMessages');
+  await sb.from('mensajes').update({leido:true}).eq('conversacion_id',convId).eq('remitente_tipo','user').eq('leido',false);
+  loadAdminConversations();
+}
+
+async function sendAdminMessage() {
+  if (!adminSelectedConvId||!isAdmin) return;
+  const input = document.getElementById('adminChatInput');
+  const text = input.value.trim();
+  if (!text) return;
+  const {error} = await sb.from('mensajes').insert({conversacion_id:adminSelectedConvId,remitente_id:currentUser.id,remitente_tipo:'admin',mensaje:text});
+  if (error) return toast('Error: '+error.message,'error');
+  await sb.from('conversaciones').update({ultimo_mensaje_en:new Date().toISOString()}).eq('id',adminSelectedConvId);
+  input.value='';
+  const msgs = await loadChatMessages(adminSelectedConvId);
+  renderChatMessages(msgs,'adminChatMessages');
+}
+
+// ──────────────────────────────────────────────
+// UI HELPERS
+// ──────────────────────────────────────────────
+function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+function toggleUserMenu() { document.getElementById('userMenu').classList.toggle('hidden'); }
+function closeUserMenu() { document.getElementById('userMenu').classList.add('hidden'); }
+function copyToken() { const t=currentPerfil?.token_licencia; if(!t) return toast('Token no disponible','error'); navigator.clipboard.writeText(t).then(()=>toast('Token copiado','success')).catch(()=>toast('No se pudo copiar','error')); }
+function cap(s){return s?s.charAt(0).toUpperCase()+s.slice(1):'';}
+function esc(s){return s!=null?String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'):'';}
+function escA(s){return s?String(s).replace(/'/g,"&#39;"):'';}
+
+document.addEventListener('click',e=>{ if(!e.target.closest('#userMenu')&&!e.target.closest('[onclick="toggleUserMenu()"]')) closeUserMenu(); });
+
+// ──────────────────────────────────────────────
+// INIT
+// ──────────────────────────────────────────────
+(async()=>{
+  const {data:{session}} = await sb.auth.getSession();
+  if (!session) {
+    document.getElementById('authScreen').classList.remove('hidden');
+    document.getElementById('mainApp').classList.add('hidden');
+    document.getElementById('chatBubble').classList.add('hidden');
+  }
+  updatePayInstructions();
+})();
+
+  // ═══════════════════════════════════════════════════════════════
+  // CALCULADORA DE RIESGO
+  // ═══════════════════════════════════════════════════════════════
+  function setRiskPct(v) {
+    document.getElementById('calcRisk').value = v;
+    calculateRisk();
+  }
+  function calculateRisk() {
+    const balance = parseFloat(document.getElementById('calcBalance').value) || 10000;
+    const riskPct = parseFloat(document.getElementById('calcRisk').value) || 1;
+    const entry   = parseFloat(document.getElementById('calcEntry').value) || 0;
+    const sl      = parseFloat(document.getElementById('calcSL').value) || 0;
+    const tp      = parseFloat(document.getElementById('calcTP').value) || 0;
+    const instr   = document.getElementById('calcInstrument').value;
+    if (!entry || !sl) return;
+    const riskMoney = balance * riskPct / 100;
+    const diff = Math.abs(entry - sl);
+    if (diff === 0) return;
+    let lot, pipsVal;
+    if (instr === 'forex') {
+      const digits = (entry < 10) ? 3 : 5;
+      const pip = Math.pow(10, -(digits - 1));
+      const pips = diff / pip;
+      lot = riskMoney / (pips * 10);
+      pipsVal = Math.round(pips);
+    } else if (instr === 'gold') {
+      lot = riskMoney / (diff * 100);
+      pipsVal = Math.round(diff * 100);
+    } else {
+      lot = riskMoney / diff;
+      pipsVal = Math.round(diff);
+    }
+    lot = Math.max(0.01, Math.round(lot * 100) / 100);
+    const reward = tp ? Math.abs(tp - entry) / diff * riskMoney : 0;
+    const rr = reward > 0 ? (reward / riskMoney).toFixed(2) : '—';
+    document.getElementById('calcResultLot').textContent    = lot.toFixed(2) + ' lotes';
+    document.getElementById('calcResultRisk').textContent   = '
+</html>
+ + riskMoney.toFixed(2);
+    document.getElementById('calcResultReward').textContent = reward > 0 ? '+
+</html>
+ + reward.toFixed(2) : '—';
+    document.getElementById('calcResultRR').textContent     = '1 : ' + rr;
+    document.getElementById('calcResultPips').textContent   = pipsVal + ' pips';
+  }
+  function saveRiskCalc() {
+    const rec = {
+      balance: document.getElementById('calcBalance').value,
+      risk: document.getElementById('calcRisk').value,
+      lot: document.getElementById('calcResultLot').textContent,
+      riskMoney: document.getElementById('calcResultRisk').textContent,
+      rr: document.getElementById('calcResultRR').textContent,
+      entry: document.getElementById('calcEntry').value,
+      sl: document.getElementById('calcSL').value,
+      ts: new Date().toLocaleString()
+    };
+    let h = JSON.parse(localStorage.getItem('riskCalcHistory') || '[]');
+    h.unshift(rec); h = h.slice(0,20);
+    localStorage.setItem('riskCalcHistory', JSON.stringify(h));
+    loadRiskHistory();
+    showToast('Cálculo guardado', 'success');
+  }
+  function loadRiskHistory() {
+    const h = JSON.parse(localStorage.getItem('riskCalcHistory') || '[]');
+    const el = document.getElementById('calcHistory');
+    if (!el) return;
+    if (!h.length) { el.innerHTML = '<p style="color:#475569;">Sin historial guardado</p>'; return; }
+    el.innerHTML = h.map(r =>
+      '<div class="flex justify-between items-center p-2 rounded-lg" style="background:rgba(30,41,59,.5);">' +
+      '<div><span style="color:#10B981;">' + r.lot + '</span> | Riesgo: ' + r.riskMoney + ' | R:B ' + r.rr + '</div>' +
+      '<span style="color:#475569;font-size:10px;">' + r.ts + '</span></div>'
+    ).join('');
+  }
+  function clearRiskHistory() {
+    localStorage.removeItem('riskCalcHistory');
+    loadRiskHistory();
+    showToast('Historial borrado', 'info');
+  }
+
+  // ═══════════════════════════════════════════════════════════════
+  // CALENDARIO DE NOTICIAS + SESIONES
+  // ═══════════════════════════════════════════════════════════════
+  const NOTICIAS_MOCK = [
+    { dia:'Lun', hora:'08:30', pais:'🇺🇸 USD', evento:'ISM Manufactura',          impacto:'alto',  anterior:'49.2', previsto:'50.1' },
+    { dia:'Lun', hora:'10:00', pais:'🇪🇺 EUR', evento:'Confianza Consumidor',      impacto:'medio', anterior:'-14.5',previsto:'-13.0'},
+    { dia:'Mar', hora:'09:30', pais:'🇬🇧 GBP', evento:'PMI Servicios',             impacto:'alto',  anterior:'52.1', previsto:'52.8' },
+    { dia:'Mar', hora:'14:00', pais:'🇺🇸 USD', evento:'JOLTS Ofertas Empleo',      impacto:'alto',  anterior:'8.7M', previsto:'8.5M' },
+    { dia:'Mié', hora:'12:30', pais:'🇺🇸 USD', evento:'ADP Employment',            impacto:'alto',  anterior:'155K', previsto:'148K' },
+    { dia:'Mié', hora:'18:00', pais:'🇺🇸 USD', evento:'FOMC Minutes',              impacto:'alto',  anterior:'—',    previsto:'—'    },
+    { dia:'Jue', hora:'12:30', pais:'🇺🇸 USD', evento:'Jobless Claims',            impacto:'medio', anterior:'215K', previsto:'210K' },
+    { dia:'Jue', hora:'11:00', pais:'🇪🇺 EUR', evento:'Decisión BCE',              impacto:'alto',  anterior:'4.25%',previsto:'4.00%'},
+    { dia:'Vie', hora:'12:30', pais:'🇺🇸 USD', evento:'Non-Farm Payrolls',         impacto:'alto',  anterior:'177K', previsto:'185K' },
+    { dia:'Vie', hora:'12:30', pais:'🇺🇸 USD', evento:'Tasa de Desempleo',         impacto:'alto',  anterior:'3.9%', previsto:'4.0%' },
+    { dia:'Vie', hora:'14:00', pais:'🇺🇸 USD', evento:'Confianza U. Michigan',     impacto:'medio', anterior:'77.5', previsto:'78.0' },
+  ];
+  const IMPACT_STYLE = {
+    alto:  'background:rgba(239,68,68,.15);color:#EF4444;',
+    medio: 'background:rgba(251,191,36,.15);color:#FBBF24;',
+    bajo:  'background:rgba(96,165,250,.15);color:#60A5FA;'
+  };
+  function renderNewsCalendar() {
+    const tbody = document.getElementById('newsTable');
+    if (!tbody) return;
+    tbody.innerHTML = NOTICIAS_MOCK.map(n =>
+      '<tr style="border-bottom:1px solid rgba(30,41,59,.5);">' +
+      '<td class="px-4 py-3 font-semibold mono">' + n.dia + ' ' + n.hora + ' UTC</td>' +
+      '<td class="px-4 py-3">' + n.pais + '</td>' +
+      '<td class="px-4 py-3">' + n.evento + '</td>' +
+      '<td class="px-4 py-3"><span class="px-2 py-1 rounded-lg text-xs font-bold" style="' + IMPACT_STYLE[n.impacto] + '">' + n.impacto.charAt(0).toUpperCase()+n.impacto.slice(1) + '</span></td>' +
+      '<td class="px-4 py-3" style="color:#94A3B8;">' + n.anterior + '</td>' +
+      '<td class="px-4 py-3" style="color:#94A3B8;">' + n.previsto + '</td>' +
+      '</tr>'
+    ).join('');
+  }
+  const SESIONES_CFG = [
+    { id:'ny',  utcOffset:-4, utcOpen:13, utcClose:22 },
+    { id:'ldn', utcOffset:1,  utcOpen:8,  utcClose:17 },
+    { id:'tok', utcOffset:9,  utcOpen:0,  utcClose:9  },
+    { id:'syd', utcOffset:11, utcOpen:22, utcClose:7  },
+  ];
+  function updateSessionClocks() {
+    const now = new Date();
+    const utcH = now.getUTCHours(), utcM = now.getUTCMinutes(), utcS = now.getUTCSeconds();
+    const pad = n => String(n).padStart(2,'0');
+    SESIONES_CFG.forEach(s => {
+      const clockEl = document.getElementById('clock-' + s.id);
+      const statusEl = document.getElementById('status-' + s.id);
+      if (!clockEl) return;
+      const localH = (utcH + s.utcOffset + 24) % 24;
+      clockEl.textContent = pad(localH) + ':' + pad(utcM) + ':' + pad(utcS);
+      const isOpen = s.utcOpen < s.utcClose
+        ? utcH >= s.utcOpen && utcH < s.utcClose
+        : utcH >= s.utcOpen || utcH < s.utcClose;
+      statusEl.textContent = isOpen ? '🟢 Abierta' : '🔴 Cerrada';
+      statusEl.style.color = isOpen ? '#10B981' : '#475569';
+    });
+  }
+  setInterval(() => {
+    if (document.getElementById('section-noticias') && !document.getElementById('section-noticias').classList.contains('hidden'))
+      updateSessionClocks();
+  }, 1000);
+
+  // ═══════════════════════════════════════════════════════════════
+  // REFERIDOS
+  // ═══════════════════════════════════════════════════════════════
+  async function loadReferralData() {
+    const linkEl = document.getElementById('refLink');
+    if (!linkEl || !currentUser) return;
+    const { data: p } = await supabase.from('perfiles')
+      .select('token_licencia, referidos_clics, referidos_conversiones, referidos_comisiones')
+      .eq('id', currentUser.id).single();
+    if (p) {
+      const base = window.location.origin + window.location.pathname;
+      linkEl.value = base + '?ref=' + (p.token_licencia || '').slice(0,8);
+      document.getElementById('refClicks').textContent        = p.referidos_clics || 0;
+      document.getElementById('refConversiones').textContent  = p.referidos_conversiones || 0;
+      document.getElementById('refComisiones').textContent    = '
+</html>
+ + (parseFloat(p.referidos_comisiones)||0).toFixed(2);
+    }
+  }
+  function copyRefLink() {
+    const el = document.getElementById('refLink');
+    if (!el) return;
+    navigator.clipboard.writeText(el.value).then(() => showToast('Enlace copiado', 'success'));
+  }
+
+  // ═══════════════════════════════════════════════════════════════
+  // DESCARGAS — TOKEN
+  // ═══════════════════════════════════════════════════════════════
+  async function loadDescargasToken() {
+    const el = document.getElementById('descargasToken');
+    if (!el || !currentUser) return;
+    const { data: p } = await supabase.from('perfiles').select('token_licencia').eq('id', currentUser.id).single();
+    el.textContent = p?.token_licencia || '—';
+    updateDescargasVisibility();
+  }
+  function copyDescargasToken() {
+    const el = document.getElementById('descargasToken');
+    if (!el) return;
+    navigator.clipboard.writeText(el.textContent).then(() => showToast('Token copiado', 'success'));
+  }
+
+  // ═══════════════════════════════════════════════════════════════
+  // DESCARGAS — BOTONES POR PLAN
+  // ═══════════════════════════════════════════════════════════════
+  function updateDescargasVisibility() {
+    const plan = currentPerfil?.plan || 'gratis';
+    const isPremiumOrElite = plan === 'premium' || plan === 'elite';
+    const isElite          = plan === 'elite';
+
+    const GITHUB_RAW = 'https://raw.githubusercontent.com/erosabalfernandez-art/quantcore-api/main/ea_modificados/';
+
+    function btnDownload(url, filename, colorClass, colorStyle) {
+      return '<a href="' + url + '" download="' + filename + '" target="_blank"'
+        + ' class="' + colorClass + ' block text-center py-2.5 rounded-xl text-sm font-semibold"'
+        + (colorStyle ? ' style="' + colorStyle + '"' : '') + '>'
+        + '&#11015; Descargar .mq5</a>';
+    }
+
+    function btnLocked(requiredPlan) {
+      const label = requiredPlan === 'elite' ? 'Solo Elite' : 'Requiere Premium o Elite';
+      return '<button disabled class="block w-full text-center py-2.5 rounded-xl text-sm font-semibold cursor-not-allowed"'
+        + ' style="background:rgba(71,85,105,.25);color:#475569;border:1px solid rgba(71,85,105,.3);">'
+        + '&#128274; ' + label + '</button>';
+    }
+
+    const rmEl  = document.getElementById('dl-btn-riskmanager');
+    const ajEl  = document.getElementById('dl-btn-autojournaling');
+    const bsEl  = document.getElementById('dl-btn-backtest');
+
+    if (rmEl)  rmEl.innerHTML  = isPremiumOrElite
+      ? btnDownload(GITHUB_RAW + 'RiskManager.mq5',        'RiskManager.mq5',        'btn-green',   '')
+      : btnLocked('premium');
+
+    if (ajEl)  ajEl.innerHTML  = isPremiumOrElite
+      ? btnDownload(GITHUB_RAW + 'AutoJournaling.mq5',     'AutoJournaling.mq5',     'btn-blue',    '')
+      : btnLocked('premium');
+
+    if (bsEl)  bsEl.innerHTML  = isElite
+      ? btnDownload(GITHUB_RAW + 'BacktestSimulator.mq5',  'BacktestSimulator.mq5',  'btn-outline', 'color:#8B5CF6;border-color:rgba(139,92,246,.3);')
+      : btnLocked('elite');
+  }
+
+  // ═══════════════════════════════════════════════════════════════
+  // LOGROS / GAMIFICACIÓN
+  // ═══════════════════════════════════════════════════════════════
+  const LOGROS_DEF = [
+    { id:'primer_trade',     icon:'🎯', nombre:'Primer Trade',      desc:'Registra tu primera operación',       check: s => s.total >= 1   },
+    { id:'diez_trades',      icon:'🔟', nombre:'10 Operaciones',    desc:'Llega a 10 trades registrados',       check: s => s.total >= 10  },
+    { id:'cincuenta_trades', icon:'💪', nombre:'50 Operaciones',    desc:'Llega a 50 trades registrados',       check: s => s.total >= 50  },
+    { id:'racha_5',          icon:'🔥', nombre:'Racha de 5',        desc:'5 ganadoras consecutivas',            check: s => s.racha >= 5   },
+    { id:'win_rate_60',      icon:'📈', nombre:'Win Rate 60%',      desc:'Win rate >= 60% con 10+ trades',      check: s => s.total>=10 && s.wr>=60 },
+    { id:'profit_factor_2',  icon:'⚖️', nombre:'Factor x2',         desc:'Factor de beneficio >= 2.0',          check: s => s.pf >= 2      },
+    { id:'drawdown_bajo',    icon:'🛡️', nombre:'Drawdown Bajo',     desc:'Max drawdown < 5%',                   check: s => s.total>=10 && s.dd<5  },
+    { id:'referido_premium', icon:'👥', nombre:'Referidor',          desc:'Consigue 1 referido de pago',         check: s => s.refs >= 1   },
+  ];
+  async function getAllTradesFromDB() {
+    return new Promise(resolve => {
+      if (!db) { resolve([]); return; }
+      const tx = db.transaction('trades','readonly');
+      const req = tx.objectStore('trades').getAll();
+      req.onsuccess = () => resolve(req.result||[]);
+      req.onerror = () => resolve([]);
+    });
+  }
+  function computeTradeStats(trades) {
+    const closed = trades.filter(t => t.resultado !== undefined && t.resultado !== null);
+    const total = closed.length;
+    const wins = closed.filter(t => parseFloat(t.resultado||0) > 0);
+    const wr = total ? wins.length / total * 100 : 0;
+    let racha = 0, maxRacha = 0;
+    closed.forEach(t => { if(parseFloat(t.resultado||0)>0){racha++;maxRacha=Math.max(maxRacha,racha);}else racha=0; });
+    const gw = wins.reduce((a,t) => a+parseFloat(t.resultado||0),0);
+    const gl = Math.abs(closed.filter(t=>parseFloat(t.resultado||0)<0).reduce((a,t)=>a+parseFloat(t.resultado||0),0));
+    const pf = gl > 0 ? gw/gl : gw > 0 ? 99 : 0;
+    return { total, wr, racha: maxRacha, dd: 3, pf, refs: 0 };
+  }
+  async function loadAchievements() {
+    const grid = document.getElementById('logrosGrid');
+    if (!grid) return;
+    const trades = await getAllTradesFromDB();
+    const stats = computeTradeStats(trades);
+    let saved = [];
+    if (currentUser) {
+      const { data: p } = await supabase.from('perfiles').select('logros').eq('id', currentUser.id).single();
+      saved = p?.logros || [];
+    }
+    let unlocked = 0;
+    grid.innerHTML = LOGROS_DEF.map(l => {
+      const ok = saved.includes(l.id) || l.check(stats);
+      if (ok) unlocked++;
+      return '<div class="glass-card rounded-xl p-4 text-center' + (ok ? '' : ' opacity-50') + '" style="' + (ok ? 'border:1px solid rgba(16,185,129,.3);' : '') + '">' +
+        '<div class="text-3xl mb-2">' + (ok ? l.icon : '🔒') + '</div>' +
+        '<div class="font-semibold text-xs mb-1">' + l.nombre + '</div>' +
+        '<div class="text-xs" style="color:#475569;">' + l.desc + '</div>' +
+        (ok ? '<div class="text-xs mt-2 font-bold" style="color:#10B981;">✓ Desbloqueado</div>' : '') +
+        '</div>';
+    }).join('');
+    const pEl = document.getElementById('logrosProgress');
+    const cEl = document.getElementById('logrosCount');
+    if (pEl) pEl.style.width = (unlocked / LOGROS_DEF.length * 100) + '%';
+    if (cEl) cEl.textContent = unlocked + '/' + LOGROS_DEF.length;
+    // Guardar logros nuevos en Supabase
+    if (currentUser) {
+      const newU = LOGROS_DEF.filter(l => l.check(stats)).map(l => l.id);
+      const merged = [...new Set([...saved, ...newU])];
+      if (merged.length > saved.length)
+        await supabase.from('perfiles').update({ logros: merged }).eq('id', currentUser.id);
+    }
+  }
+
+  // ═══════════════════════════════════════════════════════════════
+  // ADMIN: LICENCIAS EA
+  // ═══════════════════════════════════════════════════════════════
+  async function loadLicencias() {
+    const tbody = document.getElementById('licenciasTable');
+    if (!tbody) return;
+    tbody.innerHTML = '<tr><td colspan="6" class="text-center py-6" style="color:#475569;">Cargando...</td></tr>';
+    const { data, error } = await supabase.from('licencias_ea')
+      .select('*, perfiles(nombre, email)')
+      .order('ultimo_heartbeat', { ascending: false }).limit(100);
+    if (error || !data) { tbody.innerHTML = '<tr><td colspan="6" class="text-center py-6" style="color:#EF4444;">Error: ' + (error?.message||'sin datos') + '</td></tr>'; return; }
+    if (!data.length) { tbody.innerHTML = '<tr><td colspan="6" class="text-center py-6" style="color:#475569;">Sin licencias</td></tr>'; return; }
+    tbody.innerHTML = data.map(lic => {
+      const hb = lic.ultimo_heartbeat ? new Date(lic.ultimo_heartbeat).toLocaleString() : '—';
+      const badge = lic.activo
+        ? '<span class="px-2 py-1 rounded-lg text-xs font-bold" style="background:rgba(16,185,129,.15);color:#10B981;">Activa</span>'
+        : '<span class="px-2 py-1 rounded-lg text-xs font-bold" style="background:rgba(239,68,68,.15);color:#EF4444;">Inactiva</span>';
+      const btn = lic.activo
+        ? '<button onclick="toggleLicencia(' + lic.id + ',false)" class="btn-outline text-xs px-2 py-1 rounded-lg" style="color:#EF4444;border-color:rgba(239,68,68,.3);">Desactivar</button>'
+        : '<button onclick="toggleLicencia(' + lic.id + ',true)" class="btn-outline text-xs px-2 py-1 rounded-lg" style="color:#10B981;border-color:rgba(16,185,129,.3);">Activar</button>';
+      return '<tr style="border-bottom:1px solid rgba(30,41,59,.5);">' +
+        '<td class="px-4 py-3">' + (lic.perfiles?.nombre||'—') + '<br><span style="color:#475569;">' + (lic.perfiles?.email||'') + '</span></td>' +
+        '<td class="px-4 py-3"><code style="color:#60A5FA;">' + lic.ea_tipo + '</code></td>' +
+        '<td class="px-4 py-3 mono">' + lic.mt5_account + '</td>' +
+        '<td class="px-4 py-3" style="color:#94A3B8;">' + hb + '</td>' +
+        '<td class="px-4 py-3">' + badge + '</td>' +
+        '<td class="px-4 py-3 text-right">' + btn + '</td>' +
+        '</tr>';
+    }).join('');
+  }
+  async function toggleLicencia(id, activo) {
+    await supabase.from('licencias_ea').update({ activo }).eq('id', id);
+    loadLicencias();
+    showToast(activo ? 'Licencia activada' : 'Licencia desactivada', activo ? 'success' : 'info');
+  }
+  async function loadLogsLic() {
+    const tbody = document.getElementById('logsLicTable');
+    if (!tbody) return;
+    tbody.innerHTML = '<tr><td colspan="6" class="text-center py-6" style="color:#475569;">Cargando...</td></tr>';
+    const { data, error } = await supabase.from('logs_licencias').select('*').order('fecha',{ascending:false}).limit(100);
+    if (error || !data) { tbody.innerHTML = '<tr><td colspan="6" class="text-center py-6" style="color:#EF4444;">Error</td></tr>'; return; }
+    if (!data.length) { tbody.innerHTML = '<tr><td colspan="6" class="text-center py-6" style="color:#475569;">Sin logs</td></tr>'; return; }
+    tbody.innerHTML = data.map(l =>
+      '<tr style="border-bottom:1px solid rgba(30,41,59,.5);">' +
+      '<td class="px-4 py-3 mono" style="color:#94A3B8;">' + new Date(l.fecha).toLocaleString() + '</td>' +
+      '<td class="px-4 py-3 mono text-xs">' + (l.token_usado||'').slice(0,10) + '…</td>' +
+      '<td class="px-4 py-3"><code style="color:#60A5FA;">' + (l.ea_tipo||'—') + '</code></td>' +
+      '<td class="px-4 py-3 mono">' + (l.mt5_account||'—') + '</td>' +
+      '<td class="px-4 py-3">' + (l.exito ? '<span style="color:#10B981;">✓</span>' : '<span style="color:#EF4444;">✗</span>') + '</td>' +
+      '<td class="px-4 py-3" style="color:#94A3B8;">' + (l.motivo||'—') + '</td>' +
+      '</tr>'
+    ).join('');
+  }
+
+  // ═══════════════════════════════════════════════════════════════
+  // EXPORTAR PDF (Elite)
+  // ═══════════════════════════════════════════════════════════════
+  async function exportPDF() {
+    if (!currentProfile || currentProfile.plan !== 'elite') {
+      showToast('Función exclusiva plan Elite', 'error'); return;
+    }
+    if (typeof html2pdf === 'undefined') { showToast('Librería PDF no cargada', 'error'); return; }
+    const el = document.getElementById('section-diario');
+    const opt = {
+      margin: 10,
+      filename: 'diario_trading_' + new Date().toISOString().slice(0,10) + '.pdf',
+      image: { type: 'jpeg', quality: 0.9 },
+      html2canvas: { scale: 1.5, backgroundColor: '#0B0F17', useCORS: true },
+      jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' }
+    };
+    showToast('Generando PDF...', 'info');
+    try { await html2pdf().set(opt).from(el).save(); showToast('PDF descargado', 'success'); }
+    catch(e) { showToast('Error al generar PDF', 'error'); }
+  }
+
+  // ═══════════════════════════════════════════════════════════════
+  // SHARPE RATIO + MÉTRICAS AVANZADAS
+  // ═══════════════════════════════════════════════════════════════
+  async function computeAdvancedMetrics() {
+    const trades = await getAllTradesFromDB();
+    const results = trades.filter(t => t.resultado != null).map(t => parseFloat(t.resultado||0));
+    if (!results.length) return null;
+    const mean = results.reduce((a,b)=>a+b,0)/results.length;
+    const variance = results.reduce((a,b)=>a+Math.pow(b-mean,2),0)/results.length;
+    const std = Math.sqrt(variance);
+    const sharpe = std > 0 ? (mean/std*Math.sqrt(252)).toFixed(2) : 'N/A';
+    // Hourly
+    const hourly = {};
+    trades.filter(t=>t.resultado&&t.fecha).forEach(t=>{
+      const h = new Date(t.fecha).getHours();
+      hourly[h] = (hourly[h]||0) + parseFloat(t.resultado||0);
+    });
+    return { sharpe, hourly, results };
+  }
+
+  // Hook: cuando el usuario navega a Diario, renderizar métricas avanzadas
+  // (se añaden a la sección si existe el elemento #advancedMetrics)
+  async function renderAdvancedMetricsIfVisible() {
+    const m = await computeAdvancedMetrics();
+    if (!m) return;
+    const el = document.getElementById('advSharpe');
+    if (el) el.textContent = m.sharpe;
+  }
+
+  // ═══════════════════════════════════════════════════════════════
+  // HOOKS: onShowSection
+  // ═══════════════════════════════════════════════════════════════
+  // Envolver showSection para cargar datos al navegar
+  (function() {
+    const _orig = window.showSection;
+    window.showSection = function(name) {
+      _orig(name);
+      if (name === 'calculadora') { calculateRisk(); loadRiskHistory(); }
+      if (name === 'noticias')    { renderNewsCalendar(); updateSessionClocks(); }
+      if (name === 'referidos')   { loadReferralData(); }
+      if (name === 'logros')      { loadAchievements(); }
+      if (name === 'descargas')   { loadDescargasToken(); updateDescargasVisibility(); }
+      if (name === 'diario')      { renderAdvancedMetricsIfVisible(); }
+    };
+  })();
+
+</script>
+</body>
+</html>
