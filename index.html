@@ -547,6 +547,7 @@ select.input-dark option{background:#131A26;color:#E2E8F0;}
               </div>
             </div>
           </div>
+        </div><!-- /adminContent-chats -->
 
         <!-- Tab: Licencias EA -->
         <div id="adminContent-licencias" class="hidden">
@@ -1686,11 +1687,10 @@ async function loadLicencias() {
   if (!tb) return;
   tb.innerHTML = '<tr><td colspan="6" class="text-center py-8" style="color:#94A3B8;">Cargando...</td></tr>';
   const { data, error } = await sb
-    .from('vista_licencias_admin')
-    .select('*')
+    .from('vista_licencias_admin').select('*')
     .order('ultimo_heartbeat', { ascending: false });
   if (error) {
-    tb.innerHTML = '<tr><td colspan="6" class="text-center py-8 text-red-400">Error: '+esc(error.message)+'</td></tr>';
+    tb.innerHTML = '<tr><td colspan="6" class="text-center py-8" style="color:#EF4444;">Error: '+esc(error.message)+'</td></tr>';
     return;
   }
   if (!data || !data.length) {
@@ -1703,30 +1703,28 @@ async function loadLicencias() {
     const minAgo = hb ? Math.round((now - hb.getTime()) / 60000) : null;
     const online = minAgo !== null && minAgo < 75;
     const hbStr  = hb ? hb.toLocaleString('es-ES',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}) : '—';
-    const estadoBadge = l.activo
+    const badge  = l.activo
       ? (online ? '<span style="color:#10B981;font-weight:700;">● Online</span>'
                 : '<span style="color:#F59E0B;font-weight:700;">○ Inactivo</span>')
       : '<span style="color:#EF4444;font-weight:700;">✕ Revocada</span>';
-    const accionBtn = l.activo
-      ? '<button onclick="toggleLicencia('+l.id+',false)" class="btn-ghost text-xs font-medium" style="color:#EF4444;" title="Revocar">&#10005; Revocar</button>'
-      : '<button onclick="toggleLicencia('+l.id+',true)"  class="btn-ghost text-xs font-medium" style="color:#10B981;" title="Reactivar">&#8634; Reactivar</button>';
+    const btn = l.activo
+      ? '<button onclick="toggleLicencia('+l.id+',false)" class="btn-ghost text-xs" style="color:#EF4444;">✕ Revocar</button>'
+      : '<button onclick="toggleLicencia('+l.id+',true)"  class="btn-ghost text-xs" style="color:#10B981;">↺ Reactivar</button>';
     return '<tr class="table-row">'
       +'<td class="px-4 py-3">'+esc(l.nombre||'—')+'<br><span style="color:#475569;font-size:10px;">'+esc(l.email||'—')+'</span></td>'
       +'<td class="px-4 py-3"><span class="px-2 py-0.5 rounded-full text-xs font-semibold" style="background:rgba(59,130,246,.15);color:#3B82F6;">'+esc(l.ea_tipo)+'</span></td>'
       +'<td class="px-4 py-3 mono">'+esc(l.mt5_account)+'</td>'
       +'<td class="px-4 py-3">'+hbStr+'<br><span style="color:#475569;font-size:10px;">'+(minAgo!==null?minAgo+' min atrás':'—')+'</span></td>'
-      +'<td class="px-4 py-3">'+estadoBadge+'</td>'
-      +'<td class="px-4 py-3 text-right">'+accionBtn+'</td>'
-      +'</tr>';
+      +'<td class="px-4 py-3">'+badge+'</td>'
+      +'<td class="px-4 py-3 text-right">'+btn+'</td></tr>';
   }).join('');
 }
 
 async function toggleLicencia(id, activar) {
-  const accion = activar ? 'reactivar' : 'revocar';
-  if (!confirm('Confirmar '+accion+' la licencia #'+id+'?')) return;
+  if (!confirm((activar?'Reactivar':'Revocar')+' licencia #'+id+'?')) return;
   const { error } = await sb.from('licencias_ea').update({ activo: activar }).eq('id', id);
-  if (error) return toast('Error: '+error.message, 'error');
-  toast('Licencia '+(activar?'reactivada':'revocada'), 'success');
+  if (error) return toast('Error: '+error.message,'error');
+  toast('Licencia '+(activar?'reactivada':'revocada'),'success');
   loadLicencias();
 }
 
@@ -1736,11 +1734,10 @@ async function loadLogsLic() {
   tb.innerHTML = '<tr><td colspan="6" class="text-center py-8" style="color:#94A3B8;">Cargando...</td></tr>';
   const { data, error } = await sb
     .from('logs_licencias')
-    .select('fecha, token_usado, ea_tipo, mt5_account, exito, motivo')
-    .order('fecha', { ascending: false })
-    .limit(100);
+    .select('fecha,token_usado,ea_tipo,mt5_account,exito,motivo')
+    .order('fecha', { ascending: false }).limit(100);
   if (error) {
-    tb.innerHTML = '<tr><td colspan="6" class="text-center py-8 text-red-400">Error: '+esc(error.message)+'</td></tr>';
+    tb.innerHTML = '<tr><td colspan="6" class="text-center py-8" style="color:#EF4444;">Error: '+esc(error.message)+'</td></tr>';
     return;
   }
   if (!data || !data.length) {
@@ -1748,17 +1745,40 @@ async function loadLogsLic() {
     return;
   }
   tb.innerHTML = data.map(l => {
-    const fecha = l.fecha ? new Date(l.fecha).toLocaleString('es-ES',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}) : '—';
-    const token = (l.token_usado||'—').substring(0,8)+'…';
+    const f = l.fecha ? new Date(l.fecha).toLocaleString('es-ES',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}) : '—';
+    const tok = (l.token_usado||'—').substring(0,8)+'…';
     return '<tr class="table-row">'
-      +'<td class="px-4 py-3 mono" style="white-space:nowrap;">'+fecha+'</td>'
-      +'<td class="px-4 py-3 mono" title="'+esc(l.token_usado||'')+'">'+esc(token)+'</td>'
+      +'<td class="px-4 py-3 mono" style="white-space:nowrap;">'+f+'</td>'
+      +'<td class="px-4 py-3 mono" title="'+esc(l.token_usado||'')+'">'+esc(tok)+'</td>'
       +'<td class="px-4 py-3">'+esc(l.ea_tipo||'—')+'</td>'
       +'<td class="px-4 py-3 mono">'+esc(l.mt5_account||'—')+'</td>'
-      +'<td class="px-4 py-3">'+(l.exito?'<span style="color:#10B981;font-weight:700;">&#10003; S&#237;</span>':'<span style="color:#EF4444;font-weight:700;">&#10005; No</span>')+'</td>'
-      +'<td class="px-4 py-3" style="color:#94A3B8;">'+esc(l.motivo||'—')+'</td>'
-      +'</tr>';
+      +'<td class="px-4 py-3">'+(l.exito
+        ?'<span style="color:#10B981;font-weight:700;">✓ Sí</span>'
+        :'<span style="color:#EF4444;font-weight:700;">✕ No</span>')+'</td>'
+      +'<td class="px-4 py-3" style="color:#94A3B8;">'+esc(l.motivo||'—')+'</td></tr>';
   }).join('');
+}
+
+// ──────────────────────────────────────────────
+// DESCARGAS — visibilidad según plan
+// ──────────────────────────────────────────────
+function updateDescargasVisibility() {
+  const plan = currentPerfil && currentPerfil.plan ? currentPerfil.plan : 'gratis';
+  const isPremOrElite = plan === 'premium' || plan === 'elite';
+  const isElite = plan === 'elite';
+  const BASE = 'https://raw.githubusercontent.com/erosabalfernandez-art/quantcore-api/main/ea_modificados/';
+  function dlBtn(url, file, cls, sty) {
+    return '<a href="'+url+'" download="'+file+'" target="_blank" class="'+cls+' block text-center py-2.5 rounded-xl text-sm font-semibold"'+(sty?' style="'+sty+'"':'')+'>&#11015; Descargar .mq5</a>';
+  }
+  function locked(req) {
+    return '<button disabled class="block w-full py-2.5 rounded-xl text-sm font-semibold cursor-not-allowed text-center" style="background:rgba(71,85,105,.2);color:#475569;border:1px solid rgba(71,85,105,.3);">&#128274; '+(req==='elite'?'Solo Elite':'Requiere Premium o Elite')+'</button>';
+  }
+  const rm=document.getElementById('dl-btn-riskmanager');
+  const aj=document.getElementById('dl-btn-autojournaling');
+  const bs=document.getElementById('dl-btn-backtest');
+  if(rm) rm.innerHTML = isPremOrElite ? dlBtn(BASE+'RiskManager.mq5','RiskManager.mq5','btn-green','') : locked('premium');
+  if(aj) aj.innerHTML = isPremOrElite ? dlBtn(BASE+'AutoJournaling.mq5','AutoJournaling.mq5','btn-blue','') : locked('premium');
+  if(bs) bs.innerHTML = isElite ? dlBtn(BASE+'BacktestSimulator.mq5','BacktestSimulator.mq5','btn-outline','color:#8B5CF6;border-color:rgba(139,92,246,.3);') : locked('elite');
 }
 
 
@@ -1978,12 +1998,8 @@ document.addEventListener('click',e=>{ if(!e.target.closest('#userMenu')&&!e.tar
     const reward = tp ? Math.abs(tp - entry) / diff * riskMoney : 0;
     const rr = reward > 0 ? (reward / riskMoney).toFixed(2) : '—';
     document.getElementById('calcResultLot').textContent    = lot.toFixed(2) + ' lotes';
-    document.getElementById('calcResultRisk').textContent   = '
-</html>
- + riskMoney.toFixed(2);
-    document.getElementById('calcResultReward').textContent = reward > 0 ? '+
-</html>
- + reward.toFixed(2) : '—';
+    document.getElementById('calcResultRisk').textContent   = '$' + riskMoney.toFixed(2);
+    document.getElementById('calcResultReward').textContent = reward > 0 ? '+$' + reward.toFixed(2) : '\u2014';
     document.getElementById('calcResultRR').textContent     = '1 : ' + rr;
     document.getElementById('calcResultPips').textContent   = pipsVal + ' pips';
   }
@@ -2098,9 +2114,7 @@ document.addEventListener('click',e=>{ if(!e.target.closest('#userMenu')&&!e.tar
       linkEl.value = base + '?ref=' + (p.token_licencia || '').slice(0,8);
       document.getElementById('refClicks').textContent        = p.referidos_clics || 0;
       document.getElementById('refConversiones').textContent  = p.referidos_conversiones || 0;
-      document.getElementById('refComisiones').textContent    = '
-</html>
- + (parseFloat(p.referidos_comisiones)||0).toFixed(2);
+      document.getElementById('refComisiones').textContent    = '$' + (parseFloat(p.referidos_comisiones)||0).toFixed(2);
     }
   }
   function copyRefLink() {
@@ -2117,53 +2131,11 @@ document.addEventListener('click',e=>{ if(!e.target.closest('#userMenu')&&!e.tar
     if (!el || !currentUser) return;
     const { data: p } = await supabase.from('perfiles').select('token_licencia').eq('id', currentUser.id).single();
     el.textContent = p?.token_licencia || '—';
-    updateDescargasVisibility();
   }
   function copyDescargasToken() {
     const el = document.getElementById('descargasToken');
     if (!el) return;
     navigator.clipboard.writeText(el.textContent).then(() => showToast('Token copiado', 'success'));
-  }
-
-  // ═══════════════════════════════════════════════════════════════
-  // DESCARGAS — BOTONES POR PLAN
-  // ═══════════════════════════════════════════════════════════════
-  function updateDescargasVisibility() {
-    const plan = currentPerfil?.plan || 'gratis';
-    const isPremiumOrElite = plan === 'premium' || plan === 'elite';
-    const isElite          = plan === 'elite';
-
-    const GITHUB_RAW = 'https://raw.githubusercontent.com/erosabalfernandez-art/quantcore-api/main/ea_modificados/';
-
-    function btnDownload(url, filename, colorClass, colorStyle) {
-      return '<a href="' + url + '" download="' + filename + '" target="_blank"'
-        + ' class="' + colorClass + ' block text-center py-2.5 rounded-xl text-sm font-semibold"'
-        + (colorStyle ? ' style="' + colorStyle + '"' : '') + '>'
-        + '&#11015; Descargar .mq5</a>';
-    }
-
-    function btnLocked(requiredPlan) {
-      const label = requiredPlan === 'elite' ? 'Solo Elite' : 'Requiere Premium o Elite';
-      return '<button disabled class="block w-full text-center py-2.5 rounded-xl text-sm font-semibold cursor-not-allowed"'
-        + ' style="background:rgba(71,85,105,.25);color:#475569;border:1px solid rgba(71,85,105,.3);">'
-        + '&#128274; ' + label + '</button>';
-    }
-
-    const rmEl  = document.getElementById('dl-btn-riskmanager');
-    const ajEl  = document.getElementById('dl-btn-autojournaling');
-    const bsEl  = document.getElementById('dl-btn-backtest');
-
-    if (rmEl)  rmEl.innerHTML  = isPremiumOrElite
-      ? btnDownload(GITHUB_RAW + 'RiskManager.mq5',        'RiskManager.mq5',        'btn-green',   '')
-      : btnLocked('premium');
-
-    if (ajEl)  ajEl.innerHTML  = isPremiumOrElite
-      ? btnDownload(GITHUB_RAW + 'AutoJournaling.mq5',     'AutoJournaling.mq5',     'btn-blue',    '')
-      : btnLocked('premium');
-
-    if (bsEl)  bsEl.innerHTML  = isElite
-      ? btnDownload(GITHUB_RAW + 'BacktestSimulator.mq5',  'BacktestSimulator.mq5',  'btn-outline', 'color:#8B5CF6;border-color:rgba(139,92,246,.3);')
-      : btnLocked('elite');
   }
 
   // ═══════════════════════════════════════════════════════════════
