@@ -14,6 +14,7 @@ app.post('/api/validar-licencia',    require('./api/validar-licencia'));
 app.post('/api/heartbeat',           require('./api/heartbeat'));
 app.post('/api/desactivar-licencia', require('./api/desactivar-licencia'));
 app.post('/api/recibir-trades',      require('./api/recibir-trades'));
+app.post('/api/recibir-simbolos',    require('./api/recibir-simbolos'));
 app.get('/api/health',               require('./api/health'));
 
 // ─── AI Proxy ────────────────────────────────────────────────────────────────
