@@ -2028,6 +2028,7 @@ select.input-dark option{background:#131A26;color:#E2E8F0;}
 // ═══════════════════════════════════════════════════════════════
 // CONFIG
 // ═══════════════════════════════════════════════════════════════
+const VERCEL_API    = 'https://quantcore-api.vercel.app';
 const SUPABASE_URL  = 'https://raznmwztnucismwjaetc.supabase.co';
 const SUPABASE_KEY  = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJhem5td3p0bnVjaXNtd2phZXRjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAxNDg2NDMsImV4cCI6MjA5NTcyNDY0M30.PRF0zgiHnsXWb-2vt801Mf3Sl2a-o8BBJXD19aCEjpM';
 const FINNHUB_KEY   = 'd8dq7fpr01qhm4agkptgd8dq7fpr01qhm4agkpu0';
@@ -2465,7 +2466,7 @@ async function testLicenseConnection() {
   el.classList.remove('hidden');
   el.style.cssText = 'background:rgba(30,41,59,.5);border:1px solid rgba(30,41,59,.8);color:#94A3B8;line-height:1.6;';
   try {
-    const res = await fetch('/api/validar-licencia', {
+    const res = await fetch(VERCEL_API+'/api/validar-licencia', {
       method:'POST', headers:{'Content-Type':'application/json'},
       body: JSON.stringify({ token, ea_tipo:'risk_manager', mt5_account: currentPerfil?.mt5_cuenta||'TEST' })
     });
@@ -4416,7 +4417,7 @@ async function callAiApi(cfg, userText) {
   const {provider,apiKey,model}=cfg;
 
   async function proxyPost(targetUrl, headers, body) {
-    const res = await fetch('/api/ai-proxy', {
+    const res = await fetch(VERCEL_API+'/api/ai-proxy', {
       method: 'POST',
       headers: {'Content-Type':'application/json'},
       body: JSON.stringify({targetUrl, headers, body})
