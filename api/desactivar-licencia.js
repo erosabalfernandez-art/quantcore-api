@@ -19,22 +19,19 @@ module.exports = async function handler(req, res) {
   const { licencia_id } = req.body ?? {};
   if (!licencia_id) return res.status(400).json({ error: 'licencia_id requerido' });
 
-  // Verificar que el solicitante es admin via JWT de Supabase
   const authHeader = req.headers['authorization'] ?? '';
   const jwt = authHeader.replace('Bearer ', '').trim();
   if (!jwt) return res.status(401).json({ error: 'Sin autorización. Envía Authorization: Bearer <token>' });
 
   const sb = createClient(
     process.env.SUPABASE_URL,
-    process.env.SUPABASE_SERVICE_ROLE_KEY   // service_role, nunca anon key
+    process.env.SUPABASE_SERVICE_ROLE_KEY
   );
 
   try {
-    // 1. Verificar que el JWT pertenece a un usuario real
     const { data: { user }, error: authErr } = await sb.auth.getUser(jwt);
     if (authErr || !user) return res.status(401).json({ error: 'Token JWT inválido o expirado' });
 
-    // 2. Verificar que ese usuario es administrador
     const { data: adminRow } = await sb
       .from('admins')
       .select('user_id')
@@ -43,7 +40,6 @@ module.exports = async function handler(req, res) {
 
     if (!adminRow) return res.status(403).json({ error: 'Acceso denegado. Solo administradores.' });
 
-    // 3. Desactivar la licencia
     const { error } = await sb
       .from('licencias_ea')
       .update({ activo: false })
