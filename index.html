@@ -1040,39 +1040,52 @@ async function handleRegister() {
   if (pass.length < 8)           return showRegMsg('🔒 La contraseña debe tener mínimo 8 caracteres.');
 
   const btn = document.getElementById('btnRegister');
+  // Garantizar que el botón siempre se desbloquea usando un timer de seguridad
+  const unlockBtn = () => { btn.disabled = false; btn.textContent = 'Crear cuenta'; };
+  const safetyTimer = setTimeout(unlockBtn, 15000); // máx 15s por si algo falla
   btn.disabled = true; btn.textContent = 'Creando cuenta...';
 
   try {
     const { data, error } = await sb.auth.signUp({
       email,
       password: pass,
-      options: {
-        data: { nombre }
-        // emailRedirectTo: se toma del "Site URL" configurado en Supabase Dashboard
-        // Authentication → URL Configuration → Site URL
-      }
+      options: { data: { nombre } }
     });
+
+    clearTimeout(safetyTimer);
 
     if (error) {
       const { text } = authErrMsg(error);
       showRegMsg(text);
+      unlockBtn();
+      return;
+    }
+
+    // Supabase puede devolver data.user sin session cuando requiere confirmación de email
+    if (!data || !data.user) {
+      showRegMsg('⚠️ No se pudo crear la cuenta. Intenta de nuevo o contacta al administrador.');
+      unlockBtn();
       return;
     }
 
     if (!data.session) {
-      // Email confirmation required
+      // Email de confirmación enviado — usuario debe confirmar antes de entrar
       showRegMsg(
         '✅ ¡Cuenta creada! Revisa tu bandeja de entrada en <strong>' + email + '</strong> y haz clic en el enlace de confirmación para activarla.<br><br>' +
         '⚠️ Si no ves el email en 2 minutos, revisa la carpeta de spam.',
         'success'
       );
+      unlockBtn();
     } else {
-      toast('¡Bienvenido a Samtrader Pro!','success');
+      // Sin confirmación de email — sesión activa inmediatamente
+      toast('¡Bienvenido a Samtrader Pro!', 'success');
+      unlockBtn();
     }
   } catch(e) {
+    clearTimeout(safetyTimer);
+    console.error('[handleRegister] Error:', e);
     showRegMsg('🌐 Error de red. Comprueba tu conexión a internet.');
-  } finally {
-    btn.disabled = false; btn.textContent = 'Crear cuenta';
+    unlockBtn();
   }
 }
 
