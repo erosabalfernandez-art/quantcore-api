@@ -1849,6 +1849,7 @@ const journalPageSize = 10;
 // ═══════════════════════════════════════════════════════════════
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 let currentUser = null, currentPerfil = null, isAdmin = false;
+let currentSection = 'dashboard';
 let journalTrades = [], allUsersCache = [];
 let equityChart = null, journalEqChart = null;
 let chatConvId = null, chatPollInterval = null, lastMsgTimestamp = null;
@@ -2300,6 +2301,8 @@ function showSection(s) {
     if (n) n.classList.toggle('active', sec===s);
   });
   closeUserMenu();
+  currentSection = s;
+  refreshAiSuggestions();
   if (s==='diario')      { renderJournal(); renderAdvancedMetrics(); }
   if (s==='dashboard')   { updateDashboardMetrics(); }
   if (s==='admin'&&isAdmin) { loadAllUsers(); loadMembresiaUserSelect(); checkMaintenanceModeStatus(); }
@@ -3841,11 +3844,48 @@ function showAiChat(container, cfg) {
     const sug=document.createElement('div');
     sug.id='aiSuggestions';
     sug.style.cssText='display:flex;flex-direction:column;gap:5px;padding:0 12px 10px;';
-    sug.innerHTML=['¿Cómo instalo un EA en MT5?','¿Cómo calculo el lotaje correcto?','¿Qué incluye el plan Elite?','¿Cómo notifico un pago?'].map(q=>
-      `<button onclick="sendAiSuggestion(this,'${q}')" style="text-align:left;background:rgba(139,92,246,.08);border:1px solid rgba(139,92,246,.18);color:#C4B5FD;padding:7px 10px;border-radius:9px;cursor:pointer;font-size:11px;width:100%;">${q}</button>`
-    ).join('');
+    renderAiSuggestionButtons(sug, getContextualSuggestions(currentSection));
     container.querySelector('div').appendChild(sug);
   }
+}
+
+function getContextualSuggestions(section) {
+  const map = {
+    dashboard:    ['¿Qué significan las métricas del dashboard?','¿Cómo mejoro mi tasa de éxito?','¿Cómo funciona la curva de equity?','¿Qué es el drawdown máximo?'],
+    diario:       ['¿Cómo importo mis trades al diario?','¿Cómo interpreto las métricas avanzadas?','¿Puedo exportar mi journal a PDF?','¿Cómo uso las etiquetas en los trades?'],
+    calculadora:  ['¿Cómo calculo el lotaje correcto?','¿Qué es el riesgo por operación?','¿Cómo uso el stop loss en pips?','¿Qué porcentaje de riesgo recomiendas por trade?'],
+    planes:       ['¿Qué incluye el plan Elite?','¿Cuál es la diferencia entre Premium y Elite?','¿Cómo notifico un pago?','¿Puedo cambiar de plan en cualquier momento?'],
+    descargas:    ['¿Cómo instalo un EA en MT5?','¿Cómo obtengo mi token de licencia?','¿Qué EA se incluye en el plan Premium?','¿Cómo actualizo un EA a la nueva versión?'],
+    conectarmt5:  ['¿Cómo conecto mi cuenta MT5?','¿Qué hace el EA DataBridge?','¿Por qué no aparecen mis trades?','¿Es seguro conectar mi cuenta MT5?'],
+    noticias:     ['¿Qué eventos del calendario afectan más al mercado?','¿Cómo interpreto el impacto de las noticias?','¿Qué sesiones de trading hay hoy?','¿Qué es el Non-Farm Payroll?'],
+    referidos:    ['¿Cómo funciona el programa de referidos?','¿Cuánto gano por cada referido?','¿Cómo cobro mis comisiones?','¿Hay un límite de referidos?'],
+    ranking:      ['¿Cómo sube mi posición en el ranking?','¿Qué métricas cuentan para el ranking?','¿Cada cuánto se actualiza el leaderboard?','¿Hay premios para los primeros puestos?'],
+    logros:       ['¿Cómo desbloqueo los logros?','¿Qué logros dan más puntos?','¿Los logros tienen recompensas?','¿Puedo perder un logro ya obtenido?'],
+    perfil:       ['¿Cómo cambio mi contraseña?','¿Cómo configuro las notificaciones?','¿Puedo cambiar mi cuenta MT5 asociada?','¿Cómo elimino mi cuenta?'],
+    admin:        ['¿Cómo desactivo una licencia manualmente?','¿Cómo bloqueo un usuario?','¿Cómo veo los logs de validación?','¿Cómo cambio el plan de un usuario?'],
+  };
+  return map[section] || ['¿Cómo instalo un EA en MT5?','¿Cómo calculo el lotaje correcto?','¿Qué incluye el plan Elite?','¿Cómo notifico un pago?'];
+}
+
+function renderAiSuggestionButtons(container, questions) {
+  container.innerHTML = questions.map(q =>
+    `<button onclick="sendAiSuggestion(this,'${q.replace(/'/g,"&#39;")}')" style="text-align:left;background:rgba(139,92,246,.08);border:1px solid rgba(139,92,246,.18);color:#C4B5FD;padding:7px 10px;border-radius:9px;cursor:pointer;font-size:11px;width:100%;">${q}</button>`
+  ).join('');
+}
+
+function refreshAiSuggestions() {
+  const sug = document.getElementById('aiSuggestions');
+  if (!sug) return;
+  const label = sug.previousElementSibling;
+  const newLabel = document.getElementById('aiSugLabel');
+  const sectionNames = {
+    dashboard:'Dashboard',diario:'Diario de Trades',calculadora:'Calculadora',planes:'Planes',
+    descargas:'Descargas / EAs',conectarmt5:'Conectar MT5',noticias:'Noticias',
+    referidos:'Referidos',ranking:'Ranking',logros:'Logros',perfil:'Perfil',admin:'Admin'
+  };
+  const name = sectionNames[currentSection] || currentSection;
+  if (newLabel) newLabel.textContent = '💡 Sugerencias para ' + name;
+  renderAiSuggestionButtons(sug, getContextualSuggestions(currentSection));
 }
 
 function sendAiSuggestion(btn, text) {
