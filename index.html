@@ -1047,8 +1047,9 @@ async function handleRegister() {
       email,
       password: pass,
       options: {
-        data: { nombre },
-        emailRedirectTo: window.location.origin + window.location.pathname,
+        data: { nombre }
+        // emailRedirectTo: se toma del "Site URL" configurado en Supabase Dashboard
+        // Authentication → URL Configuration → Site URL
       }
     });
 
@@ -1078,7 +1079,7 @@ async function handleRegister() {
 async function handleResendConfirmation() {
   const email = document.getElementById('loginEmail').value.trim();
   if (!email) return showAuthError('Escribe tu email arriba para reenviar la confirmación.');
-  const { error } = await sb.auth.resend({ type: 'signup', email, options: { emailRedirectTo: location.href } });
+  const { error } = await sb.auth.resend({ type: 'signup', email, options: {} });
   if (error) return showAuthError('No se pudo reenviar: ' + error.message);
   showAuthSuccess('📧 Email de confirmación reenviado a <strong>' + email + '</strong>. Revisa también el spam.');
   document.getElementById('btnResend').classList.add('hidden');
@@ -1088,7 +1089,7 @@ async function handleForgotPassword() {
   clearAuthMessages();
   const email = document.getElementById('loginEmail').value.trim();
   if (!email) return showAuthError('Escribe tu email en el campo de arriba primero.');
-  const { error } = await sb.auth.resetPasswordForEmail(email, { redirectTo: location.href });
+  const { error } = await sb.auth.resetPasswordForEmail(email);
   if (error) return showAuthError('No se pudo enviar: ' + error.message);
   showAuthSuccess('📧 Email de recuperación enviado a <strong>' + email + '</strong>. Revisa también el spam.');
 }

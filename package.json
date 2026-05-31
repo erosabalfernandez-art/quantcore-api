@@ -1,7 +1,12 @@
 {
-  "name": "quantcore-api",
+  "name": "samtrader-pro-suite",
   "version": "1.0.0",
+  "description": "Samtrader Pro Suite – API serverless para Vercel",
+  "private": true,
+  "engines": {
+    "node": ">=18"
+  },
   "dependencies": {
-    "@supabase/supabase-js": "^2.39.0"
+    "@supabase/supabase-js": "^2.45.0"
   }
 }
