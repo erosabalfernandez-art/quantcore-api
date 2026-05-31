@@ -1,5 +1,6 @@
 {
   "version": 2,
+  "name": "samtrader-pro-suite",
   "builds": [
     {
       "src": "api/*.js",
@@ -12,12 +13,38 @@
   ],
   "routes": [
     {
-      "src": "/api/(.*)",
-      "dest": "/api/$1"
+      "src": "/api/validar-licencia",
+      "dest": "/api/validar-licencia.js"
+    },
+    {
+      "src": "/api/heartbeat",
+      "dest": "/api/heartbeat.js"
+    },
+    {
+      "src": "/api/desactivar-licencia",
+      "dest": "/api/desactivar-licencia.js"
+    },
+    {
+      "src": "/api/health",
+      "dest": "/api/health.js"
     },
     {
       "src": "/(.*)",
       "dest": "/index.html"
+    }
+  ],
+  "env": {
+    "SUPABASE_URL": "@supabase_url",
+    "SUPABASE_SERVICE_ROLE_KEY": "@supabase_service_role_key"
+  },
+  "headers": [
+    {
+      "source": "/api/(.*)",
+      "headers": [
+        { "key": "Access-Control-Allow-Origin", "value": "*" },
+        { "key": "Access-Control-Allow-Methods", "value": "GET, POST, OPTIONS" },
+        { "key": "Access-Control-Allow-Headers", "value": "Content-Type, Authorization" }
+      ]
     }
   ]
 }

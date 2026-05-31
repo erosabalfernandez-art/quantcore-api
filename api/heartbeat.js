@@ -64,7 +64,7 @@ module.exports = async function handler(req, res) {
     }
 
     if (!lic.activo) {
-      return res.status(403).json({ ok: false, motivo: 'Licencia desactivada por el administrador' });
+      return res.status(403).json({ ok: false, motivo: 'Licencia desactivada por nuestro equipo' });
     }
 
     // 3. Verificar cuenta MT5

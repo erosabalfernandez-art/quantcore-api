@@ -1,368 +1,449 @@
--- ══════════════════════════════════════════════════════════════════
--- setup_supabase_completo.sql
--- Samtrader Pro Suite — Script SQL COMPLETO
--- Ejecuta esto en: Supabase → SQL Editor → New Query → Run
--- IMPORTANTE: Ejecuta este script ANTES de registrar cualquier usuario
--- ══════════════════════════════════════════════════════════════════
+-- ================================================================
+-- SAMTRADER PRO SUITE — Setup completo de Supabase v3.1
+-- Ejecutar TODO en el SQL Editor de Supabase (dashboard.supabase.com)
+-- Orden de ejecución: de arriba hacia abajo, una sola vez
+-- ================================================================
 
--- ──────────────────────────────────────────────────────────────────
--- 1. TABLA PRINCIPAL: perfiles
---    Se crea una fila automáticamente cuando un usuario se registra
---    gracias al trigger handle_new_user (ver sección 3)
--- ──────────────────────────────────────────────────────────────────
-CREATE TABLE IF NOT EXISTS public.perfiles (
-  id                        UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
-  nombre                    TEXT,
-  plan                      TEXT NOT NULL DEFAULT 'gratis' CHECK (plan IN ('gratis','premium','elite')),
-  bloqueado                 BOOLEAN NOT NULL DEFAULT false,
-  mt5_cuenta                TEXT,
-  mt5_servidor              TEXT,
-  activos_manuales          TEXT,
-  token_licencia            TEXT UNIQUE,
-  fecha_registro            TIMESTAMPTZ NOT NULL DEFAULT now(),
-  fecha_expiracion_plan     TIMESTAMPTZ,
-  referidos_clics           INTEGER NOT NULL DEFAULT 0,
-  referidos_conversiones    INTEGER NOT NULL DEFAULT 0,
-  referidos_comisiones      NUMERIC(10,2) NOT NULL DEFAULT 0,
-  referido_por              UUID REFERENCES public.perfiles(id),
-  logros                    JSONB NOT NULL DEFAULT '[]'::jsonb
+-- ────────────────────────────────────────────────────────────────
+-- 1. TABLA: perfiles
+-- ────────────────────────────────────────────────────────────────
+create table if not exists public.perfiles (
+  id                     uuid primary key references auth.users(id) on delete cascade,
+  nombre                 text,
+  plan                   text not null default 'gratis' check (plan in ('gratis','premium','elite')),
+  bloqueado              boolean not null default false,
+  token_licencia         text unique,
+  mt5_cuenta             text,
+  mt5_servidor           text,
+  activos_manuales       text,
+  fecha_registro         timestamptz not null default now(),
+  fecha_expiracion_plan  timestamptz,
+  logros                 text[] default '{}',
+  referido_por           uuid references public.perfiles(id),
+  -- Campos para el ranking
+  compartir_estadisticas boolean not null default false,
+  win_rate               numeric(5,2) default 0,
+  beneficio_neto         numeric(12,2) default 0,
+  total_trades           integer default 0,
+  sharpe_ratio           numeric(8,4) default 0,
+  -- Preferencias
+  notificaciones_push    boolean not null default false,
+  widgets_ocultos        text[] default '{}'
+);
+comment on table public.perfiles is 'Perfiles de usuarios de Samtrader Pro Suite';
+
+-- ────────────────────────────────────────────────────────────────
+-- 2. TABLA: admins
+-- ────────────────────────────────────────────────────────────────
+create table if not exists public.admins (
+  user_id   uuid primary key references auth.users(id) on delete cascade,
+  creado_en timestamptz not null default now()
+);
+comment on table public.admins is 'Tabla de administradores de la plataforma';
+
+-- ────────────────────────────────────────────────────────────────
+-- 3. TABLA: licencias_ea
+-- ────────────────────────────────────────────────────────────────
+create table if not exists public.licencias_ea (
+  id                bigserial primary key,
+  usuario_id        uuid references auth.users(id) on delete cascade,
+  ea_tipo           text not null,
+  mt5_account       text not null,
+  activo            boolean not null default true,
+  fecha_activacion  timestamptz not null default now(),
+  ultimo_heartbeat  timestamptz,
+  intentos_fallidos integer not null default 0,
+  bloqueado_hasta   timestamptz
+);
+comment on table public.licencias_ea is 'Licencias activas de Expert Advisors por usuario';
+
+create index if not exists idx_licencias_ea_usuario_tipo on public.licencias_ea(usuario_id, ea_tipo);
+
+-- ────────────────────────────────────────────────────────────────
+-- 4. TABLA: logs_licencias
+-- ────────────────────────────────────────────────────────────────
+create table if not exists public.logs_licencias (
+  id          bigserial primary key,
+  usuario_id  uuid,
+  token_usado text,
+  ea_tipo     text,
+  mt5_account text,
+  exito       boolean,
+  motivo      text,
+  ip          text,
+  version_ea  text,
+  fecha       timestamptz not null default now()
+);
+comment on table public.logs_licencias is 'Logs de intentos de validación de licencias EA';
+
+create index if not exists idx_logs_licencias_fecha on public.logs_licencias(fecha desc);
+
+-- ────────────────────────────────────────────────────────────────
+-- 5. TABLA: pagos
+-- ────────────────────────────────────────────────────────────────
+create table if not exists public.pagos (
+  id            bigserial primary key,
+  usuario_id    uuid references auth.users(id) on delete cascade,
+  plan          text,
+  metodo        text,
+  monto         numeric(10,2),
+  estado        text not null default 'pendiente' check (estado in ('pendiente','aprobado','rechazado')),
+  notas         text,
+  creado_en     timestamptz not null default now(),
+  verificado_en timestamptz
+);
+comment on table public.pagos is 'Solicitudes de pago manual para actualización de planes';
+
+create index if not exists idx_pagos_estado on public.pagos(estado);
+
+-- ────────────────────────────────────────────────────────────────
+-- 6. TABLA: conversaciones (chat)
+-- ────────────────────────────────────────────────────────────────
+create table if not exists public.conversaciones (
+  id                bigserial primary key,
+  usuario_id        uuid unique references auth.users(id) on delete cascade,
+  ultimo_mensaje_en timestamptz,
+  estado            text not null default 'abierta' check (estado in ('abierta','cerrada'))
 );
 
--- Añadir columnas que puedan faltar si la tabla ya existía
-ALTER TABLE public.perfiles ADD COLUMN IF NOT EXISTS nombre                  TEXT;
-ALTER TABLE public.perfiles ADD COLUMN IF NOT EXISTS bloqueado               BOOLEAN NOT NULL DEFAULT false;
-ALTER TABLE public.perfiles ADD COLUMN IF NOT EXISTS mt5_cuenta              TEXT;
-ALTER TABLE public.perfiles ADD COLUMN IF NOT EXISTS mt5_servidor            TEXT;
-ALTER TABLE public.perfiles ADD COLUMN IF NOT EXISTS activos_manuales        TEXT;
-ALTER TABLE public.perfiles ADD COLUMN IF NOT EXISTS token_licencia          TEXT UNIQUE;
-ALTER TABLE public.perfiles ADD COLUMN IF NOT EXISTS fecha_registro          TIMESTAMPTZ NOT NULL DEFAULT now();
-ALTER TABLE public.perfiles ADD COLUMN IF NOT EXISTS fecha_expiracion_plan   TIMESTAMPTZ;
-ALTER TABLE public.perfiles ADD COLUMN IF NOT EXISTS referidos_clics         INTEGER NOT NULL DEFAULT 0;
-ALTER TABLE public.perfiles ADD COLUMN IF NOT EXISTS referidos_conversiones  INTEGER NOT NULL DEFAULT 0;
-ALTER TABLE public.perfiles ADD COLUMN IF NOT EXISTS referidos_comisiones    NUMERIC(10,2) NOT NULL DEFAULT 0;
-ALTER TABLE public.perfiles ADD COLUMN IF NOT EXISTS referido_por            UUID REFERENCES public.perfiles(id);
-ALTER TABLE public.perfiles ADD COLUMN IF NOT EXISTS logros                  JSONB NOT NULL DEFAULT '[]'::jsonb;
-
--- ──────────────────────────────────────────────────────────────────
--- 2. TABLA ADMINS
--- ──────────────────────────────────────────────────────────────────
-CREATE TABLE IF NOT EXISTS public.admins (
-  user_id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE
+-- ────────────────────────────────────────────────────────────────
+-- 7. TABLA: mensajes
+-- ────────────────────────────────────────────────────────────────
+create table if not exists public.mensajes (
+  id               bigserial primary key,
+  conversacion_id  bigint references public.conversaciones(id) on delete cascade,
+  remitente_id     uuid,
+  remitente_tipo   text not null check (remitente_tipo in ('user','admin')),
+  mensaje          text,
+  imagen_url       text,
+  leido            boolean not null default false,
+  enviado_en       timestamptz not null default now()
 );
 
--- ──────────────────────────────────────────────────────────────────
--- 3. TRIGGER: crear perfil automáticamente al registrarse
---    SIN ESTE TRIGGER el registro da error 422
--- ──────────────────────────────────────────────────────────────────
-CREATE OR REPLACE FUNCTION public.handle_new_user()
-RETURNS TRIGGER
-LANGUAGE plpgsql
-SECURITY DEFINER
-SET search_path = public
-AS $$
-BEGIN
-  INSERT INTO public.perfiles (
+create index if not exists idx_mensajes_conv_fecha    on public.mensajes(conversacion_id, enviado_en);
+create index if not exists idx_mensajes_no_leidos     on public.mensajes(conversacion_id, leido, remitente_tipo);
+
+-- ────────────────────────────────────────────────────────────────
+-- 8. TABLA: referidos
+-- ────────────────────────────────────────────────────────────────
+create table if not exists public.referidos (
+  id                  bigserial primary key,
+  referente_id        uuid references auth.users(id) on delete cascade,
+  referido_id         uuid references auth.users(id) on delete cascade,
+  fecha               timestamptz not null default now(),
+  plan_adquirido      text,
+  monto_pago          numeric(10,2),
+  comision_calculada  numeric(10,2),
+  pagada              boolean not null default false,
+  pagada_en           timestamptz,
+  unique(referente_id, referido_id)
+);
+
+create index if not exists idx_referidos_referente on public.referidos(referente_id);
+
+-- ────────────────────────────────────────────────────────────────
+-- 9. TABLA: descargas_ea
+-- ────────────────────────────────────────────────────────────────
+create table if not exists public.descargas_ea (
+  id         bigserial primary key,
+  usuario_id uuid references auth.users(id) on delete cascade,
+  ea_tipo    text not null,
+  fecha      timestamptz not null default now()
+);
+
+create index if not exists idx_descargas_ea_tipo on public.descargas_ea(ea_tipo);
+
+-- ────────────────────────────────────────────────────────────────
+-- 10. TABLA: admin_logs
+-- ────────────────────────────────────────────────────────────────
+create table if not exists public.admin_logs (
+  id       bigserial primary key,
+  admin_id uuid references auth.users(id),
+  accion   text not null,
+  detalles jsonb,
+  fecha    timestamptz not null default now()
+);
+
+create index if not exists idx_admin_logs_fecha on public.admin_logs(fecha desc);
+
+-- ────────────────────────────────────────────────────────────────
+-- 11. TABLA: configuracion_plataforma
+-- ────────────────────────────────────────────────────────────────
+create table if not exists public.configuracion_plataforma (
+  clave          text primary key,
+  valor          text,
+  actualizado_en timestamptz not null default now()
+);
+
+insert into public.configuracion_plataforma (clave, valor) values
+  ('modo_mantenimiento', 'false'),
+  ('max_intentos_login', '3'),
+  ('comision_gratis',    '0.05'),
+  ('comision_premium',   '0.10'),
+  ('comision_elite',     '0.15')
+on conflict (clave) do nothing;
+
+-- ────────────────────────────────────────────────────────────────
+-- 12. TABLA: trades_recibidos  ← EA DataBridge
+-- ────────────────────────────────────────────────────────────────
+create table if not exists public.trades_recibidos (
+  id              bigserial primary key,
+  usuario_id      uuid references auth.users(id) on delete cascade,
+  mt5_cuenta      text,
+  mt5_servidor    text,
+  ticket          text not null,
+  position_id     text,
+  fecha           text,
+  fecha_apertura  text,
+  activo          text,
+  tipo            text,
+  lotes           numeric(10,4),
+  precio_entrada  numeric(12,5),
+  precio_salida   numeric(12,5),
+  resultado_usd   numeric(12,2),
+  pips            numeric(10,2),
+  recibido_en     timestamptz not null default now(),
+  -- Evita duplicados si el EA reenvía el mismo trade
+  unique(usuario_id, ticket)
+);
+comment on table public.trades_recibidos is 'Trades recibidos desde el EA DataBridge (envío automático desde MT5)';
+
+create index if not exists idx_trades_recibidos_usuario   on public.trades_recibidos(usuario_id);
+create index if not exists idx_trades_recibidos_fecha     on public.trades_recibidos(recibido_en desc);
+create index if not exists idx_trades_recibidos_activo    on public.trades_recibidos(activo);
+
+-- ────────────────────────────────────────────────────────────────
+-- 13. TRIGGER: crear perfil automáticamente al registrarse
+-- ────────────────────────────────────────────────────────────────
+create or replace function public.handle_new_user()
+returns trigger
+language plpgsql
+security definer
+set search_path = public
+as $$
+begin
+  insert into public.perfiles (
     id,
     nombre,
     plan,
     bloqueado,
     token_licencia,
     fecha_registro
-  )
-  VALUES (
-    NEW.id,
-    COALESCE(
-      NEW.raw_user_meta_data->>'nombre',
-      split_part(NEW.email, '@', 1)
+  ) values (
+    new.id,
+    coalesce(
+      new.raw_user_meta_data->>'nombre',
+      split_part(new.email, '@', 1)
     ),
     'gratis',
     false,
     replace(gen_random_uuid()::text, '-', ''),
     now()
   )
-  ON CONFLICT (id) DO NOTHING;
-  RETURN NEW;
-END;
+  on conflict (id) do nothing;
+  return new;
+end;
 $$;
 
--- Eliminar trigger anterior si existe y recrear
-DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
-CREATE TRIGGER on_auth_user_created
-  AFTER INSERT ON auth.users
-  FOR EACH ROW
-  EXECUTE FUNCTION public.handle_new_user();
+drop trigger if exists on_auth_user_created on auth.users;
+create trigger on_auth_user_created
+  after insert on auth.users
+  for each row
+  execute function public.handle_new_user();
 
--- Crear perfiles para usuarios auth.users que no tengan perfil todavía
-INSERT INTO public.perfiles (id, nombre, plan, bloqueado, token_licencia, fecha_registro)
-SELECT
-  u.id,
-  COALESCE(u.raw_user_meta_data->>'nombre', split_part(u.email, '@', 1)),
-  'gratis',
-  false,
-  replace(gen_random_uuid()::text, '-', ''),
-  COALESCE(u.created_at, now())
-FROM auth.users u
-WHERE NOT EXISTS (SELECT 1 FROM public.perfiles p WHERE p.id = u.id)
-ON CONFLICT (id) DO NOTHING;
+-- ────────────────────────────────────────────────────────────────
+-- 14. ROW LEVEL SECURITY (RLS)
+-- ────────────────────────────────────────────────────────────────
+alter table public.perfiles                enable row level security;
+alter table public.admins                  enable row level security;
+alter table public.licencias_ea            enable row level security;
+alter table public.logs_licencias          enable row level security;
+alter table public.pagos                   enable row level security;
+alter table public.conversaciones          enable row level security;
+alter table public.mensajes                enable row level security;
+alter table public.referidos               enable row level security;
+alter table public.descargas_ea            enable row level security;
+alter table public.admin_logs              enable row level security;
+alter table public.configuracion_plataforma enable row level security;
+alter table public.trades_recibidos        enable row level security;
 
--- ──────────────────────────────────────────────────────────────────
--- 4. RLS (Row Level Security) para perfiles
--- ──────────────────────────────────────────────────────────────────
-ALTER TABLE public.perfiles ENABLE ROW LEVEL SECURITY;
+-- ── Perfiles ──
+create policy "perfiles_select_own" on public.perfiles
+  for select using (auth.uid() = id);
 
--- El usuario puede leer su propio perfil
-DROP POLICY IF EXISTS "perfiles_select_own" ON public.perfiles;
-CREATE POLICY "perfiles_select_own"
-  ON public.perfiles FOR SELECT
-  USING (auth.uid() = id);
+create policy "perfiles_select_ranking" on public.perfiles
+  for select using (compartir_estadisticas = true);
 
--- El usuario puede actualizar su propio perfil
-DROP POLICY IF EXISTS "perfiles_update_own" ON public.perfiles;
-CREATE POLICY "perfiles_update_own"
-  ON public.perfiles FOR UPDATE
-  USING (auth.uid() = id);
+create policy "perfiles_select_admin" on public.perfiles
+  for select using (exists (select 1 from public.admins where user_id = auth.uid()));
 
--- El trigger (SECURITY DEFINER) puede insertar
-DROP POLICY IF EXISTS "perfiles_insert_trigger" ON public.perfiles;
-CREATE POLICY "perfiles_insert_trigger"
-  ON public.perfiles FOR INSERT
-  WITH CHECK (true);
+create policy "perfiles_update_own" on public.perfiles
+  for update using (auth.uid() = id) with check (auth.uid() = id);
 
--- Los admins pueden leer todos los perfiles
-DROP POLICY IF EXISTS "perfiles_admin_select" ON public.perfiles;
-CREATE POLICY "perfiles_admin_select"
-  ON public.perfiles FOR SELECT
-  USING (EXISTS (SELECT 1 FROM public.admins WHERE user_id = auth.uid()));
+create policy "perfiles_update_admin" on public.perfiles
+  for update using (exists (select 1 from public.admins where user_id = auth.uid()));
 
--- Los admins pueden actualizar cualquier perfil
-DROP POLICY IF EXISTS "perfiles_admin_update" ON public.perfiles;
-CREATE POLICY "perfiles_admin_update"
-  ON public.perfiles FOR UPDATE
-  USING (EXISTS (SELECT 1 FROM public.admins WHERE user_id = auth.uid()));
+create policy "perfiles_insert_own" on public.perfiles
+  for insert with check (auth.uid() = id);
 
--- ──────────────────────────────────────────────────────────────────
--- 5. RLS para admins
--- ──────────────────────────────────────────────────────────────────
-ALTER TABLE public.admins ENABLE ROW LEVEL SECURITY;
+-- ── Admins ──
+create policy "admins_select_all" on public.admins
+  for select using (auth.uid() is not null);
 
-DROP POLICY IF EXISTS "admins_select_own" ON public.admins;
-CREATE POLICY "admins_select_own"
-  ON public.admins FOR SELECT
-  USING (true);
+-- ── Licencias EA ──
+create policy "licencias_select_own" on public.licencias_ea
+  for select using (
+    usuario_id = auth.uid() or
+    exists (select 1 from public.admins where user_id = auth.uid())
+  );
 
--- ──────────────────────────────────────────────────────────────────
--- 6. TABLA licencias_ea
--- ──────────────────────────────────────────────────────────────────
-CREATE TABLE IF NOT EXISTS public.licencias_ea (
-  id               SERIAL PRIMARY KEY,
-  usuario_id       UUID REFERENCES public.perfiles(id) ON DELETE CASCADE NOT NULL,
-  ea_tipo          TEXT NOT NULL CHECK (ea_tipo IN ('risk_manager','auto_journaling','backtest_simulator','data_bridge')),
-  mt5_account      TEXT NOT NULL,
-  activo           BOOLEAN NOT NULL DEFAULT true,
-  fecha_activacion TIMESTAMPTZ NOT NULL DEFAULT now(),
-  ultimo_heartbeat TIMESTAMPTZ NOT NULL DEFAULT now(),
-  UNIQUE(usuario_id, ea_tipo)
-);
+-- ── Logs licencias ──
+create policy "logs_select_admin" on public.logs_licencias
+  for select using (exists (select 1 from public.admins where user_id = auth.uid()));
 
-ALTER TABLE public.licencias_ea ADD COLUMN IF NOT EXISTS activo           BOOLEAN     NOT NULL DEFAULT true;
-ALTER TABLE public.licencias_ea ADD COLUMN IF NOT EXISTS fecha_activacion TIMESTAMPTZ NOT NULL DEFAULT now();
-ALTER TABLE public.licencias_ea ADD COLUMN IF NOT EXISTS ultimo_heartbeat TIMESTAMPTZ NOT NULL DEFAULT now();
+-- ── Pagos ──
+create policy "pagos_select_own" on public.pagos
+  for select using (
+    usuario_id = auth.uid() or
+    exists (select 1 from public.admins where user_id = auth.uid())
+  );
 
-CREATE INDEX IF NOT EXISTS idx_licencias_usuario ON public.licencias_ea(usuario_id);
-CREATE INDEX IF NOT EXISTS idx_licencias_activo  ON public.licencias_ea(activo);
+create policy "pagos_insert_own" on public.pagos
+  for insert with check (usuario_id = auth.uid());
 
-ALTER TABLE public.licencias_ea ENABLE ROW LEVEL SECURITY;
+create policy "pagos_update_admin" on public.pagos
+  for update using (exists (select 1 from public.admins where user_id = auth.uid()));
 
-DROP POLICY IF EXISTS "licencias_select_own"      ON public.licencias_ea;
-CREATE POLICY "licencias_select_own"
-  ON public.licencias_ea FOR SELECT
-  USING (usuario_id = auth.uid());
+-- ── Conversaciones ──
+create policy "conv_select_own" on public.conversaciones
+  for select using (
+    usuario_id = auth.uid() or
+    exists (select 1 from public.admins where user_id = auth.uid())
+  );
 
-DROP POLICY IF EXISTS "licencias_service_role_all" ON public.licencias_ea;
-CREATE POLICY "licencias_service_role_all"
-  ON public.licencias_ea FOR ALL
-  USING (auth.role() = 'service_role');
+create policy "conv_insert_own" on public.conversaciones
+  for insert with check (usuario_id = auth.uid());
 
-DROP POLICY IF EXISTS "licencias_admin_select"    ON public.licencias_ea;
-CREATE POLICY "licencias_admin_select"
-  ON public.licencias_ea FOR SELECT
-  USING (EXISTS (SELECT 1 FROM public.admins WHERE user_id = auth.uid()));
+create policy "conv_update_own" on public.conversaciones
+  for update using (
+    usuario_id = auth.uid() or
+    exists (select 1 from public.admins where user_id = auth.uid())
+  );
 
-DROP POLICY IF EXISTS "licencias_admin_update"    ON public.licencias_ea;
-CREATE POLICY "licencias_admin_update"
-  ON public.licencias_ea FOR UPDATE
-  USING (EXISTS (SELECT 1 FROM public.admins WHERE user_id = auth.uid()));
-
--- ──────────────────────────────────────────────────────────────────
--- 7. TABLA logs_licencias
--- ──────────────────────────────────────────────────────────────────
-CREATE TABLE IF NOT EXISTS public.logs_licencias (
-  id          SERIAL PRIMARY KEY,
-  usuario_id  UUID REFERENCES public.perfiles(id) ON DELETE SET NULL,
-  token_usado TEXT,
-  ea_tipo     TEXT,
-  mt5_account TEXT,
-  exito       BOOLEAN NOT NULL DEFAULT false,
-  motivo      TEXT,
-  ip          TEXT,
-  fecha       TIMESTAMPTZ NOT NULL DEFAULT now()
-);
-
-CREATE INDEX IF NOT EXISTS idx_logs_fecha   ON public.logs_licencias(fecha DESC);
-CREATE INDEX IF NOT EXISTS idx_logs_token   ON public.logs_licencias(token_usado);
-CREATE INDEX IF NOT EXISTS idx_logs_usuario ON public.logs_licencias(usuario_id);
-
-ALTER TABLE public.logs_licencias ENABLE ROW LEVEL SECURITY;
-
-DROP POLICY IF EXISTS "logs_service_role_all" ON public.logs_licencias;
-CREATE POLICY "logs_service_role_all"
-  ON public.logs_licencias FOR ALL
-  USING (auth.role() = 'service_role');
-
-DROP POLICY IF EXISTS "logs_admin_select" ON public.logs_licencias;
-CREATE POLICY "logs_admin_select"
-  ON public.logs_licencias FOR SELECT
-  USING (EXISTS (SELECT 1 FROM public.admins WHERE user_id = auth.uid()));
-
--- ──────────────────────────────────────────────────────────────────
--- 8. TABLAS CHAT
--- ──────────────────────────────────────────────────────────────────
-CREATE TABLE IF NOT EXISTS public.conversaciones (
-  id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  usuario_id      UUID NOT NULL REFERENCES public.perfiles(id) ON DELETE CASCADE,
-  ultimo_mensaje_en TIMESTAMPTZ,
-  creado_en       TIMESTAMPTZ NOT NULL DEFAULT now()
-);
-
-ALTER TABLE public.conversaciones ENABLE ROW LEVEL SECURITY;
-
-DROP POLICY IF EXISTS "conv_user_own" ON public.conversaciones;
-CREATE POLICY "conv_user_own"
-  ON public.conversaciones FOR ALL
-  USING (usuario_id = auth.uid());
-
-DROP POLICY IF EXISTS "conv_admin_all" ON public.conversaciones;
-CREATE POLICY "conv_admin_all"
-  ON public.conversaciones FOR ALL
-  USING (EXISTS (SELECT 1 FROM public.admins WHERE user_id = auth.uid()));
-
-CREATE TABLE IF NOT EXISTS public.mensajes (
-  id               UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  conversacion_id  UUID NOT NULL REFERENCES public.conversaciones(id) ON DELETE CASCADE,
-  remitente_id     UUID NOT NULL REFERENCES auth.users(id),
-  remitente_tipo   TEXT NOT NULL CHECK (remitente_tipo IN ('user','admin')),
-  mensaje          TEXT,
-  imagen_url       TEXT,
-  leido            BOOLEAN NOT NULL DEFAULT false,
-  enviado_en       TIMESTAMPTZ NOT NULL DEFAULT now()
-);
-
-CREATE INDEX IF NOT EXISTS idx_mensajes_conv ON public.mensajes(conversacion_id, enviado_en DESC);
-
-ALTER TABLE public.mensajes ENABLE ROW LEVEL SECURITY;
-
-DROP POLICY IF EXISTS "mensajes_user_own_conv" ON public.mensajes;
-CREATE POLICY "mensajes_user_own_conv"
-  ON public.mensajes FOR ALL
-  USING (
-    conversacion_id IN (
-      SELECT id FROM public.conversaciones WHERE usuario_id = auth.uid()
+-- ── Mensajes ──
+create policy "mensajes_select_own" on public.mensajes
+  for select using (
+    remitente_id = auth.uid() or
+    exists (
+      select 1 from public.conversaciones c
+      where c.id = conversacion_id
+      and (c.usuario_id = auth.uid() or exists (select 1 from public.admins where user_id = auth.uid()))
     )
   );
 
-DROP POLICY IF EXISTS "mensajes_admin_all" ON public.mensajes;
-CREATE POLICY "mensajes_admin_all"
-  ON public.mensajes FOR ALL
-  USING (EXISTS (SELECT 1 FROM public.admins WHERE user_id = auth.uid()));
+create policy "mensajes_insert" on public.mensajes
+  for insert with check (remitente_id = auth.uid());
 
--- ──────────────────────────────────────────────────────────────────
--- 9. TABLA pagos (para el panel admin)
--- ──────────────────────────────────────────────────────────────────
-CREATE TABLE IF NOT EXISTS public.pagos (
-  id            UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  usuario_id    UUID REFERENCES public.perfiles(id) ON DELETE SET NULL,
-  plan          TEXT NOT NULL,
-  monto         NUMERIC(10,2),
-  metodo        TEXT,
-  estado        TEXT NOT NULL DEFAULT 'pendiente' CHECK (estado IN ('pendiente','aprobado','rechazado')),
-  comprobante   TEXT,
-  notas         TEXT,
-  creado_en     TIMESTAMPTZ NOT NULL DEFAULT now()
-);
+create policy "mensajes_update_leido" on public.mensajes
+  for update using (
+    exists (
+      select 1 from public.conversaciones c
+      where c.id = conversacion_id
+      and (c.usuario_id = auth.uid() or exists (select 1 from public.admins where user_id = auth.uid()))
+    )
+  );
 
-ALTER TABLE public.pagos ENABLE ROW LEVEL SECURITY;
+-- ── Referidos ──
+create policy "referidos_select_own" on public.referidos
+  for select using (
+    referente_id = auth.uid() or referido_id = auth.uid() or
+    exists (select 1 from public.admins where user_id = auth.uid())
+  );
 
-DROP POLICY IF EXISTS "pagos_user_insert" ON public.pagos;
-CREATE POLICY "pagos_user_insert"
-  ON public.pagos FOR INSERT
-  WITH CHECK (usuario_id = auth.uid());
+create policy "referidos_insert_admin" on public.referidos
+  for insert with check (exists (select 1 from public.admins where user_id = auth.uid()));
 
-DROP POLICY IF EXISTS "pagos_user_select" ON public.pagos;
-CREATE POLICY "pagos_user_select"
-  ON public.pagos FOR SELECT
-  USING (usuario_id = auth.uid());
+create policy "referidos_update_admin" on public.referidos
+  for update using (exists (select 1 from public.admins where user_id = auth.uid()));
 
-DROP POLICY IF EXISTS "pagos_admin_all" ON public.pagos;
-CREATE POLICY "pagos_admin_all"
-  ON public.pagos FOR ALL
-  USING (EXISTS (SELECT 1 FROM public.admins WHERE user_id = auth.uid()));
+-- ── Descargas EA ──
+create policy "descargas_select_own" on public.descargas_ea
+  for select using (
+    usuario_id = auth.uid() or
+    exists (select 1 from public.admins where user_id = auth.uid())
+  );
 
--- ──────────────────────────────────────────────────────────────────
--- 10. FUNCIÓN: verificar_licencia (helper interno)
--- ──────────────────────────────────────────────────────────────────
-CREATE OR REPLACE FUNCTION public.verificar_licencia(
-  p_token      TEXT,
-  p_ea_tipo    TEXT,
-  p_mt5_account TEXT
-) RETURNS JSONB AS $$
-DECLARE
-  v_perfil  public.perfiles%ROWTYPE;
-BEGIN
-  SELECT * INTO v_perfil FROM public.perfiles WHERE token_licencia = p_token LIMIT 1;
-  IF NOT FOUND THEN
-    RETURN '{"valido":false,"motivo":"Token no encontrado"}'::jsonb;
-  END IF;
-  IF v_perfil.bloqueado THEN
-    RETURN '{"valido":false,"motivo":"Cuenta bloqueada"}'::jsonb;
-  END IF;
-  IF p_ea_tipo IN ('risk_manager','auto_journaling') AND v_perfil.plan NOT IN ('premium','elite') THEN
-    RETURN jsonb_build_object('valido',false,'motivo','Plan insuficiente');
-  END IF;
-  IF p_ea_tipo = 'backtest_simulator' AND v_perfil.plan <> 'elite' THEN
-    RETURN jsonb_build_object('valido',false,'motivo','Solo disponible para Elite');
-  END IF;
-  RETURN jsonb_build_object('valido',true,'plan',v_perfil.plan,'usuario',v_perfil.nombre);
-END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+create policy "descargas_insert_own" on public.descargas_ea
+  for insert with check (usuario_id = auth.uid());
 
--- ──────────────────────────────────────────────────────────────────
--- 11. VISTA admin para licencias
--- ──────────────────────────────────────────────────────────────────
-CREATE OR REPLACE VIEW public.vista_licencias_admin AS
-SELECT
-  l.id,
-  p.nombre,
-  (SELECT email FROM auth.users WHERE id = p.id) AS email,
-  p.plan,
-  l.ea_tipo,
-  l.mt5_account,
-  l.activo,
-  l.fecha_activacion,
-  l.ultimo_heartbeat,
-  EXTRACT(EPOCH FROM (now() - l.ultimo_heartbeat))/3600 AS horas_sin_hb
-FROM public.licencias_ea l
-JOIN public.perfiles p ON p.id = l.usuario_id
-ORDER BY l.ultimo_heartbeat DESC;
+-- ── Admin logs ──
+create policy "admin_logs_select_admin" on public.admin_logs
+  for select using (exists (select 1 from public.admins where user_id = auth.uid()));
 
-GRANT SELECT ON public.vista_licencias_admin TO authenticated;
+create policy "admin_logs_insert_admin" on public.admin_logs
+  for insert with check (exists (select 1 from public.admins where user_id = auth.uid()));
 
--- ──────────────────────────────────────────────────────────────────
--- STORAGE bucket para imágenes del chat (ejecutar si no existe)
--- ──────────────────────────────────────────────────────────────────
--- Ir a Supabase → Storage → New Bucket → nombre: "chat-images" → Public: ON
--- O ejecutar:
--- INSERT INTO storage.buckets (id, name, public) VALUES ('chat-images','chat-images',true) ON CONFLICT DO NOTHING;
+-- ── Configuración plataforma ──
+create policy "config_select_all" on public.configuracion_plataforma
+  for select using (auth.uid() is not null);
 
--- ══════════════════════════════════════════════════════════════════
--- FIN DEL SCRIPT COMPLETO
--- ══════════════════════════════════════════════════════════════════
+create policy "config_update_admin" on public.configuracion_plataforma
+  for update using (exists (select 1 from public.admins where user_id = auth.uid()));
+
+create policy "config_upsert_admin" on public.configuracion_plataforma
+  for insert with check (exists (select 1 from public.admins where user_id = auth.uid()));
+
+-- ── Trades Recibidos ──
+create policy "trades_recibidos_select_own" on public.trades_recibidos
+  for select using (
+    usuario_id = auth.uid() or
+    exists (select 1 from public.admins where user_id = auth.uid())
+  );
+
+-- La API de DataBridge usa service_role key, no necesita policy de INSERT
+-- pero la añadimos para usos futuros vía cliente:
+create policy "trades_recibidos_insert_own" on public.trades_recibidos
+  for insert with check (usuario_id = auth.uid());
+
+-- ────────────────────────────────────────────────────────────────
+-- 15. STORAGE: Bucket para imágenes del chat
+-- ────────────────────────────────────────────────────────────────
+-- Crear desde Supabase Dashboard → Storage → New Bucket
+-- Nombre: chat-images  |  Public: true
+-- O con este SQL (puede requerir permisos de superusuario):
+-- insert into storage.buckets (id, name, public)
+--   values ('chat-images', 'chat-images', true)
+--   on conflict do nothing;
+
+-- ────────────────────────────────────────────────────────────────
+-- 16. INSERTAR USUARIO ADMINISTRADOR
+-- ────────────────────────────────────────────────────────────────
+-- 1. Regístrate en la plataforma con tu email de admin.
+-- 2. Ve a Supabase Dashboard → Authentication → Users.
+-- 3. Copia el UUID del usuario recién creado.
+-- 4. Descomenta y ejecuta la línea siguiente con ese UUID:
+--
+-- insert into public.admins (user_id) values ('PEGA-TU-UUID-AQUI')
+-- on conflict (user_id) do nothing;
+
+-- ────────────────────────────────────────────────────────────────
+-- 17. VERIFICACIÓN FINAL
+-- ────────────────────────────────────────────────────────────────
+select
+  table_name,
+  (
+    select count(*)
+    from information_schema.columns c
+    where c.table_name = t.table_name
+      and c.table_schema = 'public'
+  ) as columnas
+from information_schema.tables t
+where table_schema = 'public'
+  and table_name in (
+    'perfiles','admins','licencias_ea','logs_licencias',
+    'pagos','conversaciones','mensajes','referidos',
+    'descargas_ea','admin_logs','configuracion_plataforma',
+    'trades_recibidos'
+  )
+order by table_name;
+-- Resultado esperado: 12 filas con nombres y número de columnas de cada tabla.

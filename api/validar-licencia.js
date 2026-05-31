@@ -71,7 +71,7 @@ module.exports = async function handler(req, res) {
 
     // 2. Comprobar si el usuario está bloqueado
     if (perfil.bloqueado) {
-      motivo = 'Cuenta bloqueada por administrador';
+      motivo = 'Cuenta bloqueada por nuestro equipo';
       await logIntento(supabase, { usuarioId, token, ea_tipo, mt5_account, exito: false, motivo, ip });
       return res.status(403).json({ valido: false, motivo, codigo: 403 });
     }
@@ -86,7 +86,7 @@ module.exports = async function handler(req, res) {
 
     // 4. Verificar que la cuenta MT5 coincide (si ya tiene una asignada)
     if (perfil.mt5_cuenta && String(perfil.mt5_cuenta).trim() !== String(mt5_account).trim()) {
-      motivo = `Cuenta MT5 no coincide. Esperada: ${perfil.mt5_cuenta}. Solo el administrador puede cambiarla.`;
+      motivo = `Cuenta MT5 no coincide. Esperada: ${perfil.mt5_cuenta}. Contacta con nuestro equipo para cambiarla.`;
       await logIntento(supabase, { usuarioId, token, ea_tipo, mt5_account, exito: false, motivo, ip });
       return res.status(403).json({ valido: false, motivo, codigo: 403 });
     }
@@ -100,7 +100,7 @@ module.exports = async function handler(req, res) {
       .single();
 
     if (licExistente && licExistente.activo && licExistente.mt5_account !== String(mt5_account)) {
-      motivo = `Token ya activo en otra cuenta MT5 (${licExistente.mt5_account}). Contacta al admin para cambiarla.`;
+      motivo = `Token ya activo en otra cuenta MT5 (${licExistente.mt5_account}). Contacta con nuestro equipo para cambiarla.`;
       await logIntento(supabase, { usuarioId, token, ea_tipo, mt5_account, exito: false, motivo, ip });
       return res.status(403).json({ valido: false, motivo, codigo: 403 });
     }

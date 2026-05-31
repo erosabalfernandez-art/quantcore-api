@@ -1,78 +1,171 @@
-# QuantCore Pro Suite — Parte 3: Sistema de Licencias EA
+# Samtrader Pro Suite — v3.0.0
 
-Entrega completa con todos los archivos corregidos y listos para usar.
-
-## Estructura del paquete
-
-```
-output/
-├── index.html                        ← Panel web (con sección Licencias EA completa)
-├── setup_supabase_corregido.sql      ← Script SQL corregido para Supabase
-├── api/
-│   ├── validar-licencia.js           ← Vercel serverless: valida token + plan
-│   ├── heartbeat.js                  ← Vercel serverless: actualiza último heartbeat
-│   └── desactivar-licencia.js        ← Vercel serverless: revoca licencia (admin)
-├── ea_modificados/
-│   ├── RiskManager_QuantCore.mq5     ← v13.5 con licencias (corregido)
-│   ├── AutoJournaling_QuantCore.mq5  ← v2.13 con licencias (corregido)
-│   └── BacktestSimulator_QuantCore.mq5 ← v4.2 con licencias (sin cambios adicionales)
-└── README.md                         ← Este archivo
-```
-
-## Bugs corregidos
-
-### setup_supabase_corregido.sql
-| # | Bug original | Corrección |
-|---|---|---|
-| 1 | `CREATE POLICY IF NOT EXISTS` (PostgreSQL no soporta esta sintaxis) | `DROP POLICY IF EXISTS` + `CREATE POLICY` |
-| 2 | `p.email` en `vista_licencias_admin` (columna inexistente en `perfiles`) | Subconsulta `(SELECT email FROM auth.users WHERE id = p.id)` |
-| 3 | `admins WHERE id = auth.uid()` (la tabla `admins` usa `user_id` como PK) | `admins WHERE user_id = auth.uid()` |
-
-### AutoJournaling_QuantCore.mq5
-| # | Bug original | Corrección |
-|---|---|---|
-| 1 | `input string Licencia_Token` declarado dos veces (duplicado antes del bloque de licencias) | Eliminada la declaración duplicada |
-| 2 | `input string InpServerURL = ApiUrl + "journal"` referencia `ApiUrl` antes de que exista | Línea eliminada |
-| 3 | `EventSetTimer(LIC_TIMER_SECS)` — constante `LIC_TIMER_SECS` nunca definida | Cambiado a `EventSetTimer(1)` |
-| 4 | `if(now - lastCheck >= LIC_TIMER_SECS)` en OnTimer — misma constante indefinida | Cambiado a `HeartbeatInterval` |
-| 5 | `if(!g_license_ok)` en `OnTradeTransaction` (nombre incorrecto de variable) | Corregido a `if(!g_licencia_ok)` |
-| 6 | `}` extra/suelto al final del bloque de licencias en `OnInit` | Eliminado |
-
-### RiskManager_QuantCore.mq5
-| # | Bug original | Corrección |
-|---|---|---|
-| 1 | `}` suelto en `OnInit` después del bloque de licencias (cierre falso de función) | Eliminado |
-| 2 | `}` suelto en `OnTimer` después del bloque de heartbeat | Eliminado |
-
-### index.html
-| # | Bug original | Corrección |
-|---|---|---|
-| 1 | `<div id="adminContent-chats">` nunca se cerraba — las pestañas Licencias y Logs quedaban anidadas dentro | Añadido `</div>` correcto antes de la pestaña Licencias |
-| 2 | Funciones `loadLicencias()`, `loadLogsLic()` y `toggleLicencia()` referenciadas en el HTML pero no implementadas | Implementadas completamente en JS |
-| 3 | `showAdminTab()` no disparaba carga de datos para pestañas 'licencias' y 'logslic' | Añadidos los triggers correspondientes |
-
-## Instrucciones de despliegue
-
-### 1. Supabase — ejecutar el SQL
-1. Abre tu proyecto Supabase → **SQL Editor → New Query**
-2. Pega el contenido de `setup_supabase_corregido.sql` y haz clic en **Run**
-
-### 2. Vercel — subir las funciones API
-Coloca los tres archivos de `api/` en la carpeta `api/` de tu proyecto Vercel.  
-Configura estas variables de entorno en Vercel:
-- `SUPABASE_URL` — URL de tu proyecto Supabase
-- `SUPABASE_SERVICE_KEY` — Service Role Key (nunca la anon key)
-
-### 3. EAs MT5
-1. Copia los `.mq5` a `MQL5/Experts/`
-2. Compila en MetaEditor (F7)
-3. En MT5: **Herramientas → Opciones → Expert Advisors → WebRequest**  
-   Añade: `https://TU-PROYECTO.vercel.app`
-4. Arrastra el EA al gráfico, ingresa tu token de licencia en `Licencia_Token`
-
-### 4. Panel web
-Sube el `index.html` corregido a tu hosting (reemplaza el actual).  
-Si usas el mismo `index.html` local, no es necesario ningún cambio adicional de configuración — las credenciales Supabase ya están incrustadas.
+Suite profesional para traders de MetaTrader 5. Diario de trading, calculadora de riesgo, EAs con licencias, ranking, notificaciones y panel de administración completo.
 
 ---
-*Generado automáticamente — QuantCore Pro Suite Parte 3*
+
+## Stack
+
+- **Frontend**: HTML + CSS (Tailwind CDN) + JS vanilla — un solo `index.html`
+- **Backend API**: Vercel Serverless Functions (Node.js / CommonJS)
+- **Base de datos**: Supabase (PostgreSQL + Auth + Storage)
+- **Noticias**: Finnhub API
+
+---
+
+## Estructura de archivos
+
+```
+samtrader_pro_suite/
+├── index.html                        ← Frontend completo (SPA)
+├── vercel.json                       ← Configuración Vercel
+├── setup_supabase_completo.sql       ← Script SQL completo para Supabase
+├── README.md
+├── api/
+│   ├── validar-licencia.js           ← POST /api/validar-licencia
+│   ├── heartbeat.js                  ← POST /api/heartbeat
+│   ├── desactivar-licencia.js        ← POST /api/desactivar-licencia
+│   └── health.js                     ← GET  /api/health
+├── RiskManager_QuantCore.mq5
+├── AutoJournaling_QuantCore.mq5
+└── BacktestSimulator_QuantCore.mq5
+```
+
+---
+
+## Despliegue
+
+### 1. Supabase — Configurar la base de datos
+
+1. Crea un proyecto en [supabase.com](https://supabase.com)
+2. Ve a **SQL Editor** y ejecuta el contenido de `setup_supabase_completo.sql`
+3. En **Authentication → Providers**, activa Email
+4. Crea tu usuario admin desde la app y luego inserta su ID en la tabla `admins`:
+   ```sql
+   INSERT INTO admins (user_id) VALUES ('<tu-user-id>');
+   ```
+
+### 2. Vercel — Desplegar la API y el frontend
+
+1. Sube esta carpeta a GitHub o usa Vercel CLI: `vercel deploy`
+2. En Vercel → **Settings → Environment Variables**, añade:
+   - `SUPABASE_URL` = `https://tu-proyecto.supabase.co`
+   - `SUPABASE_SERVICE_ROLE_KEY` = `eyJ...` (service role key del proyecto)
+3. El `index.html` se sirve automáticamente como página raíz
+4. Los endpoints de API estarán en `/api/*`
+
+### Render (alternativa a Vercel)
+
+Si usas Render en lugar de Vercel:
+1. Crea un **Static Site** apuntando a `index.html`
+2. Crea un **Web Service** Node.js con el siguiente server.js:
+
+```js
+const express = require('express');
+const app = express();
+app.use(express.json());
+app.use(require('cors')());
+app.post('/api/validar-licencia', require('./api/validar-licencia'));
+app.post('/api/heartbeat', require('./api/heartbeat'));
+app.post('/api/desactivar-licencia', require('./api/desactivar-licencia'));
+app.get('/api/health', require('./api/health'));
+app.listen(process.env.PORT || 3000);
+```
+
+---
+
+## Credenciales hardcodeadas en index.html
+
+El `index.html` incluye las claves de Supabase directamente (anon key, que es pública por diseño):
+
+```js
+const SUPABASE_URL = 'https://raznmwztnucismwjaetc.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...';  // anon key (pública)
+```
+
+La **service_role key** solo va en las variables de entorno de Vercel/Render, nunca en el frontend.
+
+---
+
+## Funcionalidades v3.0.0
+
+### Usuario
+- 🔐 Auth completo (login, registro, recuperar contraseña, reenvío de confirmación)
+- 📊 Dashboard con KPIs, curva de equity, rendimiento por activo, widgets ocultables
+- 📖 Diario de trading (IndexedDB local) con paginación, filtros, detalle de trade
+- 📁 Import: CSV, HTML MetaTrader, JSON | Export: CSV, JSON, PDF (Elite)
+- 📈 Métricas avanzadas: Sharpe ratio, mejor hora, mejor activo, rentabilidad/mes
+- 💳 Planes (Gratis / Premium / Elite) con notificación de pago al admin
+- 👤 Perfil con token de licencia, preferencias, estadísticas para ranking
+- 🧮 Calculadora de riesgo mejorada (SL en pips, fórmula correcta, todos los activos)
+- 🗞️ Calendario de noticias económicas (Finnhub) con alertas de alto impacto
+- 👥 Referidos con enlace único, tabla de comisiones reales (DB)
+- 🏆 Ranking de traders (opt-in, mínimo 10 trades)
+- 🎖️ Logros / Gamificación (8 insignias desbloqueables)
+- 📥 EAs & Descargas según plan
+- 🔔 Centro de notificaciones (campana en nav, badge de no leídas)
+- 🔔 Sistema de alertas avanzado: sesiones, drawdown, objetivo, racha, noticias, plan
+- 🤖 Chatbot FAQ (botón ? morado, respuestas automáticas)
+- 💬 Chat con soporte (tiempo real con polling)
+- 🔧 Modal de mantenimiento (con bypass para admin)
+- 📄 Modal de Términos de uso
+
+### Admin
+- 👥 Lista de usuarios con búsqueda, estado, plan
+- 🎖️ Otorgar/cambiar membresías manualmente
+- 💳 Gestión de pagos pendientes (con badge de cantidad)
+- 💬 Chat con todos los usuarios
+- 🔑 Gestión de licencias EA (activar/revocar)
+- 📋 Logs de validaciones
+- 📊 Estadísticas con Chart.js (ingresos, distribución de planes, EAs)
+- 👥 Referidos Admin (árbol con botón "Marcar pagada")
+- 🔧 Toggle de modo mantenimiento
+
+---
+
+## EAs de MetaTrader 5
+
+| EA | Plan requerido | Descripción |
+|----|---------------|-------------|
+| RiskManager_QuantCore.mq5 | Premium+ | Lotaje auto, breakeven, trailing, prop firm |
+| AutoJournaling_QuantCore.mq5 | Premium+ | Captura automática de operaciones |
+| BacktestSimulator_QuantCore.mq5 | Elite | Simulador histórico vela a vela |
+
+### Instalación del EA
+1. Copia tu **Token de Licencia** desde la plataforma
+2. En MT5: `Herramientas → Opciones → Expert Advisors` → activa WebRequest y añade la URL de tu API
+3. Coloca el `.mq5` en `MQL5/Experts/` y compila con F7
+4. Arrastra al gráfico → pega el token en el campo `Licencia_Token`
+
+---
+
+## Endpoints de API
+
+### POST /api/validar-licencia
+```json
+{ "token": "...", "ea_tipo": "risk_manager", "mt5_account": "12345678" }
+```
+Respuesta OK:
+```json
+{ "valido": true, "plan": "premium", "mensaje": "Licencia activa", "heartbeat_interval": 3600 }
+```
+
+### POST /api/heartbeat
+```json
+{ "token": "...", "ea_tipo": "risk_manager", "mt5_account": "12345678" }
+```
+
+### POST /api/desactivar-licencia
+Requiere header `Authorization: Bearer <supabase-jwt>` de un admin.
+```json
+{ "licencia_id": 123 }
+```
+
+### GET /api/health
+```json
+{ "ok": true, "service": "Samtrader Pro Suite API", "version": "3.0.0" }
+```
+
+---
+
+© 2026 Samtrader Pro Suite
