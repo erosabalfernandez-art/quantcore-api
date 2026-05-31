@@ -138,6 +138,34 @@ select.input-dark option{background:#131A26;color:#E2E8F0;}
 #cookieBanner{position:fixed;bottom:0;left:0;right:0;z-index:9997;background:rgba(13,20,33,.97);backdrop-filter:blur(16px);border-top:1px solid rgba(30,41,59,.7);padding:16px 24px;}
 #authOverlay{position:fixed;inset:0;z-index:800;display:flex;align-items:center;justify-content:center;padding:16px;background:rgba(0,0,0,.82);backdrop-filter:blur(8px);}
 
+
+/* ═══════ INICIO / CAROUSEL ═══════ */
+.carousel-outer{position:relative;width:100%;overflow:hidden;padding:4px 0 20px;}
+.carousel-track{display:flex;gap:16px;width:max-content;animation:carouselScroll 40s linear infinite;}
+.carousel-track:hover{animation-play-state:paused;}
+@keyframes carouselScroll{0%{transform:translateX(0);}100%{transform:translateX(-50%);}}
+.carousel-card{flex-shrink:0;width:220px;height:130px;border-radius:14px;padding:18px;cursor:pointer;position:relative;overflow:hidden;transition:transform .2s,box-shadow .2s;border:1px solid rgba(255,255,255,.07);}
+.carousel-card:hover{transform:translateY(-4px) scale(1.02);box-shadow:0 12px 40px rgba(0,0,0,.5);}
+.carousel-card .cc-icon{font-size:26px;margin-bottom:8px;}
+.carousel-card .cc-title{font-size:13px;font-weight:700;color:#fff;margin-bottom:3px;}
+.carousel-card .cc-desc{font-size:11px;color:rgba(255,255,255,.6);line-height:1.4;}
+.carousel-card::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.06) 0%,transparent 60%);}
+.bm-hero{background:linear-gradient(135deg,#0F172A 0%,#131A26 40%,#0F172A 100%);border:1px solid rgba(37,99,235,.25);border-radius:20px;padding:48px 40px;position:relative;overflow:hidden;}
+.bm-hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 70% 50%,rgba(37,99,235,.12) 0%,transparent 65%);}
+.bm-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(37,99,235,.15);border:1px solid rgba(37,99,235,.3);color:#3B82F6;font-size:11px;font-weight:600;padding:4px 12px;border-radius:20px;margin-bottom:16px;}
+.bm-stat-bar{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:rgba(30,41,59,.5);border:1px solid rgba(30,41,59,.6);border-radius:14px;overflow:hidden;margin:24px 0;}
+.bm-stat-item{background:#0B0F17;padding:16px;text-align:center;}
+.bm-stat-item .val{font-size:22px;font-weight:800;color:#2563EB;}
+.bm-stat-item .lbl{font-size:11px;color:#64748B;margin-top:2px;}
+.benefit-card{background:rgba(19,26,38,.8);border:1px solid rgba(30,41,59,.6);border-radius:14px;padding:22px;transition:all .2s;}
+.benefit-card:hover{border-color:rgba(37,99,235,.4);transform:translateY(-2px);}
+.benefit-card .bc-icon{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;margin-bottom:14px;}
+.synth-card{border-radius:14px;padding:20px;transition:all .2s;cursor:default;position:relative;overflow:hidden;}
+.synth-card:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(0,0,0,.4);}
+.synth-card::after{content:'';position:absolute;bottom:0;left:0;right:0;height:3px;}
+.propfirm-step{background:rgba(19,26,38,.8);border:1px solid rgba(30,41,59,.6);border-radius:14px;padding:20px;text-align:center;position:relative;}
+.propfirm-step .step-num{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#2563EB,#1D4ED8);color:#fff;font-size:14px;font-weight:700;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;}
+.inicio-section-divider{text-align:center;padding:12px 0 6px;font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#475569;}
 </style>
 </head>
 <body>
@@ -672,7 +700,10 @@ select.input-dark option{background:#131A26;color:#E2E8F0;}
     <!-- SIDEBAR -->
     <aside class="w-56 flex-shrink-0 border-r p-3 flex flex-col gap-0.5 overflow-y-auto" style="background:#0B0F17;border-color:rgba(30,41,59,.5);">
       <p class="text-xs font-semibold uppercase tracking-wider px-3 py-2 mb-1" style="color:#475569;">Principal</p>
-      <button class="nav-item active" id="nav-dashboard" onclick="showSection('dashboard')">
+      <button class="nav-item" id="nav-inicio" onclick="showSection('inicio')">
+        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Inicio
+      </button>
+      <button class="nav-item" id="nav-dashboard" onclick="showSection('dashboard')">
         <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>Dashboard
       </button>
       <button class="nav-item" id="nav-diario" onclick="showSection('diario')">
@@ -723,6 +754,344 @@ select.input-dark option{background:#131A26;color:#E2E8F0;}
 
     <!-- MAIN CONTENT -->
     <main class="flex-1 overflow-y-auto p-5">
+
+
+      <!-- ████ INICIO — BridgeMarkets ████ -->
+      <div id="section-inicio" class="hidden">
+
+        <!-- CAROUSEL -->
+        <div class="mb-6">
+          <p class="text-xs font-semibold uppercase tracking-wider mb-3" style="color:#475569;">Explora la plataforma</p>
+          <div class="carousel-outer">
+            <div class="carousel-track" id="carouselTrack">
+    <div class="carousel-card" style="background:linear-gradient(135deg,#1E3A5F,#2563EB);" onclick="showSection('dashboard')">
+      <div class="cc-icon">📊</div>
+      <div class="cc-title">Dashboard</div>
+      <div class="cc-desc">Equity en tiempo real, KPIs y curva de rendimiento</div>
+    </div>
+    <div class="carousel-card" style="background:linear-gradient(135deg,#064E3B,#059669);" onclick="showSection('diario')">
+      <div class="cc-icon">📓</div>
+      <div class="cc-title">Diario de Trades</div>
+      <div class="cc-desc">Registra, filtra y analiza cada operación</div>
+    </div>
+    <div class="carousel-card" style="background:linear-gradient(135deg,#3B0764,#7C3AED);" onclick="showSection('calculadora')">
+      <div class="cc-icon">🧮</div>
+      <div class="cc-title">Calculadora</div>
+      <div class="cc-desc">Tamaño de lote exacto con gestión de riesgo</div>
+    </div>
+    <div class="carousel-card" style="background:linear-gradient(135deg,#78350F,#D97706);" onclick="showSection('noticias')">
+      <div class="cc-icon">📰</div>
+      <div class="cc-title">Noticias</div>
+      <div class="cc-desc">Calendario macro, Forex, Cripto y Mercados</div>
+    </div>
+    <div class="carousel-card" style="background:linear-gradient(135deg,#1E1B4B,#4338CA);" onclick="showSection('ranking')">
+      <div class="cc-icon">🏆</div>
+      <div class="cc-title">Ranking</div>
+      <div class="cc-desc">Compite con los mejores traders de la plataforma</div>
+    </div>
+    <div class="carousel-card" style="background:linear-gradient(135deg,#164E63,#0891B2);" onclick="showSection('descargas')">
+      <div class="cc-icon">⚙️</div>
+      <div class="cc-title">EAs & Descargas</div>
+      <div class="cc-desc">Expert Advisors exclusivos para MT5</div>
+    </div>
+    <div class="carousel-card" style="background:linear-gradient(135deg,#1A2E05,#65A30D);" onclick="showSection('conectarmt5')">
+      <div class="cc-icon">🔗</div>
+      <div class="cc-title">Conectar MT5</div>
+      <div class="cc-desc">Sincroniza tu cuenta MetaTrader 5 en tiempo real</div>
+    </div>
+    <div class="carousel-card" style="background:linear-gradient(135deg,#4A0000,#DC2626);" onclick="showSection('noticias')">
+      <div class="cc-icon">💎</div>
+      <div class="cc-title">Índices Sintéticos</div>
+      <div class="cc-desc">Boom, Crash, Volatility — opera 24/7 sin noticias</div>
+    </div>
+    <div class="carousel-card" style="background:linear-gradient(135deg,#312E81,#6366F1);" onclick="showSection('calc-mt5')">
+      <div class="cc-icon">🎯</div>
+      <div class="cc-title">Calc. MT5 Personal</div>
+      <div class="cc-desc">Pip values exactos desde tu cuenta real</div>
+    </div>
+    <div class="carousel-card" style="background:linear-gradient(135deg,#1C1917,#57534E);" onclick="showSection('logros')">
+      <div class="cc-icon">🌟</div>
+      <div class="cc-title">Logros</div>
+      <div class="cc-desc">Desbloquea insignias y sigue tu progreso</div>
+    </div>
+    <div class="carousel-card" style="background:linear-gradient(135deg,#1E3A5F,#2563EB);" onclick="showSection('dashboard')">
+      <div class="cc-icon">📊</div>
+      <div class="cc-title">Dashboard</div>
+      <div class="cc-desc">Equity en tiempo real, KPIs y curva de rendimiento</div>
+    </div>
+    <div class="carousel-card" style="background:linear-gradient(135deg,#064E3B,#059669);" onclick="showSection('diario')">
+      <div class="cc-icon">📓</div>
+      <div class="cc-title">Diario de Trades</div>
+      <div class="cc-desc">Registra, filtra y analiza cada operación</div>
+    </div>
+    <div class="carousel-card" style="background:linear-gradient(135deg,#3B0764,#7C3AED);" onclick="showSection('calculadora')">
+      <div class="cc-icon">🧮</div>
+      <div class="cc-title">Calculadora</div>
+      <div class="cc-desc">Tamaño de lote exacto con gestión de riesgo</div>
+    </div>
+    <div class="carousel-card" style="background:linear-gradient(135deg,#78350F,#D97706);" onclick="showSection('noticias')">
+      <div class="cc-icon">📰</div>
+      <div class="cc-title">Noticias</div>
+      <div class="cc-desc">Calendario macro, Forex, Cripto y Mercados</div>
+    </div>
+    <div class="carousel-card" style="background:linear-gradient(135deg,#1E1B4B,#4338CA);" onclick="showSection('ranking')">
+      <div class="cc-icon">🏆</div>
+      <div class="cc-title">Ranking</div>
+      <div class="cc-desc">Compite con los mejores traders de la plataforma</div>
+    </div>
+    <div class="carousel-card" style="background:linear-gradient(135deg,#164E63,#0891B2);" onclick="showSection('descargas')">
+      <div class="cc-icon">⚙️</div>
+      <div class="cc-title">EAs & Descargas</div>
+      <div class="cc-desc">Expert Advisors exclusivos para MT5</div>
+    </div>
+    <div class="carousel-card" style="background:linear-gradient(135deg,#1A2E05,#65A30D);" onclick="showSection('conectarmt5')">
+      <div class="cc-icon">🔗</div>
+      <div class="cc-title">Conectar MT5</div>
+      <div class="cc-desc">Sincroniza tu cuenta MetaTrader 5 en tiempo real</div>
+    </div>
+    <div class="carousel-card" style="background:linear-gradient(135deg,#4A0000,#DC2626);" onclick="showSection('noticias')">
+      <div class="cc-icon">💎</div>
+      <div class="cc-title">Índices Sintéticos</div>
+      <div class="cc-desc">Boom, Crash, Volatility — opera 24/7 sin noticias</div>
+    </div>
+    <div class="carousel-card" style="background:linear-gradient(135deg,#312E81,#6366F1);" onclick="showSection('calc-mt5')">
+      <div class="cc-icon">🎯</div>
+      <div class="cc-title">Calc. MT5 Personal</div>
+      <div class="cc-desc">Pip values exactos desde tu cuenta real</div>
+    </div>
+    <div class="carousel-card" style="background:linear-gradient(135deg,#1C1917,#57534E);" onclick="showSection('logros')">
+      <div class="cc-icon">🌟</div>
+      <div class="cc-title">Logros</div>
+      <div class="cc-desc">Desbloquea insignias y sigue tu progreso</div>
+    </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- HERO BRIDGEMARKETS -->
+        <div class="bm-hero mb-6">
+          <div style="position:relative;z-index:1;">
+            <div class="bm-badge">
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="#3B82F6"><circle cx="12" cy="12" r="10"/></svg>
+              Broker Recomendado
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:24px;">
+              <div style="flex:1;min-width:260px;">
+                <div style="background:#fff;display:inline-block;padding:10px 18px;border-radius:12px;margin-bottom:20px;">
+                  <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAN8AAABlCAYAAADNqDY/AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAABLuSURBVHhe7Z0HmBRFFsfvzkvemcV8ZlQQMYCKCSRnQQlKVIIkCZIFBVGSEpWMZAQFXJCcc0ZEliBZEJAgSxQQhEXr5l9UD9XdVT09OzNbvfh+3/c+2K3q3p6e+ne9evWq+i+MIAgjkPgIwhAkPoIwBImPIAxB4iMIQ5D4CMIQJD6CMASJjyAMQeIjCEOQ+AjCECQ+gjAEiY8gDEHiIwhDkPgIwhAkPoIwBImPIAxB4iMIQ5D4CMIQfwrxbVi3nV31l+dc9sRDFUQNgkh/SHwEYYjLRnwrl29gi+avsdmyxcksNTWVxEcEkstGfI9mLs+u+0dum915QxF27NhJEl8AOX8+la1P3sZmTlvGFi1Yw1av2sQO7E9hf/zxh6hx+XPZiO/he8q4xHXr1QXZ0aO/JEx8Y0fPZndcV9jT7ryhKHsqW2XWqE4XlvzdVnGknueeqKY8j2x3ZyrG8jxVg73Xoi/7YcdP4kg1586dZ2VLNLcdv2b1ZlHqZkCfJFtdp+Hz5MxaiVUu+y7r+8lYtn9fijgyModTjrPuH33OCr1Ql93477zK7wS/f+yBV1m5ks35g1NHjiwVlNensgduL8XWrtkijgwOJL4YGDl0qvK8Orv+n3nY1ElLxNFqst1bTnmszq4P9fA/7f1ZHO3mt9/OsaIvvmU75puVG0Wpm0+7fWGrG8ngcRw8eEQcrefChQvslWJNlefQ2d49+s8FQamOUdlN/8nHvv1mkzgyOJD4YiBa8cEef/A1cbSaaMUHe/HpmuzXX8+KM9hJtPhg+EwnT/4qzqCmSf3u7Oq/qo/XGYkvgxAE8d1yVQGW69HXw/bIfeX4uPMqR6ObMXWZOIMbp/jghuGzwdDIs9z1Crv92kKhhvx8uM61f8/NP6OKeIhP/kwP3fky/5zOOlMmLhZncPPjrv3s5v/mt9WHF5A986us9hsdWNeOI1iPj0extu/0Z9UrteMPkwf/V9rTpXWKD9clX6dseXPVYps27hRHBgcSXww4xfdCzuqi5CK///47275tj6uxPvPY66KGG6f4iuWtL0ougjHc5u93sftve8lWb+Wy9aKGnXiIDy6jxZkzv/Fe5LZrCtrqfPjeZ6KGm9kzVvAHhFx/zKiZ/LPoQE+O+6fDKb6RQ6aIkowDiS8GIonPIm+uN231ME7SEUl8Fs0a9LDV++rLOaLETrzFZ9Gy8ae2Os0b9hQlbiA0ufcvU7yZKEk7JL4AEWTxtW87yFYvHuJ7t3kfWz38rCJR4pswbr6tTr0anUSJm07thtjq4n7ECokvjsCdQQi9dJEm4jfREWTxIbwu10MoXYdf8bVp2c9WD2MnFYkSH8atV//t0rgTUw86UCafb0DvJFGSdkh8cQQ+Pm5ikVBDUXH27G9s3BezXbZqxQZeHmTx5Xumlq1e8fwNRYkbv+LDHJ9cr/6bH4kSO4kS35yZK9k1V7wQrlMkTz1R4gYBlPD5Qu7nmFGzREnaIfHFEUt8BZ6rI35jB5Ev+WZbVuv19rw8qOLbtmU3D3Vbda4J9RZ79xwUpW7S6nZ27TRClNhJlPjmzV5lC6LkeaqmKHGDCXGrHgQbaa7TDyS+OGKJL0eWiuI3djKC+O66sShrXK9b2KqWb8MnwcN1Qk/9SmVai6PV+BVfw9of2+rNm/2NKLGTKPEtmLuap/BZdZ71iODCzbbqQbBzZ60SJYzPD2I+T2VIQdPhFB8+o3zvZQsqgRMfQtgqMoL4vAzzfU0b9GAHDxwWR6uJJL5ffjnNksbM5Wlecj3dJHKixLdw3re+xZf17kvfjVN8o0fMCJc5zSsdzyk+LwsqgRMfbPnSdeK3l8jo4iucux4fn+JzeuEUnx+75+YSbM9utSubKPHNn/NNSHx5wnXS2vOR+BLAsWO/sFHDp9ls86ZdotSNLL5aVS8KSiajiw+G8U7T+t3F0WrSIj7cA92EdBB6Pvm7IfFdImHi+37DD66b0O/TcaLUjSy+zLe/xA4fPi5KLpIRxPdktso8jcmyNas3sS4dR/BUKqsO0sK8VhVEIz40ZEwxeGWCBGHMl/3+8uF6uGZESi02f7+Tde88kpszayYa8X3cfpjt3ssWVAIpPnyp8tMRZATxqaKdWJ9WuZx9nitX9qqi1I1TfMiJfPLhSmGTXT2IetH8b8WRahLpdkJIVh1MJ+jAdVv10PtPm6yOdiKf06oHi0Z8FO2UiEV8sIqvtBIlF8mo4gNYSybXw7XqeqtIARfM58nlnw+bJkrUJEp8znm+4vkaiBI3znk+zM+qIPHFiVjFh+yJyV9fypTPyOI7efK0rR6SonFdKiKJb2CfJFu5V5I2SJT4nBkuVcq9J0rcVCrTKlwPy4qGDpwoSuyQ+OJErOKDPf1IFXbkyAlenpHFdyQ0fpXrQXzW53ISSXyqz5KSckyUukmU+NB7yXXeqtlZlLjBige5LpYPqSDxxYl4iA9Pyf69vuLlGVl8znoP3FFau/g0kviAcwuGju8PFiVuEiW+Zg172urgZx1jR8+yrWp4u25XUWKHxBcn4iE+WKYr8/GdyDKq+LCQ1Ln2DtE/HX7E58zrxJ4oKoGAeIsPWScTxs1zLY5t30a/ng+bJMnBGaxvxG5zTkh8EcBCTqyklj84bOok+0pmlfg+6ztelLrRiQ+GBnHq1K98FbezLEjiQ4PM/WSNsMk5jZZhqgGZLjr8iA/IwY67MhXjIlcRD/HhPlmm2/ho5rTl4gxudmzfy78LuT4eqlgTiHbz9VfzWb+Qh+OsE4347ru1pO06ZXv28TfYxvU7xJHBId3El/PhSrz30hFJfHDTsCLaWRYk8fkxNBKvFdx+xYdrt+rAPV+yaK0osRMP8UWyF59+k509e06cQU2Ltz9RHutl0YjPyy6bPVzSIj6sXF684Ds2fuxcUeomkvggXGwnhwTie28pES7LSOJDjuP0KUvF0Wr8iq9FI3tjfq30O6LETiLFh/nYkgUa8oCSH14t1VJ5Hp2R+BxEIz74+R93GM7nouCSpWXMB7PEh9D28zmq8QZ8vZhsDrr44GZijNfpg6GurB0VfsWHPTPleuj9cA+dxFt8cHexkVPzRj3ZxtB3rPqbOlAX7inGxqpzW4bhRc0qH7CjmogwIPFJ5hTfnt0H+XzORx8ODQ/OYxWf9XP5l1qwJQvXcl/epPj+bKSmXojbjtI/HzzCVq3YyNPU4DIj5W7b1j3sxIlTosblT8LEd/r0GZbvGfvGQfESHwzXAFENHnBxwpbER2Q00i3gAoun+OBmwT2xxlDYI1Muh5H4iCATs/gwDsPCTrgPMokWn2WW24ltDbBxqjyZS+IjgkxM4rv7puI8u2LYoEl8rxKZ9BYf/kW+YYNalxKPSXxEkIlafNiBOf+ztbnokKWA4Acacnq7nZbJAZdrr3iBDeo3gW9dnjNrRRIfEWiiFh/C5ZgwxaS5vEg0COLDz5jeQBR01PDpbGLSAnbq1JmEiQ/nrlu9k+fiWAsswfFKPlaBY7DNHrZN9APSwJAt4txBADZr+nK+usILRDInjV/Ipyd0TAid/9Cho+InO0g9w7QSVl6ozGv5E7a7V123bJFe84VlWkhl69Z5JOvWaSTr32scmzZ5Kdv30yFRI1gkLOCya+d+VrJgI77UBIm06Cm9bh4azvDBk7nQsCHsm1Xb81dKFXy+Dhs9YjoPTaMnc/5dp/gsgwixizIaEtKbMivmhWIV3+GUY3z1dQcfOzAjpQzvivMLGlLZEs34ukY8yPxw5sxZPu7t0mF4eHU4rPMHQ/jfx/Z+SxZ+J2q7wVQCtm5UvRcPwuzZZTSff9OJEymAyHaR/7ZsXg/fyRMW8tUPlmE+F6v05d9hXK9j2ZJk9lKht/kDbuhnk3gqY88uo1ijUNt747W27Phx/bv+TBGT+K4LNXAk9XYICcu5FyW+LHyZsYAGiLQlPFHxf/R+SLJGYjEmenENOvHBLLcTjQkTwq2a9rb11vEQH7a8wD3wAteODZSiEd+B/Yd5A0RmEHa89oMlPp048BDCMAHXo8JLfCuWruNvEPLqFSE+5yLotALRqDbSUoFrguh3/vCTch5Sl3RumqjFh7VjeIKNGDKFTfl6EXeL+vdO4k+2Ni37ssZvdWfVKr7PU8owNsRbWR/N/Co37GKVK3sVnnSMrAvUqVH5A54qhT04Bg/4mk0MuT3Llqzjb1yFK+oFbrbVm9ap1pHv4qUSH9zO264pxJqH/s74cfN4T4W3q8ZDfGjsrZv1Ce+creKLkTNYx3ZDohIf8lixFAcuE9LS/DzIIokPIA1Ndy6d+LBlBB52O3/YJ36jxpT4Vq/6nhXJ81bcEgDSi6jFt2njTrZq+YaQW7mPnTjuLxvhyOETLHnNVr4UBS4QNo5FI8HuzbJYnIZUphxZK7L3W/Xn6UG6J7YM3F+ICsfrAi5I2UI+ou61Wn6xxIfzoOdVgacuRAc3PBrxIQHbcjfhLk4KuWWR8CM+9Hy6xG6d+PDQjDReBKbEt33rbu4lRHpYB42oxYfMFbyGGA0DLiA2cEVPiFw/fLEIxGS7tyz/F6/GKlW4Me8JsXwE9TAdgIYIIeFmoYfDC/HxlEfvULX8e1xw8s5YlmF8hf1AMBbAu8PXJ6tfCAkgOEQ+cb34Pybl5XPBZca4MhYs8aWmpnLx4e84WRi6R3hXAxq2X/GtT97G32RkPWzwZMdnjvRkjyQ+uO/4jnRumFN8+G7Q4znncHWYEh9o32YQd4uRt5pResCoxRcJNBjk7GGbbogQ67bkRm8Z3kiEm4VpAYzl8MXJIKk2aexc/mU+cEcp7jbKa9gsQ1nXTiO5oCE0FVYUEPud3PCvF8PHxsvtBCtCvd+wQZP5/2XgjuPzRSM+PKiSxs4TP10ET/aUQ/rtIoAlPtRDgEE2RKnfadKLDwt0yOJD74h7Xzh3XV8eB8B3WDTkVcwJucwq27Ftr6gZmWjFB8EhaINhDq4B0W7cd7+RYhPEXXwycFXQKOtW72gTjGzokdAo0bjq1eysfOcA1vJhMSR6WYwR+auWHedB8jay5Vs27qXdqxE97eKF37HqoZ4YQo6n+HCNiLbJoDGjIaABRCO+/CEBOJ/evbp/yR9qXljia1Snq+t9BYgaI+Ls5ZJa4kOwBw9GrEiBiz7V45XPMlx8obE8XoSisq2bfxQ1IxOt+CzwqjmrrcBbgOe1fEmyKA0WCRWfzOqQO+B8Q6vOsO0CVkPgJqqeXBARAicVXm7FczrlvSwte7loE+4u6ZbxLA65upijiwVZfAAPGVkgmCLBnCjwKz58NjQajEllQ9Dm6exVRC01Xm4nrivSlIglPrzMst27A/kDAL/DOjydVyFj0u3UgUAYAnx+5mLTm3QTH8BykdbNekcMtFiGgMlzT7zBG55qnAJ3CC4Wele8gFHeJwSG3g1r6T5qP4z3TE68egE/OMWHxoIvGqDRYrJ/948Hwj/7ER8iwDin86X+ObJW4p9Pt10E8BIfXE94F3jRig5LfHiIyOfA2Ll0kcYRQ/ZBFB9Yt3Ybe7/VAPFTcEhX8QF8wRCgLJJIBtcU6WKD+08IiU2dXQEQgcVkLBq9U4hYAQHXDZP18cIpPjTOXI9WZVs27eJfeDFpI1k/4kOvh8W3x46q9/TE5Hm71vpGFCnggvvutdOZJT5EiGXwkKtWoS2fWvIiqOJDu9C9Ntsk6S4+gME85ptkcfgxCAouKSKjOuAq4SmPLcmzOjZcQk+IAA0G4/GIiDnFB/ACEUwLDBk4kbs8Fn7Eh8+Fnl4HoqpwAXVEEh/Ejcl+/KvCEp9qkh2CxLEYU+kIqvg+6TqapxoGDSPiA1u37FamfPkxuK2FQg0B0xZeILSOrR6QgSL3hBAhUt8wmR8LKvGlpBznQQdEVuXopB/x4enstXUCQOM+f149TxdJfAD7a6qmRICX+ADuZZ1qHfh9VQHxlSjQkC1dtFZpXttXOIlWfAP7judBHXgc2EUByQmYDkOeJ4J0QVwhb0x8AAEPWVRpMUQY/dxYZM5kutK+7V2s0U704HMV0Vk0MmfGC3paJP160bB2F/E/PbOmr1BGhAGup37NzlpxAMwh9tCkq8Ftbtuyn2dwBal927bal49ZIDhWt1pHViHk1ahM9eo3HdiCBG8w8gtcSwSUShV+mz2RpQKfn0RADvGAoGJUfAge+A2+6AzjQaSuId0NbpkXiBr27jEmvP9nrOIjiFgwKj5ge4NNDAYRI8naTy+IyVeMrfA+PYIwhXHxLVuczIYPmhw3U21DrgKrJcY7skgIIj0xLj6C+LNC4iMIQ5D4CMIQJD6CMASJjyAMQeIjCEOQ+AjCECQ+gjAEiY8gDEHiIwhDkPgIwhAkPoIwBImPIAxB4iMIQ5D4CMIQJD6CMASJjyAMQeIjCEOQ+AjCECQ+gjAEiY8gDEHiIwhDkPgIwhAkPoIwBImPIAxB4iMIQ5D4CMIQJD6CMASJjyAMQeIjCEOQ+AjCCIz9H5MBDXDnozqRAAAAAElFTkSuQmCC" alt="BridgeMarkets" style="height:44px;display:block;object-fit:contain;"/>
+                </div>
+                <h2 style="font-size:26px;font-weight:800;color:#F1F5F9;line-height:1.25;margin:0 0 12px;">
+                  El broker ideal para<br/><span style="color:#3B82F6;">Índices Sintéticos</span> & Prop Firm
+                </h2>
+                <p style="color:#94A3B8;font-size:14px;line-height:1.7;margin:0 0 24px;max-width:480px;">
+                  BridgeMarkets es la plataforma de trading que combina acceso a mercados sintéticos 24/7, condiciones de spreads competitivos y un programa de fondeo prop firm — todo en un solo lugar. Sin noticias que arruinen tus trades. Sin cierres de mercado.
+                </p>
+                <div style="display:flex;gap:12px;flex-wrap:wrap;">
+                  <a href="https://trading.bridgemarkets.global//register?ref=6af2c3f6-2fdd-47&branchUuid=6bdab320-a2b8-43a5-a218-f" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:8px;background:linear-gradient(135deg,#2563EB,#1D4ED8);color:#fff;font-weight:700;font-size:14px;padding:13px 26px;border-radius:12px;text-decoration:none;transition:all .2s;box-shadow:0 4px 20px rgba(37,99,235,.4);">
+                    Abrir Cuenta Gratis
+                    <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 0 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                  </a>
+                  <button onclick="showSection('calculadora')" style="display:inline-flex;align-items:center;gap:8px;background:rgba(37,99,235,.1);color:#3B82F6;border:1px solid rgba(37,99,235,.3);font-weight:600;font-size:13px;padding:13px 22px;border-radius:12px;cursor:pointer;transition:all .2s;">
+                    🧮 Calculadora de Riesgo
+                  </button>
+                </div>
+              </div>
+              <div style="flex-shrink:0;display:flex;flex-direction:column;gap:10px;min-width:180px;">
+                
+                <div style="display:flex;align-items:center;gap:10px;background:rgba(30,41,59,.5);border:1px solid rgba(30,41,59,.8);border-radius:10px;padding:10px 14px;">
+                  <span style="font-size:15px;">✅</span>
+                  <span style="font-size:12px;font-weight:500;color:#CBD5E1;">Regulado y auditado</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:10px;background:rgba(30,41,59,.5);border:1px solid rgba(30,41,59,.8);border-radius:10px;padding:10px 14px;">
+                  <span style="font-size:15px;">⚡</span>
+                  <span style="font-size:12px;font-weight:500;color:#CBD5E1;">Ejecución instantánea</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:10px;background:rgba(30,41,59,.5);border:1px solid rgba(30,41,59,.8);border-radius:10px;padding:10px 14px;">
+                  <span style="font-size:15px;">🕐</span>
+                  <span style="font-size:12px;font-weight:500;color:#CBD5E1;">Mercado 24/7</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:10px;background:rgba(30,41,59,.5);border:1px solid rgba(30,41,59,.8);border-radius:10px;padding:10px 14px;">
+                  <span style="font-size:15px;">💰</span>
+                  <span style="font-size:12px;font-weight:500;color:#CBD5E1;">Prop Firm disponible</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:10px;background:rgba(30,41,59,.5);border:1px solid rgba(30,41,59,.8);border-radius:10px;padding:10px 14px;">
+                  <span style="font-size:15px;">📱</span>
+                  <span style="font-size:12px;font-weight:500;color:#CBD5E1;">MT5 + WebTrader</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:10px;background:rgba(30,41,59,.5);border:1px solid rgba(30,41,59,.8);border-radius:10px;padding:10px 14px;">
+                  <span style="font-size:15px;">🎓</span>
+                  <span style="font-size:12px;font-weight:500;color:#CBD5E1;">Soporte en español</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- STATS BAR -->
+        <div class="bm-stat-bar mb-6">
+          
+          <div class="bm-stat-item">
+            <div class="val">24/7</div>
+            <div class="lbl">Mercado abierto</div>
+          </div>
+          <div class="bm-stat-item">
+            <div class="val">0 pip</div>
+            <div class="lbl">Spread mínimo</div>
+          </div>
+          <div class="bm-stat-item">
+            <div class="val">500+</div>
+            <div class="lbl">Instrumentos</div>
+          </div>
+          <div class="bm-stat-item">
+            <div class="val">5 min</div>
+            <div class="lbl">Apertura de cuenta</div>
+          </div>
+        </div>
+
+        <!-- POR QUÉ BRIDGEMARKETS -->
+        <div class="mb-6">
+          <div class="inicio-section-divider">¿Por qué BridgeMarkets?</div>
+          <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mt-3">
+            
+            <div class="benefit-card">
+              <div class="bc-icon" style="background:rgba(37,99,235,.2);">
+                <span>🌐</span>
+              </div>
+              <h4 style="font-size:13px;font-weight:700;color:#F1F5F9;margin:0 0 6px;">Sin Horarios</h4>
+              <p style="font-size:12px;color:#94A3B8;line-height:1.6;margin:0;">Los índices sintéticos operan los 365 días del año, las 24 horas. Lunes o domingo, siempre hay mercado.</p>
+            </div>
+            <div class="benefit-card">
+              <div class="bc-icon" style="background:rgba(139,92,246,.2);">
+                <span>🏦</span>
+              </div>
+              <h4 style="font-size:13px;font-weight:700;color:#F1F5F9;margin:0 0 6px;">Prop Firm</h4>
+              <p style="font-size:12px;color:#94A3B8;line-height:1.6;margin:0;">Accede a capital institucional. Demuestra tu habilidad y opera con fondos de la firma sin arriesgar tu capital.</p>
+            </div>
+            <div class="benefit-card">
+              <div class="bc-icon" style="background:rgba(16,185,129,.2);">
+                <span>📊</span>
+              </div>
+              <h4 style="font-size:13px;font-weight:700;color:#F1F5F9;margin:0 0 6px;">Sin Noticias</h4>
+              <p style="font-size:12px;color:#94A3B8;line-height:1.6;margin:0;">Los índices sintéticos son inmunes a eventos macroeconómicos. Tu análisis técnico siempre manda.</p>
+            </div>
+            <div class="benefit-card">
+              <div class="bc-icon" style="background:rgba(245,158,11,.2);">
+                <span>⚡</span>
+              </div>
+              <h4 style="font-size:13px;font-weight:700;color:#F1F5F9;margin:0 0 6px;">Baja Latencia</h4>
+              <p style="font-size:12px;color:#94A3B8;line-height:1.6;margin:0;">Ejecución de órdenes en milisegundos. Sin requotes, sin slippage excesivo. Ideal para scalping y EA.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- ÍNDICES SINTÉTICOS -->
+        <div class="mb-6">
+          <div class="inicio-section-divider">Índices Sintéticos — Opera 24/7</div>
+          <p style="text-align:center;font-size:13px;color:#64748B;margin:6px 0 16px;">Instrumentos algorítmicos sin correlación con el mercado real. Volatilidad predecible, spreads bajos, análisis técnico puro.</p>
+          <div class="grid grid-cols-2 lg:grid-cols-3 gap-3">
+            
+          <div class="synth-card" style="background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.25);">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+              <span style="font-size:22px;">📈</span>
+              <span style="font-weight:700;font-size:13px;color:#10B981;">Boom 300/500/1000</span>
+            </div>
+            <p style="font-size:12px;color:#94A3B8;line-height:1.6;margin:0;">Gráfico que sube continuamente con picos alcistas aleatorios. Ideal para estrategias de tendencia alcista y scalping en impulsos.</p>
+            <div class="synth-card::after" style="position:absolute;bottom:0;left:0;right:0;height:2px;background:#10B981;opacity:.4;border-radius:0 0 14px 14px;"></div>
+          </div>
+          <div class="synth-card" style="background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.25);">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+              <span style="font-size:22px;">📉</span>
+              <span style="font-weight:700;font-size:13px;color:#EF4444;">Crash 300/500/1000</span>
+            </div>
+            <p style="font-size:12px;color:#94A3B8;line-height:1.6;margin:0;">Movimiento bajista constante con caídas abruptas. Perfecto para traders que dominan el análisis de rupturas y soportes.</p>
+            <div class="synth-card::after" style="position:absolute;bottom:0;left:0;right:0;height:2px;background:#EF4444;opacity:.4;border-radius:0 0 14px 14px;"></div>
+          </div>
+          <div class="synth-card" style="background:rgba(59,130,246,.08);border:1px solid rgba(59,130,246,.25);">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+              <span style="font-size:22px;">〰️</span>
+              <span style="font-weight:700;font-size:13px;color:#3B82F6;">Volatility 10/25/50/75/100</span>
+            </div>
+            <p style="font-size:12px;color:#94A3B8;line-height:1.6;margin:0;">Volatilidad controlada y constante según el número. A mayor número, mayor rango de movimiento. Spreads muy bajos.</p>
+            <div class="synth-card::after" style="position:absolute;bottom:0;left:0;right:0;height:2px;background:#3B82F6;opacity:.4;border-radius:0 0 14px 14px;"></div>
+          </div>
+          <div class="synth-card" style="background:rgba(139,92,246,.08);border:1px solid rgba(139,92,246,.25);">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+              <span style="font-size:22px;">📶</span>
+              <span style="font-weight:700;font-size:13px;color:#8B5CF6;">Step Index</span>
+            </div>
+            <p style="font-size:12px;color:#94A3B8;line-height:1.6;margin:0;">Movimientos exactos de 0.1 en cada vela. Sin gaps, sin noticias. El índice más predecible para sistemas de reversión.</p>
+            <div class="synth-card::after" style="position:absolute;bottom:0;left:0;right:0;height:2px;background:#8B5CF6;opacity:.4;border-radius:0 0 14px 14px;"></div>
+          </div>
+          <div class="synth-card" style="background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.25);">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+              <span style="font-size:22px;">⚡</span>
+              <span style="font-weight:700;font-size:13px;color:#F59E0B;">Jump 10/25/50/75/100</span>
+            </div>
+            <p style="font-size:12px;color:#94A3B8;line-height:1.6;margin:0;">Combina volatilidad suave con saltos bruscos aleatorios. Exige gestión de riesgo firme. Alto potencial de ganancia.</p>
+            <div class="synth-card::after" style="position:absolute;bottom:0;left:0;right:0;height:2px;background:#F59E0B;opacity:.4;border-radius:0 0 14px 14px;"></div>
+          </div>
+          <div class="synth-card" style="background:rgba(236,72,153,.08);border:1px solid rgba(236,72,153,.25);">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+              <span style="font-size:22px;">🔥</span>
+              <span style="font-weight:700;font-size:13px;color:#EC4899;">Range Break 100/200</span>
+            </div>
+            <p style="font-size:12px;color:#94A3B8;line-height:1.6;margin:0;">Se mantiene en rango hasta que rompe con fuerza en una dirección. Ideal para estrategias de ruptura de consolidación.</p>
+            <div class="synth-card::after" style="position:absolute;bottom:0;left:0;right:0;height:2px;background:#EC4899;opacity:.4;border-radius:0 0 14px 14px;"></div>
+          </div>
+          </div>
+        </div>
+
+        <!-- PROP FIRM -->
+        <div class="mb-6" style="background:linear-gradient(135deg,rgba(37,99,235,.08),rgba(139,92,246,.06));border:1px solid rgba(37,99,235,.2);border-radius:16px;padding:28px;">
+          <div class="inicio-section-divider" style="padding-top:0;">Programa Prop Firm</div>
+          <p style="text-align:center;font-size:13px;color:#64748B;margin:4px 0 20px;">Opera con capital de la firma. Sin riesgo propio. Gana hasta el 80% de las ganancias.</p>
+          <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-5">
+            
+            <div class="propfirm-step">
+              <div class="step-num">1</div>
+              <div style="font-size:22px;margin-bottom:8px;">📋</div>
+              <h4 style="font-size:13px;font-weight:700;color:#F1F5F9;margin:0 0 6px;">Aplica</h4>
+              <p style="font-size:11px;color:#94A3B8;line-height:1.5;margin:0;">Completa el formulario de evaluación y elige tu tamaño de cuenta</p>
+            </div>
+            <div class="propfirm-step">
+              <div class="step-num">2</div>
+              <div style="font-size:22px;margin-bottom:8px;">🎯</div>
+              <h4 style="font-size:13px;font-weight:700;color:#F1F5F9;margin:0 0 6px;">Evalúate</h4>
+              <p style="font-size:11px;color:#94A3B8;line-height:1.5;margin:0;">Demuestra tu consistencia cumpliendo los objetivos de profit y drawdown</p>
+            </div>
+            <div class="propfirm-step">
+              <div class="step-num">3</div>
+              <div style="font-size:22px;margin-bottom:8px;">✅</div>
+              <h4 style="font-size:13px;font-weight:700;color:#F1F5F9;margin:0 0 6px;">Fondéate</h4>
+              <p style="font-size:11px;color:#94A3B8;line-height:1.5;margin:0;">Aprueba la evaluación y recibe acceso a la cuenta fondeada</p>
+            </div>
+            <div class="propfirm-step">
+              <div class="step-num">4</div>
+              <div style="font-size:22px;margin-bottom:8px;">💸</div>
+              <h4 style="font-size:13px;font-weight:700;color:#F1F5F9;margin:0 0 6px;">Retira</h4>
+              <p style="font-size:11px;color:#94A3B8;line-height:1.5;margin:0;">Opera con el capital de la firma y retira hasta el 80% de tus ganancias</p>
+            </div>
+          </div>
+          <div style="text-align:center;">
+            <a href="https://trading.bridgemarkets.global//register?ref=6af2c3f6-2fdd-47&branchUuid=6bdab320-a2b8-43a5-a218-f" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:8px;background:linear-gradient(135deg,#7C3AED,#2563EB);color:#fff;font-weight:700;font-size:14px;padding:13px 32px;border-radius:12px;text-decoration:none;box-shadow:0 4px 24px rgba(124,58,237,.35);">
+              💎 Quiero el Prop Firm
+              <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </a>
+          </div>
+        </div>
+
+        <!-- FINAL CTA -->
+        <div style="background:linear-gradient(135deg,#0F172A,#131A26);border:1px solid rgba(37,99,235,.2);border-radius:16px;padding:36px;text-align:center;margin-bottom:8px;">
+          <p style="font-size:22px;font-weight:800;color:#F1F5F9;margin:0 0 10px;">¿Listo para operar sin límites?</p>
+          <p style="font-size:14px;color:#64748B;margin:0 0 24px;">Únete a BridgeMarkets hoy. Cuenta demo gratis, spreads desde 0 y mercado abierto las 24 horas.</p>
+          <a href="https://trading.bridgemarkets.global//register?ref=6af2c3f6-2fdd-47&branchUuid=6bdab320-a2b8-43a5-a218-f" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:10px;background:linear-gradient(135deg,#2563EB,#1D4ED8);color:#fff;font-weight:700;font-size:15px;padding:15px 36px;border-radius:14px;text-decoration:none;box-shadow:0 6px 28px rgba(37,99,235,.45);transition:all .2s;">
+            🚀 Crear Cuenta en BridgeMarkets
+          </a>
+          <p style="font-size:11px;color:#334155;margin:14px 0 0;">Al registrarte usas el enlace de referido de FlowTrade Suite</p>
+        </div>
+
+      </div>
+      <!-- ████ END INICIO ████ -->
 
       <!-- DASHBOARD -->
       <div id="section-dashboard">
@@ -2042,7 +2411,7 @@ const journalPageSize = 10;
 // ═══════════════════════════════════════════════════════════════
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 let currentUser = null, currentPerfil = null, isAdmin = false;
-let currentSection = 'dashboard';
+let currentSection = 'inicio';
 let journalTrades = [], allUsersCache = [];
 let equityChart = null, journalEqChart = null;
 let chatConvId = null, chatPollInterval = null, lastMsgTimestamp = null;
@@ -2484,7 +2853,7 @@ async function testLicenseConnection() {
 // ═══════════════════════════════════════════════════════════════
 // NAVIGATION
 // ═══════════════════════════════════════════════════════════════
-const ALL_SECTIONS = ['dashboard','diario','planes','perfil','admin','calculadora','calc-mt5','noticias','referidos','ranking','logros','descargas','conectarmt5'];
+const ALL_SECTIONS = ['inicio','dashboard','diario','planes','perfil','admin','calculadora','calc-mt5','noticias','referidos','ranking','logros','descargas','conectarmt5'];
 
 function showSection(s) {
   ALL_SECTIONS.forEach(sec => {
@@ -4299,7 +4668,7 @@ function showAiChat(container, cfg) {
   if (aiHistory.length===0) {
     addAiMessage('¡Hola! Soy tu asistente de IA de FlowTrade. Pregúntame cualquier cosa sobre la plataforma: EAs, configuración, métricas, pagos, etc.','bot');
     const sectionNames = {
-      dashboard:'Dashboard',diario:'Diario de Trades',calculadora:'Calculadora',planes:'Planes',
+      inicio:'Inicio',dashboard:'Dashboard',diario:'Diario de Trades',calculadora:'Calculadora',planes:'Planes',
       descargas:'Descargas / EAs',conectarmt5:'Conectar MT5',noticias:'Noticias',
       referidos:'Referidos',ranking:'Ranking',logros:'Logros',perfil:'Perfil',admin:'Admin'
     };
@@ -5212,6 +5581,7 @@ async function mt5SimulateReceive() {
   } else {
     document.getElementById('landingPage').classList.add('hidden');
     document.getElementById('authOverlay').classList.add('hidden');
+    showSection('inicio');
   }
   updatePayInstructions();
   // Check maintenance on load (public check)
