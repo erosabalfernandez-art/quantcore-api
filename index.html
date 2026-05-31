@@ -3841,11 +3841,22 @@ function showAiChat(container, cfg) {
   </div>`;
   if (aiHistory.length===0) {
     addAiMessage('¡Hola! Soy tu asistente de IA de FlowTrade. Pregúntame cualquier cosa sobre la plataforma: EAs, configuración, métricas, pagos, etc.','bot');
+    const sectionNames = {
+      dashboard:'Dashboard',diario:'Diario de Trades',calculadora:'Calculadora',planes:'Planes',
+      descargas:'Descargas / EAs',conectarmt5:'Conectar MT5',noticias:'Noticias',
+      referidos:'Referidos',ranking:'Ranking',logros:'Logros',perfil:'Perfil',admin:'Admin'
+    };
+    const lbl=document.createElement('p');
+    lbl.id='aiSugLabel';
+    lbl.style.cssText='font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#6D28D9;padding:2px 12px 6px;margin:0;display:flex;align-items:center;gap:5px;';
+    lbl.innerHTML='<span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:#8B5CF6;flex-shrink:0;"></span> Sugerencias para '+(sectionNames[currentSection]||currentSection);
     const sug=document.createElement('div');
     sug.id='aiSuggestions';
     sug.style.cssText='display:flex;flex-direction:column;gap:5px;padding:0 12px 10px;';
     renderAiSuggestionButtons(sug, getContextualSuggestions(currentSection));
-    container.querySelector('div').appendChild(sug);
+    const wrapper=container.querySelector('div');
+    wrapper.appendChild(lbl);
+    wrapper.appendChild(sug);
   }
 }
 
