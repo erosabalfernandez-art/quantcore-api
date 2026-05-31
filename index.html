@@ -691,6 +691,9 @@ select.input-dark option{background:#131A26;color:#E2E8F0;}
       <button class="nav-item" id="nav-calculadora" onclick="showSection('calculadora')">
         <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>Calculadora
       </button>
+      <button class="nav-item" id="nav-calc-mt5" onclick="showSection('calc-mt5')">
+        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>Calc. MT5 Personal
+      </button>
       <button class="nav-item" id="nav-noticias" onclick="showSection('noticias')">
         <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Noticias
       </button>
@@ -1238,8 +1241,8 @@ select.input-dark option{background:#131A26;color:#E2E8F0;}
       <!-- CALCULADORA DE RIESGO -->
       <div id="section-calculadora" class="hidden">
         <div class="mb-5">
-          <h1 class="text-xl font-bold">🧮 Calculadora de Riesgo</h1>
-          <p class="text-xs mt-0.5" style="color:#94A3B8;">Calcula el lotaje óptimo según tu riesgo — pip value = $10 fijo para todos los pares</p>
+          <h1 class="text-xl font-bold">🧮 Calculadora de Riesgo Global</h1>
+          <p class="text-xs mt-0.5" style="color:#94A3B8;">Pip values reales por activo — Forex, Metales, Índices, Sintéticos Deriv/Weltrade/BridgeMarkets</p>
         </div>
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
           <div class="glass-card rounded-xl p-5">
@@ -1303,11 +1306,70 @@ select.input-dark option{background:#131A26;color:#E2E8F0;}
                     <option value="EURHUF">EURHUF</option><option value="USDHUF">USDHUF</option>
                     <option value="USDCZK">USDCZK</option><option value="USDDKK">USDDKK</option>
                   </optgroup>
-                  <optgroup label="Metales">
+                  <optgroup label="Metales &amp; Materias primas">
                     <option value="XAUUSD">XAUUSD (Oro)</option>
                     <option value="XAGUSD">XAGUSD (Plata)</option>
+                    <option value="XTIUSD">XTIUSD / USOIL (Petróleo WTI)</option>
+                    <option value="XBRUSD">XBRUSD / UKOIL (Brent)</option>
+                  </optgroup>
+                  <optgroup label="Índices (CFD)">
+                    <option value="US30">US30 / DJ30 (Dow Jones)</option>
+                    <option value="NAS100">NAS100 / USTEC (Nasdaq)</option>
+                    <option value="US500">US500 / SPX500 (S&amp;P 500)</option>
+                    <option value="UK100">UK100 / FTSE 100</option>
+                    <option value="GER40">GER40 / DAX 40</option>
+                    <option value="FRA40">FRA40 / CAC 40</option>
+                    <option value="JPN225">JPN225 / Nikkei</option>
+                    <option value="AUS200">AUS200 / ASX 200</option>
+                    <option value="HK50">HK50 / Hang Seng</option>
+                  </optgroup>
+                  <optgroup label="Criptomonedas">
+                    <option value="BTCUSD">BTCUSD (Bitcoin)</option>
+                    <option value="ETHUSD">ETHUSD (Ethereum)</option>
+                    <option value="LTCUSD">LTCUSD (Litecoin)</option>
+                    <option value="XRPUSD">XRPUSD (Ripple)</option>
+                    <option value="BNBUSD">BNBUSD (BNB)</option>
+                  </optgroup>
+                  <optgroup label="Sintéticos Deriv — Boom &amp; Crash">
+                    <option value="BOOM300">Boom 300 Index</option>
+                    <option value="BOOM500">Boom 500 Index</option>
+                    <option value="BOOM1000">Boom 1000 Index</option>
+                    <option value="CRASH300">Crash 300 Index</option>
+                    <option value="CRASH500">Crash 500 Index</option>
+                    <option value="CRASH1000">Crash 1000 Index</option>
+                  </optgroup>
+                  <optgroup label="Sintéticos Deriv — Volatility">
+                    <option value="V10">Volatility 10 (V10)</option>
+                    <option value="V25">Volatility 25 (V25)</option>
+                    <option value="V50">Volatility 50 (V50)</option>
+                    <option value="V75">Volatility 75 (V75)</option>
+                    <option value="V100">Volatility 100 (V100)</option>
+                    <option value="V10_1S">V10 (1s)</option>
+                    <option value="V25_1S">V25 (1s)</option>
+                    <option value="V50_1S">V50 (1s)</option>
+                    <option value="V75_1S">V75 (1s)</option>
+                    <option value="V100_1S">V100 (1s)</option>
+                  </optgroup>
+                  <optgroup label="Sintéticos Deriv — Otros">
+                    <option value="STEPINDEX">Step Index</option>
+                    <option value="RANGEBREAK100">Range Break 100</option>
+                    <option value="RANGEBREAK200">Range Break 200</option>
+                    <option value="JUMP10">Jump 10 Index</option>
+                    <option value="JUMP25">Jump 25 Index</option>
+                    <option value="JUMP50">Jump 50 Index</option>
+                    <option value="JUMP75">Jump 75 Index</option>
+                    <option value="JUMP100">Jump 100 Index</option>
+                  </optgroup>
+                  <optgroup label="Personalizado">
+                    <option value="CUSTOM">Activo personalizado (ingresar pip value)</option>
                   </optgroup>
                 </select>
+              </div>
+              <!-- Pip value manual override -->
+              <div id="calcPipManualRow">
+                <label class="block text-xs font-medium mb-1.5" style="color:#94A3B8;">Pip Value manual ($/pip/lote) <span style="color:#475569;">— para sintéticos o activos no listados</span></label>
+                <input id="calcPipManual" type="number" step="0.001" min="0.001" placeholder="Ej: 0.01 para Boom300" class="input-dark w-full px-4 py-3 rounded-xl text-sm mono" oninput="calculateRisk()"/>
+                <p class="text-xs mt-1" style="color:#475569;">Déjalo en 0 para usar el valor automático del activo seleccionado</p>
               </div>
               <!-- Alerta fondeo en rojo -->
               <div id="calcRiskAlert" class="hidden px-3 py-2 rounded-xl text-xs font-medium" style="background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);color:#EF4444;">
@@ -1339,6 +1401,10 @@ select.input-dark option{background:#131A26;color:#E2E8F0;}
                   <span class="text-xs" style="color:#94A3B8;">Pips de SL</span>
                   <span id="calcResultPips" class="font-bold" style="color:#8B5CF6;">— pips</span>
                 </div>
+                <div class="flex justify-between items-center p-3 rounded-xl" style="background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.2);">
+                  <span class="text-xs" style="color:#94A3B8;">Pip value usado</span>
+                  <span id="calcResultPipValue" class="font-bold text-xs mono" style="color:#10B981;">—</span>
+                </div>
               </div>
               <div class="flex gap-2 mt-4">
                 <button onclick="saveRiskCalc()" class="btn-green flex-1 py-2.5 rounded-xl text-sm font-semibold">💾 Guardar</button>
@@ -1354,52 +1420,178 @@ select.input-dark option{background:#131A26;color:#E2E8F0;}
         </div>
       </div>
 
+      <!-- CALC MT5 PERSONAL -->
+      <div id="section-calc-mt5" class="hidden">
+        <div class="mb-5">
+          <h1 class="text-xl font-bold">🎯 Calculadora MT5 Personal</h1>
+          <p class="text-xs mt-0.5" style="color:#94A3B8;">Usa los datos exactos de tu cuenta MT5 — pip values reales exportados por el DataBridge EA</p>
+        </div>
+        <div class="mb-4 px-4 py-3 rounded-xl flex items-start gap-3" style="background:rgba(37,99,235,.06);border:1px solid rgba(37,99,235,.2);">
+          <span style="font-size:18px;">ℹ️</span>
+          <div>
+            <p class="text-xs font-semibold mb-0.5" style="color:#60A5FA;">¿Cómo funciona?</p>
+            <p class="text-xs" style="color:#94A3B8;">El EA <strong style="color:#E2E8F0;">DataBridge v2</strong> (descargable en EAs &amp; Descargas) envía automáticamente las especificaciones exactas de tus símbolos (tick_value, contract_size, dígitos) desde MT5. Esta calculadora los usa para dar un lotaje 100% preciso.</p>
+          </div>
+        </div>
+        <div id="mt5CalcStatus" class="text-xs mb-4 px-3 py-2 rounded-xl" style="background:rgba(30,41,59,.4);color:#94A3B8;">Haz clic en "Cargar datos MT5" para actualizar</div>
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+          <div class="glass-card rounded-xl p-5">
+            <div class="flex items-center justify-between mb-4">
+              <h3 class="font-semibold text-sm">Parámetros</h3>
+              <button onclick="loadMt5CalcData()" class="text-xs px-3 py-1.5 rounded-lg font-semibold" style="background:rgba(37,99,235,.15);color:#60A5FA;border:1px solid rgba(37,99,235,.3);">🔄 Cargar datos MT5</button>
+            </div>
+            <div class="space-y-4">
+              <div>
+                <label class="block text-xs font-medium mb-1.5" style="color:#94A3B8;">Símbolo (desde tu MT5)</label>
+                <select id="mt5CalcSymbolSelect" class="input-dark w-full px-4 py-3 rounded-xl text-sm" onchange="calculateMt5Risk()">
+                  <option value="">— Carga tus datos MT5 primero —</option>
+                </select>
+                <div id="mt5CalcSymInfo" class="mt-2"></div>
+              </div>
+              <div>
+                <label class="block text-xs font-medium mb-1.5" style="color:#94A3B8;">Balance de la cuenta ($)</label>
+                <input id="mt5CalcBalance" type="number" value="10000" class="input-dark w-full px-4 py-3 rounded-xl text-sm" oninput="calculateMt5Risk()"/>
+              </div>
+              <div>
+                <label class="block text-xs font-medium mb-1.5" style="color:#94A3B8;">Riesgo (%)</label>
+                <div class="flex gap-2 mb-2">
+                  <button onclick="setMt5RiskPct(0.5)" class="btn-outline text-xs px-3 py-1.5 rounded-lg">0.5%</button>
+                  <button onclick="setMt5RiskPct(1)" class="btn-outline text-xs px-3 py-1.5 rounded-lg">1%</button>
+                  <button onclick="setMt5RiskPct(2)" class="btn-outline text-xs px-3 py-1.5 rounded-lg">2%</button>
+                </div>
+                <input id="mt5CalcRisk" type="number" value="1" step="0.1" min="0.1" max="10" class="input-dark w-full px-4 py-3 rounded-xl text-sm" oninput="calculateMt5Risk()"/>
+              </div>
+              <div>
+                <label class="block text-xs font-medium mb-1.5" style="color:#94A3B8;">Stop Loss en Pips</label>
+                <input id="mt5CalcSLPips" type="number" value="20" step="1" min="1" class="input-dark w-full px-4 py-3 rounded-xl text-sm mono" oninput="calculateMt5Risk()" placeholder="Ej: 20"/>
+              </div>
+              <div>
+                <label class="block text-xs font-medium mb-1.5" style="color:#94A3B8;">Ratio R:B</label>
+                <input id="mt5CalcRR" type="number" value="2" step="0.5" min="0.5" class="input-dark w-full px-4 py-3 rounded-xl text-sm" oninput="calculateMt5Risk()"/>
+              </div>
+            </div>
+          </div>
+          <div class="space-y-4">
+            <div class="glass-card rounded-xl p-5">
+              <h3 class="font-semibold text-sm mb-4">Resultado MT5</h3>
+              <div class="space-y-3">
+                <div class="flex justify-between items-center p-3 rounded-xl" style="background:rgba(37,99,235,.08);border:1px solid rgba(37,99,235,.2);">
+                  <span class="text-xs" style="color:#94A3B8;">Lotaje exacto MT5</span>
+                  <span id="mt5CalcResultLot" class="font-bold text-base" style="color:#2563EB;">— lotes</span>
+                </div>
+                <div class="flex justify-between items-center p-3 rounded-xl" style="background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);">
+                  <span class="text-xs" style="color:#94A3B8;">Riesgo en dinero</span>
+                  <span id="mt5CalcResultRisk" class="font-bold" style="color:#EF4444;">— USD</span>
+                </div>
+                <div class="flex justify-between items-center p-3 rounded-xl" style="background:rgba(96,165,250,.08);border:1px solid rgba(96,165,250,.2);">
+                  <span class="text-xs" style="color:#94A3B8;">Beneficio potencial</span>
+                  <span id="mt5CalcResultReward" class="font-bold" style="color:#60A5FA;">— USD</span>
+                </div>
+                <div class="flex justify-between items-center p-3 rounded-xl" style="background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.2);">
+                  <span class="text-xs" style="color:#94A3B8;">Ratio R:B</span>
+                  <span id="mt5CalcResultRR" class="font-bold" style="color:#FBBF24;">1:—</span>
+                </div>
+                <div class="flex justify-between items-center p-3 rounded-xl" style="background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.2);">
+                  <span class="text-xs" style="color:#94A3B8;">Pip value exacto (desde MT5)</span>
+                  <span id="mt5CalcResultPV" class="font-bold text-xs mono" style="color:#10B981;">—</span>
+                </div>
+              </div>
+              <p class="text-xs mt-3" style="color:#475569;">✓ Cálculo basado en tick_value real enviado por el EA desde tu MT5</p>
+            </div>
+            <div class="glass-card rounded-xl p-5">
+              <h3 class="font-semibold text-sm mb-3">Todos tus símbolos MT5</h3>
+              <div id="mt5SymbolsList" class="space-y-1.5" style="max-height:220px;overflow-y:auto;color:#94A3B8;font-size:11px;">Sin datos — activa el DataBridge EA v2</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <!-- NOTICIAS -->
       <div id="section-noticias" class="hidden">
         <div class="mb-5">
-          <h1 class="text-xl font-bold">📰 Calendario de Noticias</h1>
-          <p class="text-xs mt-0.5" style="color:#94A3B8;">Noticias económicas y sesiones de mercado en tiempo real</p>
+          <h1 class="text-xl font-bold">📰 Noticias del Mercado</h1>
+          <p class="text-xs mt-0.5" style="color:#94A3B8;">Noticias en tiempo real y calendario económico — Forex, Cripto y Mercados</p>
         </div>
-        <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-5">
-          <div class="glass-card rounded-xl p-4 text-center"><div class="text-xs font-semibold mb-1" style="color:#94A3B8;">🇺🇸 Nueva York</div><div id="clock-ny" class="text-lg font-bold mono" style="color:#2563EB;">--:--</div><div id="status-ny" class="text-xs mt-1" style="color:#475569;">—</div></div>
-          <div class="glass-card rounded-xl p-4 text-center"><div class="text-xs font-semibold mb-1" style="color:#94A3B8;">🇬🇧 Londres</div><div id="clock-ldn" class="text-lg font-bold mono" style="color:#60A5FA;">--:--</div><div id="status-ldn" class="text-xs mt-1" style="color:#475569;">—</div></div>
-          <div class="glass-card rounded-xl p-4 text-center"><div class="text-xs font-semibold mb-1" style="color:#94A3B8;">🇯🇵 Tokio</div><div id="clock-tok" class="text-lg font-bold mono" style="color:#FBBF24;">--:--</div><div id="status-tok" class="text-xs mt-1" style="color:#475569;">—</div></div>
-          <div class="glass-card rounded-xl p-4 text-center"><div class="text-xs font-semibold mb-1" style="color:#94A3B8;">🇦🇺 Sídney</div><div id="clock-syd" class="text-lg font-bold mono" style="color:#F472B6;">--:--</div><div id="status-syd" class="text-xs mt-1" style="color:#475569;">—</div></div>
+        <!-- Tabs -->
+        <div class="flex gap-1 mb-5 p-1 rounded-xl" style="background:rgba(30,41,59,.5);">
+          <button id="ntab-calendario" onclick="switchNewsTab('calendario')" class="flex-1 py-2 rounded-lg text-xs font-semibold transition-all" style="background:rgba(37,99,235,.2);color:#60A5FA;">📊 Calendario Macro</button>
+          <button id="ntab-forex"      onclick="switchNewsTab('forex')"      class="flex-1 py-2 rounded-lg text-xs font-semibold transition-all" style="color:#94A3B8;">💱 Forex</button>
+          <button id="ntab-cripto"     onclick="switchNewsTab('cripto')"     class="flex-1 py-2 rounded-lg text-xs font-semibold transition-all" style="color:#94A3B8;">🪙 Cripto</button>
+          <button id="ntab-mercados"   onclick="switchNewsTab('mercados')"   class="flex-1 py-2 rounded-lg text-xs font-semibold transition-all" style="color:#94A3B8;">📈 Mercados</button>
         </div>
-        <div class="glass-card rounded-xl overflow-hidden">
-          <div class="p-4 border-b flex items-center gap-3 flex-wrap" style="border-color:rgba(30,41,59,.5);">
-            <h3 class="font-semibold text-sm flex-1">Eventos de la semana</h3>
-            <select id="newsFilter" onchange="renderNewsCalendar()" class="input-dark px-3 py-2 rounded-lg text-xs">
-              <option value="all">Todos los impactos</option>
-              <option value="high">Solo Alto</option>
-              <option value="medium">Solo Medio</option>
-            </select>
-            <div class="flex gap-2">
-              <span class="text-xs px-2 py-1 rounded-lg font-bold" style="background:rgba(239,68,68,.15);color:#EF4444;">🔴 Alto</span>
-              <span class="text-xs px-2 py-1 rounded-lg font-bold" style="background:rgba(251,191,36,.15);color:#FBBF24;">🟡 Medio</span>
-              <span class="text-xs px-2 py-1 rounded-lg font-bold" style="background:rgba(96,165,250,.15);color:#60A5FA;">🔵 Bajo</span>
+
+        <!-- TAB: Calendario Macro -->
+        <div id="newsTab-calendario">
+          <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-5">
+            <div class="glass-card rounded-xl p-4 text-center"><div class="text-xs font-semibold mb-1" style="color:#94A3B8;">🇺🇸 Nueva York</div><div id="clock-ny" class="text-lg font-bold mono" style="color:#2563EB;">--:--</div><div id="status-ny" class="text-xs mt-1" style="color:#475569;">—</div></div>
+            <div class="glass-card rounded-xl p-4 text-center"><div class="text-xs font-semibold mb-1" style="color:#94A3B8;">🇬🇧 Londres</div><div id="clock-ldn" class="text-lg font-bold mono" style="color:#60A5FA;">--:--</div><div id="status-ldn" class="text-xs mt-1" style="color:#475569;">—</div></div>
+            <div class="glass-card rounded-xl p-4 text-center"><div class="text-xs font-semibold mb-1" style="color:#94A3B8;">🇯🇵 Tokio</div><div id="clock-tok" class="text-lg font-bold mono" style="color:#FBBF24;">--:--</div><div id="status-tok" class="text-xs mt-1" style="color:#475569;">—</div></div>
+            <div class="glass-card rounded-xl p-4 text-center"><div class="text-xs font-semibold mb-1" style="color:#94A3B8;">🇦🇺 Sídney</div><div id="clock-syd" class="text-lg font-bold mono" style="color:#F472B6;">--:--</div><div id="status-syd" class="text-xs mt-1" style="color:#475569;">—</div></div>
+          </div>
+          <div class="glass-card rounded-xl overflow-hidden">
+            <div class="p-4 border-b flex items-center gap-3 flex-wrap" style="border-color:rgba(30,41,59,.5);">
+              <h3 class="font-semibold text-sm flex-1">Eventos de la semana <span style="color:#475569;font-weight:400;">(haz clic en una fila para ver detalle)</span></h3>
+              <select id="newsFilter" onchange="renderNewsCalendar()" class="input-dark px-3 py-2 rounded-lg text-xs">
+                <option value="all">Todos los impactos</option>
+                <option value="high">Solo Alto</option>
+                <option value="medium">Solo Medio</option>
+              </select>
+              <div class="flex gap-2">
+                <span class="text-xs px-2 py-1 rounded-lg font-bold" style="background:rgba(239,68,68,.15);color:#EF4444;">🔴 Alto</span>
+                <span class="text-xs px-2 py-1 rounded-lg font-bold" style="background:rgba(251,191,36,.15);color:#FBBF24;">🟡 Medio</span>
+                <span class="text-xs px-2 py-1 rounded-lg font-bold" style="background:rgba(96,165,250,.15);color:#60A5FA;">🔵 Bajo</span>
+              </div>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="w-full text-xs">
+                <thead><tr style="border-bottom:1px solid rgba(30,41,59,.5);">
+                  <th class="text-left px-4 py-3 font-semibold uppercase tracking-wider" style="color:#475569;">Fecha / Hora</th>
+                  <th class="text-left px-4 py-3 font-semibold uppercase tracking-wider" style="color:#475569;">País</th>
+                  <th class="text-left px-4 py-3 font-semibold uppercase tracking-wider" style="color:#475569;">Evento</th>
+                  <th class="text-left px-4 py-3 font-semibold uppercase tracking-wider" style="color:#475569;">Impacto</th>
+                  <th class="text-left px-4 py-3 font-semibold uppercase tracking-wider" style="color:#475569;">Actual</th>
+                  <th class="text-left px-4 py-3 font-semibold uppercase tracking-wider" style="color:#475569;">Previsión</th>
+                  <th class="px-4 py-3 font-semibold uppercase tracking-wider" style="color:#475569;width:56px;text-align:center;">⭐</th>
+                </tr></thead>
+                <tbody id="newsTable"></tbody>
+              </table>
             </div>
           </div>
-          <div class="overflow-x-auto">
-            <table class="w-full text-xs">
-              <thead><tr style="border-bottom:1px solid rgba(30,41,59,.5);">
-                <th class="text-left px-4 py-3 font-semibold uppercase tracking-wider" style="color:#475569;">Fecha / Hora</th>
-                <th class="text-left px-4 py-3 font-semibold uppercase tracking-wider" style="color:#475569;">País</th>
-                <th class="text-left px-4 py-3 font-semibold uppercase tracking-wider" style="color:#475569;">Evento</th>
-                <th class="text-left px-4 py-3 font-semibold uppercase tracking-wider" style="color:#475569;">Impacto</th>
-                <th class="text-left px-4 py-3 font-semibold uppercase tracking-wider" style="color:#475569;">Actual</th>
-                <th class="text-left px-4 py-3 font-semibold uppercase tracking-wider" style="color:#475569;">Previsión</th>
-                <th class="px-4 py-3 font-semibold uppercase tracking-wider" style="color:#475569;width:56px;text-align:center;">⭐</th>
-              </tr></thead>
-              <tbody id="newsTable"></tbody>
-            </table>
-          </div>
         </div>
-        <div id="newsExpandOverlay" class="hidden" style="position:fixed;inset:0;z-index:800;background:rgba(0,0,0,.7);display:flex;align-items:center;justify-content:center;">
-          <div style="background:#131A26;border:1px solid rgba(139,92,246,.3);border-radius:18px;width:360px;max-width:95vw;padding:22px 22px 18px;">
+
+        <!-- TAB: Forex -->
+        <div id="newsTab-forex" class="hidden">
+          <div class="flex items-center justify-between mb-4">
+            <p class="text-xs" style="color:#94A3B8;">Noticias Forex en tiempo real · <span id="newsForexTs" style="color:#475569;">—</span></p>
+            <button onclick="fetchAndRenderNewsCategory('forex',true)" class="text-xs px-3 py-1.5 rounded-lg" style="background:rgba(37,99,235,.12);color:#60A5FA;border:1px solid rgba(37,99,235,.2);">🔄 Actualizar</button>
+          </div>
+          <div id="newsArticles-forex" class="grid grid-cols-1 lg:grid-cols-2 gap-4"></div>
+        </div>
+
+        <!-- TAB: Cripto -->
+        <div id="newsTab-cripto" class="hidden">
+          <div class="flex items-center justify-between mb-4">
+            <p class="text-xs" style="color:#94A3B8;">Noticias Cripto en tiempo real · <span id="newsCriptoTs" style="color:#475569;">—</span></p>
+            <button onclick="fetchAndRenderNewsCategory('cripto',true)" class="text-xs px-3 py-1.5 rounded-lg" style="background:rgba(37,99,235,.12);color:#60A5FA;border:1px solid rgba(37,99,235,.2);">🔄 Actualizar</button>
+          </div>
+          <div id="newsArticles-cripto" class="grid grid-cols-1 lg:grid-cols-2 gap-4"></div>
+        </div>
+
+        <!-- TAB: Mercados -->
+        <div id="newsTab-mercados" class="hidden">
+          <div class="flex items-center justify-between mb-4">
+            <p class="text-xs" style="color:#94A3B8;">Noticias de Mercados en tiempo real · <span id="newsMercadosTs" style="color:#475569;">—</span></p>
+            <button onclick="fetchAndRenderNewsCategory('mercados',true)" class="text-xs px-3 py-1.5 rounded-lg" style="background:rgba(37,99,235,.12);color:#60A5FA;border:1px solid rgba(37,99,235,.2);">🔄 Actualizar</button>
+          </div>
+          <div id="newsArticles-mercados" class="grid grid-cols-1 lg:grid-cols-2 gap-4"></div>
+        </div>
+
+        <!-- Modal expandible — sirve para eventos del calendario Y artículos de noticias -->
+        <div id="newsExpandOverlay" class="hidden" style="position:fixed;inset:0;z-index:800;background:rgba(0,0,0,.75);display:flex;align-items:center;justify-content:center;padding:16px;">
+          <div style="background:#131A26;border:1px solid rgba(139,92,246,.3);border-radius:18px;width:520px;max-width:95vw;max-height:88vh;overflow-y:auto;padding:22px 22px 18px;">
             <div class="flex items-center justify-between mb-4">
-              <h4 class="font-bold text-sm">Detalle del Evento</h4>
-              <button onclick="closeNewsExpand()" class="btn-ghost text-xs">✕</button>
+              <h4 id="newsExpandTitle" class="font-bold text-sm">Detalle</h4>
+              <button onclick="closeNewsExpand()" class="btn-ghost text-xs px-2 py-1 rounded-lg" style="font-size:16px;">✕</button>
             </div>
             <div id="newsExpandContent"></div>
           </div>
@@ -2291,7 +2483,7 @@ async function testLicenseConnection() {
 // ═══════════════════════════════════════════════════════════════
 // NAVIGATION
 // ═══════════════════════════════════════════════════════════════
-const ALL_SECTIONS = ['dashboard','diario','planes','perfil','admin','calculadora','noticias','referidos','ranking','logros','descargas','conectarmt5'];
+const ALL_SECTIONS = ['dashboard','diario','planes','perfil','admin','calculadora','calc-mt5','noticias','referidos','ranking','logros','descargas','conectarmt5'];
 
 function showSection(s) {
   ALL_SECTIONS.forEach(sec => {
@@ -2307,7 +2499,8 @@ function showSection(s) {
   if (s==='dashboard')   { updateDashboardMetrics(); }
   if (s==='admin'&&isAdmin) { loadAllUsers(); loadMembresiaUserSelect(); checkMaintenanceModeStatus(); }
   if (s==='calculadora') { calculateRisk(); loadRiskHistory(); }
-  if (s==='noticias')    { renderNewsCalendar(); updateSessionClocks(); }
+  if (s==='calc-mt5')    { loadMt5CalcData(); }
+  if (s==='noticias')    { switchNewsTab(activeNewsTab||'calendario'); }
   if (s==='referidos')   { loadReferralData(); }
   if (s==='ranking')     { loadRanking(); }
   if (s==='logros')      { loadAchievements(); }
@@ -3138,11 +3331,81 @@ function copyDescargasToken() {
 function setRiskPct(v) { document.getElementById('calcRisk').value=v; calculateRisk(); }
 function setRR(v) { document.getElementById('calcRR').value=v; calculateRisk(); }
 
+// ─── Pip Value Table: valor de 1 pip por 1 lote estándar en USD ───────────────
+const PIP_VALUE_TABLE = {
+  // USD como moneda cotizada (exacto: $10/pip por lote estándar 100,000)
+  EURUSD:10,GBPUSD:10,AUDUSD:10,NZDUSD:10,
+  // USD como moneda base (~varía con el tipo de cambio, valores a mediados 2025)
+  USDJPY:6.67,USDCHF:10.9,USDCAD:7.4,USDMXN:0.58,USDZAR:0.56,
+  USDTRY:0.31,USDNOK:0.96,USDSEK:0.97,USDPLN:2.5,
+  USDHUF:0.028,USDCZK:0.44,USDDKK:1.46,
+  // Cruces con EUR
+  EURGBP:12.5,EURAUD:6.5,EURCAD:7.4,EURCHF:10.9,EURJPY:6.67,
+  EURNZD:6.0,EURTRY:0.31,EURPLN:2.5,EURCZK:0.44,EURHUF:0.028,
+  // Cruces con GBP
+  GBPAUD:6.5,GBPCAD:7.4,GBPCHF:10.9,GBPJPY:6.67,GBPNZD:6.0,GBPZAR:0.56,
+  // Otros cruces
+  AUDCAD:7.4,AUDCHF:10.9,AUDJPY:6.67,AUDNZD:6.0,
+  CADCHF:10.9,CADJPY:6.67,CHFJPY:6.67,
+  NZDCAD:7.4,NZDCHF:10.9,NZDJPY:6.67,
+  // Metales
+  XAUUSD:10,XAGUSD:50,XTIUSD:10,XBRUSD:10,USOIL:10,UKOIL:10,WTI:10,BRENT:10,
+  // Índices CFD (por punto/pip)
+  US30:1,DJ30:1,USWALL:1,
+  NAS100:1,USTEC:0.1,NDX:0.1,
+  US500:0.1,SPX500:0.1,SP500:0.1,
+  UK100:0.8,FTSE100:0.8,
+  GER40:0.9,GER30:0.9,DAX:0.9,DAX40:0.9,
+  FRA40:0.8,CAC40:0.8,
+  JPN225:0.07,JP225:0.07,NIKKEI:0.07,
+  AUS200:0.65,ASX200:0.65,
+  HK50:0.13,HK33:0.13,
+  // Criptomonedas (contratos micro/mini)
+  BTCUSD:1,ETHUSD:0.1,LTCUSD:0.05,XRPUSD:0.01,BNBUSD:0.05,
+  // ── Sintéticos Deriv / Weltrade / BridgeMarkets ────────────────────────────
+  // Boom & Crash (1 lot = 1 contrato, pip ≈ 1 tick)
+  BOOM300:0.3,BOOM500:0.5,BOOM1000:1.0,
+  CRASH300:0.3,CRASH500:0.5,CRASH1000:1.0,
+  // Volatility Index (continuous)
+  V10:0.1,VOL10:0.1,VOLATILITY10:0.1,
+  V25:0.25,VOL25:0.25,VOLATILITY25:0.25,
+  V50:0.5,VOL50:0.5,VOLATILITY50:0.5,
+  V75:0.75,VOL75:0.75,VOLATILITY75:0.75,
+  V100:1.0,VOL100:1.0,VOLATILITY100:1.0,
+  // Volatility 1s (tick speed)
+  'V10_1S':0.1,'V25_1S':0.25,'V50_1S':0.5,'V75_1S':0.75,'V100_1S':1.0,
+  // Otros sintéticos
+  STEPINDEX:0.1,STEP:0.1,
+  RANGEBREAK100:0.5,RANGEBREAK200:1.0,
+  JUMP10:0.1,JUMP25:0.25,JUMP50:0.5,JUMP75:0.75,JUMP100:1.0,
+};
+
+function getPipValue(symbol) {
+  // Comprueba override manual primero
+  const manualEl = document.getElementById('calcPipManual');
+  if (manualEl && parseFloat(manualEl.value) > 0) return parseFloat(manualEl.value);
+
+  const s = (symbol||'').toUpperCase().replace(/[^A-Z0-9_]/g,'');
+  if (PIP_VALUE_TABLE[s] !== undefined) return PIP_VALUE_TABLE[s];
+
+  // Heurísticas por moneda cotizada
+  if (s.length === 6 && s.endsWith('USD')) return 10;
+  if (s.endsWith('JPY')) return 6.67;
+  if (s.endsWith('GBP')) return 12.5;
+  if (s.endsWith('CHF')) return 10.9;
+  if (s.endsWith('CAD')) return 7.4;
+  if (s.endsWith('AUD')) return 6.5;
+  if (s.endsWith('NZD')) return 6.0;
+  if (s.endsWith('EUR')) return 10.9;
+  return 10; // fallback
+}
+
 function calculateRisk() {
   const balance = parseFloat(document.getElementById('calcBalance').value)||10000;
   const riskPct = parseFloat(document.getElementById('calcRisk').value)||1;
   const slPips  = parseFloat(document.getElementById('calcSLPips').value)||20;
   const rrRatio = parseFloat(document.getElementById('calcRR').value)||2;
+  const activo  = (document.getElementById('calcActivo')||{}).value || 'EURUSD';
 
   const alertEl = document.getElementById('calcRiskAlert');
   if (alertEl) alertEl.classList.toggle('hidden', riskPct<=1);
@@ -3150,7 +3413,7 @@ function calculateRisk() {
   const riskMoney = balance * riskPct / 100;
   if (!slPips||slPips<=0) return;
 
-  const pipValue = 10; // $10/pip para todos los pares forex y metales
+  const pipValue = getPipValue(activo);
   let lot = riskMoney / (slPips * pipValue);
   lot = Math.max(0.01, Math.round(lot*100)/100);
 
@@ -3163,6 +3426,8 @@ function calculateRisk() {
   document.getElementById('calcResultReward').textContent = '+$'+reward.toFixed(2);
   document.getElementById('calcResultRR').textContent     = '1 : '+rrRatio.toFixed(1);
   document.getElementById('calcResultPips').textContent   = slPips+' pips';
+  const pvEl = document.getElementById('calcResultPipValue');
+  if (pvEl) pvEl.textContent = '$'+pipValue.toFixed(activo==='CUSTOM'?4:2)+'/pip/lote';
 }
 
 function applyToMT5() {
@@ -3339,6 +3604,197 @@ function expandNewsEvent(idx) {
   document.getElementById('newsExpandOverlay').classList.remove('hidden');
 }
 function closeNewsExpand() { document.getElementById('newsExpandOverlay').classList.add('hidden'); }
+
+// ═══════════════════════════════════════════════════════════════
+// NEWS TABS — Forex / Cripto / Mercados
+// ═══════════════════════════════════════════════════════════════
+let activeNewsTab = 'calendario';
+const _newsArticlesCache = {};
+const NEWS_CACHE_TTL = 900000; // 15 min
+
+function switchNewsTab(tab) {
+  activeNewsTab = tab;
+  ['calendario','forex','cripto','mercados'].forEach(t => {
+    const btn = document.getElementById('ntab-'+t);
+    const el  = document.getElementById('newsTab-'+t);
+    if (btn) {
+      btn.style.background = t===tab ? 'rgba(37,99,235,.2)' : '';
+      btn.style.color = t===tab ? '#60A5FA' : '#94A3B8';
+    }
+    if (el) el.classList.toggle('hidden', t!==tab);
+  });
+  if (tab === 'calendario') { renderNewsCalendar(); updateSessionClocks(); }
+  else fetchAndRenderNewsCategory(tab, false);
+}
+
+async function fetchAndRenderNewsCategory(category, force) {
+  const container = document.getElementById('newsArticles-'+category);
+  if (!container) return;
+  const tsEl = document.getElementById('news'+category.charAt(0).toUpperCase()+category.slice(1)+'Ts');
+
+  // Check cache
+  const cacheKey = 'flowtrade_news_'+category;
+  const cached = _newsArticlesCache[category] || JSON.parse(localStorage.getItem(cacheKey)||'null');
+  if (!force && cached && (Date.now()-cached.ts) < NEWS_CACHE_TTL) {
+    _newsArticlesCache[category] = cached;
+    renderNewsArticles(container, cached.data, category);
+    if (tsEl) tsEl.textContent = 'Caché · '+new Date(cached.ts).toLocaleString('es-ES',{hour:'2-digit',minute:'2-digit'});
+    return;
+  }
+
+  container.innerHTML = '<div class="col-span-2 text-center py-10" style="color:#475569;"><div style="font-size:28px;margin-bottom:8px;">⏳</div>Cargando noticias...</div>';
+  const catMap = {forex:'forex',cripto:'crypto',mercados:'general'};
+  const finnhubCat = catMap[category]||'general';
+  const FKEY = typeof FINNHUB_KEY!=='undefined' ? FINNHUB_KEY : (window._fk||'');
+
+  try {
+    const res = await fetch('https://finnhub.io/api/v1/news?category='+finnhubCat+'&token='+FKEY);
+    if (!res.ok) throw new Error('HTTP '+res.status);
+    const articles = await res.json();
+    const entry = {ts:Date.now(), data:articles.slice(0,40)};
+    _newsArticlesCache[category] = entry;
+    try { localStorage.setItem(cacheKey, JSON.stringify(entry)); } catch(e){}
+    renderNewsArticles(container, articles, category);
+    if (tsEl) tsEl.textContent = 'Actualizado ahora';
+  } catch(err) {
+    container.innerHTML = '<div class="col-span-2 text-center py-8" style="color:#EF4444;">⚠️ Error: '+esc(err.message)+'</div>';
+  }
+}
+
+function renderNewsArticles(container, articles, category) {
+  if (!articles || !articles.length) {
+    container.innerHTML = '<div class="col-span-2 text-center py-10" style="color:#475569;">Sin noticias disponibles en este momento.</div>';
+    return;
+  }
+  window['_newsArticlesList_'+category] = articles;
+  const icons = {forex:'💱',cripto:'🪙',mercados:'📈'};
+  const icon = icons[category]||'📰';
+  container.innerHTML = articles.slice(0,20).map((a,idx) => {
+    const dt = a.datetime ? new Date(a.datetime*1000).toLocaleString('es-ES',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}) : '—';
+    const imgBlock = a.image
+      ? `<img src="${esc(a.image)}" loading="lazy" style="width:100%;height:140px;object-fit:cover;border-radius:10px 10px 0 0;" onerror="this.parentNode.style.display='none'">`
+      : `<div style="width:100%;height:56px;background:rgba(37,99,235,.06);border-radius:10px 10px 0 0;display:flex;align-items:center;justify-content:center;font-size:22px;">${icon}</div>`;
+    return `<div class="glass-card rounded-xl overflow-hidden cursor-pointer transition-all" onclick="expandNewsArticle('${category}',${idx})" style="hover:transform:translateY(-2px);">
+      ${imgBlock}
+      <div style="padding:12px 12px 14px;">
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px;flex-wrap:wrap;">
+          <span style="font-size:10px;color:#60A5FA;font-weight:600;">${esc((a.source||'').toUpperCase())}</span>
+          <span style="font-size:10px;color:#475569;">${dt}</span>
+        </div>
+        <p style="font-size:12px;font-weight:600;color:#E2E8F0;line-height:1.45;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;">${esc(a.headline||'Sin título')}</p>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function expandNewsArticle(category, idx) {
+  const articles = window['_newsArticlesList_'+category] || [];
+  const a = articles[idx];
+  if (!a) return;
+  const dt = a.datetime ? new Date(a.datetime*1000).toLocaleString('es-ES',{weekday:'long',day:'2-digit',month:'long',year:'numeric',hour:'2-digit',minute:'2-digit'}) : '—';
+  const titleEl = document.getElementById('newsExpandTitle');
+  if (titleEl) titleEl.textContent = a.source||'Noticia';
+  document.getElementById('newsExpandContent').innerHTML =
+    `<div style="display:flex;flex-direction:column;gap:14px;">
+      ${a.image?`<img src="${esc(a.image)}" loading="lazy" style="width:100%;max-height:220px;object-fit:cover;border-radius:10px;" onerror="this.style.display='none'">`:''}
+      <p style="font-size:15px;font-weight:700;color:#E2E8F0;line-height:1.4;">${esc(a.headline||'Sin título')}</p>
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+        <span style="font-size:11px;color:#60A5FA;font-weight:600;">${esc(a.source||'—')}</span>
+        <span style="font-size:11px;color:#475569;">${dt}</span>
+      </div>
+      ${a.summary?`<p style="font-size:12px;color:#94A3B8;line-height:1.65;">${esc((a.summary||'').substring(0,500))}${(a.summary||'').length>500?'…':''}</p>`:''}
+      ${a.url?`<a href="${esc(a.url)}" target="_blank" rel="noopener noreferrer" style="display:block;text-align:center;padding:12px;background:rgba(37,99,235,.12);border:1px solid rgba(37,99,235,.3);border-radius:10px;color:#60A5FA;font-size:12px;font-weight:600;text-decoration:none;">🔗 Leer artículo completo →</a>`:''}
+    </div>`;
+  document.getElementById('newsExpandOverlay').classList.remove('hidden');
+}
+
+// ═══════════════════════════════════════════════════════════════
+// CALCULADORA MT5 PERSONAL
+// ═══════════════════════════════════════════════════════════════
+let _mt5Symbols = [];
+
+async function loadMt5CalcData() {
+  if (!currentUser) { toast('Inicia sesión primero','error'); return; }
+  const statusEl = document.getElementById('mt5CalcStatus');
+  const listEl   = document.getElementById('mt5SymbolsList');
+  if (statusEl) statusEl.innerHTML = '<span style="color:#FBBF24;">⏳ Cargando datos de MT5...</span>';
+
+  const { data, error } = await sb
+    .from('simbolos_usuario')
+    .select('*')
+    .eq('usuario_id', currentUser.id)
+    .order('last_updated', { ascending: false });
+
+  if (error || !data || data.length === 0) {
+    if (statusEl) statusEl.innerHTML = '<span style="color:#EF4444;">⚠️ Sin datos — activa el DataBridge v2 EA para enviar los símbolos de tu MT5.</span>';
+    const sel = document.getElementById('mt5CalcSymbolSelect');
+    if (sel) sel.innerHTML = '<option value="">— Sin datos de MT5 —</option>';
+    if (listEl) listEl.innerHTML = '<p style="color:#475569;">Descarga el DataBridge v2 desde EAs &amp; Descargas e instálalo en cualquier gráfico de MT5.</p>';
+    return;
+  }
+
+  _mt5Symbols = data;
+  const sel = document.getElementById('mt5CalcSymbolSelect');
+  if (sel) sel.innerHTML = data.map(s =>
+    `<option value="${esc(s.simbolo)}">${esc(s.simbolo)}  ·  pip: $${parseFloat(s.pip_value||0).toFixed(4)}/lot</option>`
+  ).join('');
+
+  const ts = new Date(data[0].last_updated).toLocaleString('es-ES',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'});
+  if (statusEl) statusEl.innerHTML = `<span style="color:#10B981;">✓ ${data.length} símbolo${data.length!==1?'s':''} desde MT5  ·  Actualizado: ${ts}</span>`;
+
+  if (listEl) listEl.innerHTML = data.map(s =>
+    `<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 8px;border-radius:8px;background:rgba(30,41,59,.4);margin-bottom:4px;">
+      <span style="color:#E2E8F0;font-weight:600;">${esc(s.simbolo)}</span>
+      <div style="display:flex;gap:10px;">
+        <span style="color:#10B981;">pip $${parseFloat(s.pip_value||0).toFixed(4)}</span>
+        <span style="color:#475569;">tick $${parseFloat(s.tick_value||0).toFixed(5)}</span>
+        <span style="color:#475569;">${s.digits||0}d</span>
+      </div>
+    </div>`
+  ).join('');
+
+  calculateMt5Risk();
+}
+
+function calculateMt5Risk() {
+  const balance = parseFloat(document.getElementById('mt5CalcBalance').value)||10000;
+  const riskPct = parseFloat(document.getElementById('mt5CalcRisk').value)||1;
+  const slPips  = parseFloat(document.getElementById('mt5CalcSLPips').value)||20;
+  const rrRatio = parseFloat(document.getElementById('mt5CalcRR').value)||2;
+  const symbol  = (document.getElementById('mt5CalcSymbolSelect')||{}).value||'';
+
+  const sym = _mt5Symbols.find(s => s.simbolo === symbol);
+  let pipValue = sym ? parseFloat(sym.pip_value||0) : 0;
+  if (!pipValue || pipValue <= 0) pipValue = getPipValue(symbol||'EURUSD');
+
+  const riskMoney = balance * riskPct / 100;
+  if (!slPips || slPips <= 0) return;
+
+  let lot = riskMoney / (slPips * pipValue);
+  lot = Math.max(0.01, Math.round(lot*100)/100);
+  const reward = riskMoney * rrRatio;
+
+  const set = (id, val) => { const el=document.getElementById(id); if(el) el.textContent=val; };
+  set('mt5CalcResultLot',    lot.toFixed(2)+' lotes');
+  set('mt5CalcResultRisk',   '$'+riskMoney.toFixed(2));
+  set('mt5CalcResultReward', '+$'+reward.toFixed(2));
+  set('mt5CalcResultRR',     '1:'+rrRatio.toFixed(1));
+  set('mt5CalcResultPV',     '$'+pipValue.toFixed(4)+'/pip/lote');
+
+  const infoEl = document.getElementById('mt5CalcSymInfo');
+  if (infoEl && sym) infoEl.innerHTML =
+    `<div style="font-size:10px;color:#475569;display:flex;gap:10px;flex-wrap:wrap;margin-top:4px;">
+      <span>Contrato: <strong style="color:#94A3B8;">${sym.contract_size||'—'}</strong></span>
+      <span>Tick size: <strong style="color:#94A3B8;">${sym.tick_size||'—'}</strong></span>
+      <span>Tick value: <strong style="color:#94A3B8;">$${parseFloat(sym.tick_value||0).toFixed(5)}</strong></span>
+      <span>Dígitos: <strong style="color:#94A3B8;">${sym.digits||'—'}</strong></span>
+    </div>`;
+}
+
+function setMt5RiskPct(v) {
+  const el=document.getElementById('mt5CalcRisk');
+  if(el){el.value=v;calculateMt5Risk();}
+}
 
 function toggleNewsFav(key, btn) {
   const favs=JSON.parse(localStorage.getItem('flowtrade_news_favs')||'{}');
@@ -3864,7 +4320,8 @@ function getContextualSuggestions(section) {
   const map = {
     dashboard:    ['¿Qué significan las métricas del dashboard?','¿Cómo mejoro mi tasa de éxito?','¿Cómo funciona la curva de equity?','¿Qué es el drawdown máximo?'],
     diario:       ['¿Cómo importo mis trades al diario?','¿Cómo interpreto las métricas avanzadas?','¿Puedo exportar mi journal a PDF?','¿Cómo uso las etiquetas en los trades?'],
-    calculadora:  ['¿Cómo calculo el lotaje correcto?','¿Qué es el riesgo por operación?','¿Cómo uso el stop loss en pips?','¿Qué porcentaje de riesgo recomiendas por trade?'],
+    calculadora:  ['¿Cómo calculo el lotaje correcto?','¿Qué es el riesgo por operación?','¿Cómo uso el stop loss en pips?','¿Cuál es el pip value del XAUUSD?'],
+    'calc-mt5':   ['¿Cómo activo el DataBridge EA v2?','¿Por qué no aparecen mis símbolos?','¿Qué es el tick_value en MT5?','¿Cómo interpreto el pip value de un sintético?'],
     planes:       ['¿Qué incluye el plan Elite?','¿Cuál es la diferencia entre Premium y Elite?','¿Cómo notifico un pago?','¿Puedo cambiar de plan en cualquier momento?'],
     descargas:    ['¿Cómo instalo un EA en MT5?','¿Cómo obtengo mi token de licencia?','¿Qué EA se incluye en el plan Premium?','¿Cómo actualizo un EA a la nueva versión?'],
     conectarmt5:  ['¿Cómo conecto mi cuenta MT5?','¿Qué hace el EA DataBridge?','¿Por qué no aparecen mis trades?','¿Es seguro conectar mi cuenta MT5?'],
@@ -3890,7 +4347,8 @@ function refreshAiSuggestions() {
   const label = sug.previousElementSibling;
   const newLabel = document.getElementById('aiSugLabel');
   const sectionNames = {
-    dashboard:'Dashboard',diario:'Diario de Trades',calculadora:'Calculadora',planes:'Planes',
+    dashboard:'Dashboard',diario:'Diario de Trades',calculadora:'Calculadora Global',
+    'calc-mt5':'Calc. MT5 Personal',planes:'Planes',
     descargas:'Descargas / EAs',conectarmt5:'Conectar MT5',noticias:'Noticias',
     referidos:'Referidos',ranking:'Ranking',logros:'Logros',perfil:'Perfil',admin:'Admin'
   };
