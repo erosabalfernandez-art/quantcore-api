@@ -97,18 +97,21 @@ select.input-dark option{background:#131A26;color:#E2E8F0;}
       </div>
       <div id="formLogin">
         <div class="space-y-4">
-          <div><label class="block text-sm font-medium mb-1.5" style="color:#94A3B8;">Email</label><input id="loginEmail" type="email" placeholder="tu@email.com" class="input-dark w-full px-4 py-3 rounded-xl text-sm"/></div>
-          <div><label class="block text-sm font-medium mb-1.5" style="color:#94A3B8;">Contraseña</label><input id="loginPassword" type="password" placeholder="••••••••" class="input-dark w-full px-4 py-3 rounded-xl text-sm" onkeydown="if(event.key==='Enter')handleLogin()"/></div>
-          <button onclick="handleLogin()" class="btn-green w-full py-3 rounded-xl text-sm font-semibold">Entrar a la plataforma</button>
+          <div><label class="block text-sm font-medium mb-1.5" style="color:#94A3B8;">Email</label><input id="loginEmail" type="email" placeholder="tu@email.com" class="input-dark w-full px-4 py-3 rounded-xl text-sm" autocomplete="email"/></div>
+          <div><label class="block text-sm font-medium mb-1.5" style="color:#94A3B8;">Contraseña</label><input id="loginPassword" type="password" placeholder="••••••••" class="input-dark w-full px-4 py-3 rounded-xl text-sm" autocomplete="current-password" onkeydown="if(event.key==='Enter')handleLogin()"/></div>
+          <div id="authMsg" class="hidden text-xs px-3 py-2.5 rounded-xl" style="background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.3);color:#FCA5A5;line-height:1.5;"></div>
+          <button id="btnLogin" onclick="handleLogin()" class="btn-green w-full py-3 rounded-xl text-sm font-semibold">Entrar a la plataforma</button>
+          <button id="btnResend" onclick="handleResendConfirmation()" class="hidden w-full py-2.5 rounded-xl text-sm font-semibold" style="background:rgba(59,130,246,.15);color:#60A5FA;border:1px solid rgba(59,130,246,.3);">📧 Reenviar email de confirmación</button>
           <button onclick="handleForgotPassword()" class="w-full text-center text-xs btn-ghost py-1">¿Olvidaste tu contraseña?</button>
         </div>
       </div>
       <div id="formRegister" class="hidden">
         <div class="space-y-4">
-          <div><label class="block text-sm font-medium mb-1.5" style="color:#94A3B8;">Nombre completo</label><input id="regNombre" type="text" placeholder="Tu nombre" class="input-dark w-full px-4 py-3 rounded-xl text-sm"/></div>
-          <div><label class="block text-sm font-medium mb-1.5" style="color:#94A3B8;">Email</label><input id="regEmail" type="email" placeholder="tu@email.com" class="input-dark w-full px-4 py-3 rounded-xl text-sm"/></div>
-          <div><label class="block text-sm font-medium mb-1.5" style="color:#94A3B8;">Contraseña</label><input id="regPassword" type="password" placeholder="Mínimo 8 caracteres" class="input-dark w-full px-4 py-3 rounded-xl text-sm"/></div>
-          <button onclick="handleRegister()" class="btn-green w-full py-3 rounded-xl text-sm font-semibold">Crear cuenta</button>
+          <div><label class="block text-sm font-medium mb-1.5" style="color:#94A3B8;">Nombre completo</label><input id="regNombre" type="text" placeholder="Tu nombre" class="input-dark w-full px-4 py-3 rounded-xl text-sm" autocomplete="name"/></div>
+          <div><label class="block text-sm font-medium mb-1.5" style="color:#94A3B8;">Email</label><input id="regEmail" type="email" placeholder="tu@email.com" class="input-dark w-full px-4 py-3 rounded-xl text-sm" autocomplete="email"/></div>
+          <div><label class="block text-sm font-medium mb-1.5" style="color:#94A3B8;">Contraseña</label><input id="regPassword" type="password" placeholder="Mínimo 8 caracteres" class="input-dark w-full px-4 py-3 rounded-xl text-sm" autocomplete="new-password" onkeydown="if(event.key==='Enter')handleRegister()"/></div>
+          <div id="regMsg" class="hidden text-xs px-3 py-2.5 rounded-xl" style="line-height:1.5;"></div>
+          <button id="btnRegister" onclick="handleRegister()" class="btn-green w-full py-3 rounded-xl text-sm font-semibold">Crear cuenta</button>
         </div>
       </div>
     </div>
@@ -933,37 +936,160 @@ function showTab(tab) {
   document.getElementById('formRegister').classList.toggle('hidden',isL);
   document.getElementById('tabLogin').style.cssText = isL ? 'background:#131A26;color:#E2E8F0;' : 'background:transparent;color:#94A3B8;';
   document.getElementById('tabRegister').style.cssText = !isL ? 'background:#131A26;color:#E2E8F0;' : 'background:transparent;color:#94A3B8;';
+  clearAuthMessages();
+}
+
+function clearAuthMessages() {
+  const m1 = document.getElementById('authMsg');
+  const m2 = document.getElementById('regMsg');
+  const r  = document.getElementById('btnResend');
+  if (m1) { m1.classList.add('hidden'); m1.textContent=''; }
+  if (m2) { m2.classList.add('hidden'); m2.textContent=''; }
+  if (r)  { r.classList.add('hidden'); }
+}
+
+function showAuthError(msg, showResend=false) {
+  const el = document.getElementById('authMsg');
+  if (!el) return toast(msg,'error');
+  el.innerHTML = msg;
+  el.classList.remove('hidden');
+  el.style.cssText = 'background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.3);color:#FCA5A5;line-height:1.5;';
+  const r = document.getElementById('btnResend');
+  if (r) r.classList.toggle('hidden', !showResend);
+}
+
+function showAuthSuccess(msg) {
+  const el = document.getElementById('authMsg');
+  if (!el) return toast(msg,'success');
+  el.innerHTML = msg;
+  el.classList.remove('hidden');
+  el.style.cssText = 'background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.3);color:#6EE7B7;line-height:1.5;';
+}
+
+function showRegMsg(msg, type='error') {
+  const el = document.getElementById('regMsg');
+  if (!el) return toast(msg, type);
+  el.innerHTML = msg;
+  el.classList.remove('hidden');
+  el.style.cssText = type==='success'
+    ? 'background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.3);color:#6EE7B7;line-height:1.5;'
+    : 'background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.3);color:#FCA5A5;line-height:1.5;';
+}
+
+function authErrMsg(error) {
+  const msg = (error?.message || '').toLowerCase();
+  const status = error?.status;
+  if (msg.includes('email not confirmed') || msg.includes('email_not_confirmed'))
+    return { text: '📧 Email no confirmado. Revisa tu bandeja de entrada (y spam). Confirma el enlace antes de iniciar sesión.', resend: true };
+  if (msg.includes('invalid login credentials') || msg.includes('invalid_credentials') || status === 400)
+    return { text: '❌ Email o contraseña incorrectos. Verifica tus datos e intenta de nuevo.', resend: false };
+  if (msg.includes('too many requests') || msg.includes('rate limit') || status === 429)
+    return { text: '⏳ Demasiados intentos. Espera unos minutos antes de volver a intentarlo.', resend: false };
+  if (msg.includes('user already registered') || msg.includes('already_exists'))
+    return { text: '⚠️ Este email ya está registrado. Inicia sesión o usa "¿Olvidaste tu contraseña?"', resend: false };
+  if (msg.includes('password') && msg.includes('characters'))
+    return { text: '🔒 La contraseña debe tener al menos 8 caracteres.', resend: false };
+  if (msg.includes('unable to validate') || status === 422)
+    return { text: '⚠️ Email inválido o formato incorrecto. Comprueba que el email esté bien escrito.', resend: false };
+  if (msg.includes('signup is disabled'))
+    return { text: '⛔ El registro está desactivado temporalmente. Contacta al administrador.', resend: false };
+  if (msg.includes('network') || msg.includes('fetch'))
+    return { text: '🌐 Error de conexión. Comprueba tu internet e inténtalo de nuevo.', resend: false };
+  return { text: '⚠️ ' + (error?.message || 'Error desconocido. Inténtalo de nuevo.'), resend: false };
 }
 
 // ── AUTH ACTIONS ───────────────────────────────────────────────
 async function handleLogin() {
+  clearAuthMessages();
   const email = document.getElementById('loginEmail').value.trim();
-  const pass = document.getElementById('loginPassword').value;
-  if (!email||!pass) return toast('Rellena todos los campos','error');
-  const {data,error} = await sb.auth.signInWithPassword({email,password:pass});
-  if (error) return toast(error.message,'error');
-  const {data:p} = await sb.from('perfiles').select('bloqueado').eq('id',data.user.id).single();
-  if (p?.bloqueado) { await sb.auth.signOut(); return toast('Cuenta suspendida. Contacta soporte.','error',6000); }
+  const pass  = document.getElementById('loginPassword').value;
+  if (!email || !pass) return showAuthError('Rellena el email y la contraseña.');
+  if (!email.includes('@')) return showAuthError('Escribe un email válido (debe incluir @).');
+
+  const btn = document.getElementById('btnLogin');
+  btn.disabled = true; btn.textContent = 'Verificando...';
+
+  try {
+    const { data, error } = await sb.auth.signInWithPassword({ email, password: pass });
+    if (error) {
+      const { text, resend } = authErrMsg(error);
+      showAuthError(text, resend);
+      return;
+    }
+    const { data: p } = await sb.from('perfiles').select('bloqueado').eq('id', data.user.id).single();
+    if (p?.bloqueado) {
+      await sb.auth.signOut();
+      showAuthError('⛔ Cuenta suspendida. Contacta con el administrador.');
+    }
+  } catch(e) {
+    showAuthError('🌐 Error de red. Comprueba tu conexión a internet.');
+  } finally {
+    btn.disabled = false; btn.textContent = 'Entrar a la plataforma';
+  }
 }
 
 async function handleRegister() {
+  clearAuthMessages();
   const nombre = document.getElementById('regNombre').value.trim();
-  const email = document.getElementById('regEmail').value.trim();
-  const pass = document.getElementById('regPassword').value;
-  if (!nombre||!email||!pass) return toast('Rellena todos los campos','error');
-  if (pass.length<8) return toast('Contraseña mínimo 8 caracteres','error');
-  const {data,error} = await sb.auth.signUp({email,password:pass,options:{data:{nombre}}});
-  if (error) return toast(error.message,'error');
-  if (!data.session) toast('Revisa tu email para confirmar la cuenta','info',7000);
-  else toast('¡Bienvenido a Samtrader Pro!','success');
+  const email  = document.getElementById('regEmail').value.trim();
+  const pass   = document.getElementById('regPassword').value;
+
+  if (!nombre || !email || !pass) return showRegMsg('Rellena todos los campos.');
+  if (!email.includes('@'))       return showRegMsg('Escribe un email válido.');
+  if (pass.length < 8)           return showRegMsg('🔒 La contraseña debe tener mínimo 8 caracteres.');
+
+  const btn = document.getElementById('btnRegister');
+  btn.disabled = true; btn.textContent = 'Creando cuenta...';
+
+  try {
+    const { data, error } = await sb.auth.signUp({
+      email,
+      password: pass,
+      options: {
+        data: { nombre },
+        emailRedirectTo: location.href,
+      }
+    });
+
+    if (error) {
+      const { text } = authErrMsg(error);
+      showRegMsg(text);
+      return;
+    }
+
+    if (!data.session) {
+      // Email confirmation required
+      showRegMsg(
+        '✅ ¡Cuenta creada! Revisa tu bandeja de entrada en <strong>' + email + '</strong> y haz clic en el enlace de confirmación para activarla.<br><br>' +
+        '⚠️ Si no ves el email en 2 minutos, revisa la carpeta de spam.',
+        'success'
+      );
+    } else {
+      toast('¡Bienvenido a Samtrader Pro!','success');
+    }
+  } catch(e) {
+    showRegMsg('🌐 Error de red. Comprueba tu conexión a internet.');
+  } finally {
+    btn.disabled = false; btn.textContent = 'Crear cuenta';
+  }
+}
+
+async function handleResendConfirmation() {
+  const email = document.getElementById('loginEmail').value.trim();
+  if (!email) return showAuthError('Escribe tu email arriba para reenviar la confirmación.');
+  const { error } = await sb.auth.resend({ type: 'signup', email, options: { emailRedirectTo: location.href } });
+  if (error) return showAuthError('No se pudo reenviar: ' + error.message);
+  showAuthSuccess('📧 Email de confirmación reenviado a <strong>' + email + '</strong>. Revisa también el spam.');
+  document.getElementById('btnResend').classList.add('hidden');
 }
 
 async function handleForgotPassword() {
+  clearAuthMessages();
   const email = document.getElementById('loginEmail').value.trim();
-  if (!email) return toast('Escribe tu email primero','error');
-  const {error} = await sb.auth.resetPasswordForEmail(email,{redirectTo:location.href});
-  if (error) return toast(error.message,'error');
-  toast('Email de recuperación enviado','success');
+  if (!email) return showAuthError('Escribe tu email en el campo de arriba primero.');
+  const { error } = await sb.auth.resetPasswordForEmail(email, { redirectTo: location.href });
+  if (error) return showAuthError('No se pudo enviar: ' + error.message);
+  showAuthSuccess('📧 Email de recuperación enviado a <strong>' + email + '</strong>. Revisa también el spam.');
 }
 
 async function handleLogout() {
