@@ -989,8 +989,8 @@ function authErrMsg(error) {
     return { text: '⚠️ Este email ya está registrado. Inicia sesión o usa "¿Olvidaste tu contraseña?"', resend: false };
   if (msg.includes('password') && msg.includes('characters'))
     return { text: '🔒 La contraseña debe tener al menos 8 caracteres.', resend: false };
-  if (msg.includes('unable to validate') || status === 422)
-    return { text: '⚠️ Email inválido o formato incorrecto. Comprueba que el email esté bien escrito.', resend: false };
+  if (status === 422 || msg.includes('unable to validate'))
+    return { text: '⚠️ No se pudo completar el registro. Puede que el email ya esté en uso o que la base de datos no esté configurada. Contacta al administrador si el problema persiste.', resend: false };
   if (msg.includes('signup is disabled'))
     return { text: '⛔ El registro está desactivado temporalmente. Contacta al administrador.', resend: false };
   if (msg.includes('network') || msg.includes('fetch'))
@@ -1020,6 +1020,7 @@ async function handleLogin() {
     if (p?.bloqueado) {
       await sb.auth.signOut();
       showAuthError('⛔ Cuenta suspendida. Contacta con el administrador.');
+      return;
     }
   } catch(e) {
     showAuthError('🌐 Error de red. Comprueba tu conexión a internet.');
@@ -1047,7 +1048,7 @@ async function handleRegister() {
       password: pass,
       options: {
         data: { nombre },
-        emailRedirectTo: location.href,
+        emailRedirectTo: window.location.origin + window.location.pathname,
       }
     });
 
@@ -1121,8 +1122,24 @@ sb.auth.onAuthStateChange(async(event,session)=>{
 
 // ── LOAD PROFILE ───────────────────────────────────────────────
 async function loadUserProfile() {
-  const {data:p,error} = await sb.from('perfiles').select('*').eq('id',currentUser.id).single();
-  if (error) return;
+  let {data:p, error} = await sb.from('perfiles').select('*').eq('id',currentUser.id).single();
+  if (error || !p) {
+    // Perfil no encontrado — puede ocurrir si el trigger de Supabase falló al registrarse.
+    // Intentar crear el perfil directamente (fallback seguro).
+    const nombre = (currentUser.user_metadata?.nombre) || currentUser.email.split('@')[0];
+    const token = crypto.randomUUID().replace(/-/g,'');
+    const {data:nuevo, error:errIns} = await sb.from('perfiles').insert({
+      id: currentUser.id,
+      nombre,
+      plan: 'gratis',
+      bloqueado: false,
+      token_licencia: token,
+      fecha_registro: new Date().toISOString()
+    }).select().single();
+    p = (errIns || !nuevo)
+      ? { id: currentUser.id, nombre, plan: 'gratis', bloqueado: false, token_licencia: null }
+      : nuevo;
+  }
   currentPerfil = p;
   if (p.bloqueado) { await sb.auth.signOut(); toast('Tu cuenta ha sido suspendida.','error',6000); return; }
   const {data:adminRow} = await sb.from('admins').select('user_id').eq('user_id',currentUser.id).single();
