@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<title>Diagnóstico Supabase</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  body { font-family: monospace; background: #0B0F17; color: #E2E8F0; padding: 20px; }
+  input { background: #1E293B; color: #E2E8F0; border: 1px solid #334155; padding: 8px; margin: 4px; width: 260px; border-radius: 6px; }
+  button { background: #10B981; color: #fff; border: none; padding: 10px 20px; margin: 4px; border-radius: 6px; cursor: pointer; }
+  pre { background: #131A26; padding: 16px; border-radius: 8px; white-space: pre-wrap; word-break: break-all; font-size: 12px; }
+  .ok { color: #10B981; } .err { color: #EF4444; }
+</style>
+</head>
+<body>
+<h2>🔍 Diagnóstico de Autenticación</h2>
+<p style="color:#94A3B8;">Esta página prueba directamente la conexión con Supabase.</p>
+
+<div style="margin:16px 0;">
+  <input id="email" type="email" placeholder="tu@email.com" value=""/><br/>
+  <input id="pass" type="password" placeholder="Contraseña (min 8 chars)" value=""/><br/>
+  <input id="nombre" type="text" placeholder="Nombre (para registro)" value="Test Usuario"/><br/>
+  <button onclick="testSignup()">🧪 Probar REGISTRO</button>
+  <button onclick="testLogin()">🧪 Probar LOGIN</button>
+  <button onclick="clearLog()">🗑 Limpiar</button>
+</div>
+
+<pre id="log">Resultados aparecerán aquí...</pre>
+
+<script>
+const { createClient } = supabase;
+const SUPABASE_URL = 'https://raznmwztnucismwjaetc.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJhem5td3p0bnVjaXNtd2phZXRjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAxNDg2NDMsImV4cCI6MjA5NTcyNDY0M30.PRF0zgiHnsXWb-2vt801Mf3Sl2a-o8BBJXD19aCEjpM';
+const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+function log(msg, cls='') {
+  const el = document.getElementById('log');
+  const time = new Date().toLocaleTimeString();
+  el.innerHTML += `\n[${time}] <span class="${cls}">${msg}</span>`;
+  el.scrollTop = el.scrollHeight;
+}
+function clearLog() { document.getElementById('log').innerHTML = ''; }
+
+async function testSignup() {
+  const email = document.getElementById('email').value.trim();
+  const pass = document.getElementById('pass').value;
+  const nombre = document.getElementById('nombre').value.trim();
+  if (!email || !pass) return log('❌ Rellena email y contraseña', 'err');
+  log(`⏳ Intentando REGISTRO con: ${email}...`);
+  try {
+    const { data, error } = await sb.auth.signUp({ email, password: pass, options: { data: { nombre } } });
+    if (error) {
+      log(`❌ ERROR signup - status: ${error.status}, mensaje: ${error.message}`, 'err');
+      log(`   Objeto error completo: ${JSON.stringify(error)}`, 'err');
+    } else {
+      log(`✅ SIGNUP OK`, 'ok');
+      log(`   user.id: ${data.user?.id || 'null'}`, 'ok');
+      log(`   session: ${data.session ? 'SÍ (sesión inmediata)' : 'NO (necesita confirmación email)'}`, data.session ? 'ok' : 'err');
+      log(`   email_confirmed_at: ${data.user?.email_confirmed_at || 'null (no confirmado)'}`);
+    }
+  } catch(e) {
+    log(`💥 EXCEPCIÓN: ${e.message}`, 'err');
+  }
+}
+
+async function testLogin() {
+  const email = document.getElementById('email').value.trim();
+  const pass = document.getElementById('pass').value;
+  if (!email || !pass) return log('❌ Rellena email y contraseña', 'err');
+  log(`⏳ Intentando LOGIN con: ${email}...`);
+  try {
+    const { data, error } = await sb.auth.signInWithPassword({ email, password: pass });
+    if (error) {
+      log(`❌ ERROR login - status: ${error.status}, mensaje: ${error.message}`, 'err');
+      log(`   Objeto error completo: ${JSON.stringify(error)}`, 'err');
+    } else {
+      log(`✅ LOGIN OK`, 'ok');
+      log(`   user.id: ${data.user?.id}`, 'ok');
+      log(`   access_token recibido: SÍ`, 'ok');
+    }
+  } catch(e) {
+    log(`💥 EXCEPCIÓN: ${e.message}`, 'err');
+  }
+}
+</script>
+</body>
+</html>
