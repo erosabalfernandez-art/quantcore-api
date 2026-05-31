@@ -29,6 +29,10 @@
       "dest": "/api/health.js"
     },
     {
+      "src": "/api/recibir-simbolos",
+      "dest": "/api/recibir-simbolos.js"
+    },
+    {
       "src": "/(.*)",
       "dest": "/index.html"
     }
