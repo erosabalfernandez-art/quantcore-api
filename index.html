@@ -2821,7 +2821,7 @@ function showSection(id) {
   try { if (id==='perfil')     loadProfile(); }       catch(_){}
   try { if (id==='admin')    { loadAllUsers(); loadPagos(); checkMaintenanceModeStatus(); const pp=document.getElementById('adminPushPanel'); if(pp&&isAdmin)pp.style.display=''; } } catch(_){}
   try { if (id==='noticias') { renderNewsCalendar(); updateSessionClocks(); } } catch(_){}
-  try { if (id==='conectarmt5') loadMt5Metrics(); }  catch(_){}
+  try { if (id==='conectarmt5') { loadMt5Metrics(); refreshMt5LinkedAccount(); } }  catch(_){}
   try { if (id==='diario')     loadJournal(); }       catch(_){}
 }
 
@@ -3374,6 +3374,17 @@ async function loadProfile() {
   if (el('profileNombre')) el('profileNombre').value = p.nombre || '';
   if (el('profileEmail'))  el('profileEmail').value  = currentUser.email || '';
   if (el('profileMt5'))    el('profileMt5').value    = p.mt5_cuenta || '';
+    // Update DataBridge linked account display
+    const mt5Num=document.getElementById('mt5LinkedAccountNum');
+    const mt5Note=document.getElementById('mt5LinkedAccountNote');
+    const mt5Lock=document.getElementById('mt5LockIcon');
+    if (mt5Num) {
+      mt5Num.textContent = p.mt5_cuenta||'—';
+      if (mt5Note) mt5Note.textContent = p.mt5_cuenta
+        ? '✅ Cuenta MT5 vinculada y activa con DataBridge'
+        : 'Sin cuenta vinculada aún. El EA la registrará automáticamente al primer envío.';
+      if (mt5Lock && p.mt5_cuenta) mt5Lock.style.color='#10B981';
+    }
   if (el('profileServidor')) el('profileServidor').value = p.mt5_servidor || '';
   if (el('profileActivos')) el('profileActivos').value = (p.activos_manuales || []).join(', ');
 
@@ -4630,21 +4641,51 @@ async function loadChatMessages(convId) {
   return data||[];
 }
 function renderChatMessages(msgs, containerId='chatMessages') {
-  const c=document.getElementById(containerId);
-  if (!c) return;
-  c.innerHTML=msgs.map(m=>{
-    const isMe=m.remitente_id===currentUser?.id;
-    const time=new Date(m.enviado_en).toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'});
-    return `<div class="flex ${isMe?'justify-end':'justify-start'}">
-      <div class="${isMe?'chat-msg-user':'chat-msg-admin'} p-3 max-w-xs" style="max-width:75%;">
-        ${m.imagen_url?`<div style="position:relative;display:inline-block;margin-bottom:4px;"><a href="${esc(m.imagen_url)}" target="_blank" rel="noopener" title="Ver imagen"><img src="${esc(m.imagen_url)}" class="rounded-lg object-cover cursor-pointer" style="max-height:130px;max-width:210px;display:block;" onerror="this.parentNode.parentNode.style.display='none'"/></a><a href="${esc(m.imagen_url)}" download target="_blank" style="position:absolute;bottom:4px;right:4px;background:rgba(0,0,0,.65);border-radius:6px;padding:2px 7px;font-size:10px;color:#fff;text-decoration:none;line-height:1.6;" title="Descargar imagen">&#11015;</a></div>`:''}
-        <p style="font-size:13px;">${esc(m.mensaje||'')}</p>
-        <p style="font-size:10px;color:#475569;margin-top:4px;text-align:${isMe?'right':'left'};">${time}</p>
-      </div>
-    </div>`;
-  }).join('');
-  c.scrollTop=c.scrollHeight;
-}
+    const c=document.getElementById(containerId);
+    if (!c) return;
+    const isAdminPanel = containerId==='adminChatMessages';
+    c.innerHTML=msgs.map(m=>{
+      const isMe = isAdminPanel ? m.remitente_tipo==='admin' : m.remitente_tipo==='user';
+      const time=new Date(m.enviado_en).toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'});
+      const imgHtml = m.imagen_url ? '<div style="margin-bottom:6px;"><a href="'+esc(m.imagen_url)+'" target="_blank" rel="noopener" style="display:block;"><img src="'+esc(m.imagen_url)+'" class="rounded-lg object-cover cursor-pointer" style="max-height:150px;max-width:220px;display:block;border:1px solid rgba(37,99,235,.2);" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'inline-block\';"/><span style="display:none;font-size:11px;color:#94A3B8;padding:4px 0;">&#128206; Imagen — clic para ver</span></a><button onclick="downloadChatImg(\''+esc(m.imagen_url)+'\');" style="margin-top:4px;font-size:10px;color:#94A3B8;background:rgba(30,41,59,.6);border:1px solid rgba(30,41,59,.8);border-radius:6px;cursor:pointer;padding:2px 8px;">&#11015; Descargar</button></div>' : '';
+      const txtHtml = (m.mensaje && m.mensaje!=='[imagen]') ? '<p style="font-size:13px;">'+esc(m.mensaje)+'</p>' : '';
+      return '<div class="flex '+(isMe?'justify-end':'justify-start')+'"><div class="'+(isMe?'chat-msg-user':'chat-msg-admin')+' p-3 max-w-xs" style="max-width:75%;">'+imgHtml+txtHtml+'<p style="font-size:10px;color:#475569;margin-top:4px;text-align:'+(isMe?'right':'left')+';">'+time+'</p></div></div>';
+    }).join('');
+    c.scrollTop=c.scrollHeight;
+  }
+  async function downloadChatImg(url) {
+    try {
+      const r=await fetch(url);
+      if(!r.ok) throw new Error('fail');
+      const blob=await r.blob();
+      const a=document.createElement('a');
+      a.href=URL.createObjectURL(blob);
+      a.download='imagen_chat_'+Date.now()+'.jpg';
+      document.body.appendChild(a);a.click();document.body.removeChild(a);
+      setTimeout(()=>URL.revokeObjectURL(a.href),2000);
+    } catch(e){window.open(url,'_blank');}
+  }
+  async function refreshMt5LinkedAccount() {
+    if (!currentUser) return;
+    try {
+      const { data } = await sb.from('perfiles').select('mt5_cuenta,mt5_servidor').eq('id', currentUser.id).single();
+      if (!data) return;
+      currentPerfil = Object.assign({}, currentPerfil || {}, data);
+      const mt5Num  = document.getElementById('mt5LinkedAccountNum');
+      const mt5Note = document.getElementById('mt5LinkedAccountNote');
+      const mt5Lock = document.getElementById('mt5LockIcon');
+      if (mt5Num) {
+        mt5Num.textContent = data.mt5_cuenta || '—';
+        if (mt5Note) mt5Note.textContent = data.mt5_cuenta
+          ? '✅ Cuenta MT5 vinculada y activa con DataBridge'
+          : 'Sin cuenta vinculada aún. El EA la registrará automáticamente al primer envío.';
+        if (mt5Lock && data.mt5_cuenta) mt5Lock.style.color = '#10B981';
+      }
+      // Also update profile section input if visible
+      const profileMt5El = document.getElementById('profileMt5');
+      if (profileMt5El) profileMt5El.value = data.mt5_cuenta || '';
+    } catch(e) { /* silent */ }
+  }
 async function toggleChatModal() {
   const modal=document.getElementById('modalChat');
   if (modal.classList.contains('hidden')) {
