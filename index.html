@@ -2610,11 +2610,39 @@ const SUPABASE_KEY  = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFz
 const FINNHUB_KEY   = 'd8dq7fpr01qhm4agkptgd8dq7fpr01qhm4agkpu0';
 const FINNHUB_CACHE_KEY = 'finnhub_calendar_v2';
 const FINNHUB_CACHE_TTL = 3600000;
-const PAYMENT_INFO  = { pix:'erosabalfernandez@gmail.com', paypal:'cuentasbrasil033@gmail.com',
-    usdt_bep20:`USDT BEP20 (BSC): <strong>${PAYMENT_INFO.usdt_bep20}</strong><br>Envía exactamente ${precio} USDT — Red BEP20/BSC`,
-    usdc_bep20:`USDC BEP20 (BSC): <strong>${PAYMENT_INFO.usdc_bep20}</strong><br>Envía exactamente ${precio} USDC — Red BEP20/BSC`,
+const PAYMENT_INFO  = { pix:'erosabalfernandez@gmail.com', paypal:'cuentasbrasil033@gmail.com', usdt_bep20:'0x24252ef84f8b4665170c199595ce326bb4709a0f', usdc_bep20:'0x24252ef84f8b4665170c199595ce326bb4709a0f' };
+function openPayModal(plan) {
+  document.getElementById('pagoSelectedPlan').value = plan;
+  updatePayInstructions();
+  document.getElementById('modalPago').classList.remove('hidden');
+}
+function updatePayInstructions() {
+  const metodo = document.getElementById('pagoMetodo')?.value||'pix';
+  const plan = document.getElementById('pagoSelectedPlan')?.value||'premium';
+  const precio = plan==='elite'?39:19;
+  const instrEl = document.getElementById('pagoInstrucciones');
+  const copyBtn = `<button onclick="copyPayAddress()" style="margin-top:10px;padding:5px 12px;border-radius:8px;font-size:11px;font-weight:600;background:rgba(37,99,235,.15);color:#93C5FD;border:1px solid rgba(37,99,235,.3);cursor:pointer;display:inline-flex;align-items:center;gap:5px;">📋 Copiar dirección</button>`;
+  const info = {
+    pix:`<div>PIX: <strong style="color:#E2E8F0;">${PAYMENT_INFO.pix}</strong><br>Envía ${precio}€ equivalente en BRL</div>${copyBtn}`,
+    paypal:`<div>PayPal: <strong style="color:#E2E8F0;">${PAYMENT_INFO.paypal}</strong><br>Envía ${precio}€ como "Friends &amp; Family"</div>${copyBtn}`,
+    usdt_bep20:`<div>USDT BEP20 (BSC):<br><strong style="color:#E2E8F0;word-break:break-all;font-size:11px;">${PAYMENT_INFO.usdt_bep20}</strong><br>Envía exactamente ${precio} USDT — Red BEP20/BSC</div>${copyBtn}`,
+    usdc_bep20:`<div>USDC BEP20 (BSC):<br><strong style="color:#E2E8F0;word-break:break-all;font-size:11px;">${PAYMENT_INFO.usdc_bep20}</strong><br>Envía exactamente ${precio} USDC — Red BEP20/BSC</div>${copyBtn}`,
   };
   if (instrEl) instrEl.innerHTML = info[metodo]||'';
+}
+function copyPayAddress() {
+  const metodo = document.getElementById('pagoMetodo')?.value||'pix';
+  const vals = { pix:PAYMENT_INFO.pix, paypal:PAYMENT_INFO.paypal, usdt_bep20:PAYMENT_INFO.usdt_bep20, usdc_bep20:PAYMENT_INFO.usdc_bep20 };
+  const val = vals[metodo]||'';
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(val).then(()=>toast('📋 Dirección copiada','success',2000)).catch(()=>fallbackCopy(val));
+  } else { fallbackCopy(val); }
+}
+function fallbackCopy(val) {
+  const ta = document.createElement('textarea'); ta.value = val; ta.style.position='fixed'; ta.style.opacity='0';
+  document.body.appendChild(ta); ta.focus(); ta.select();
+  try { document.execCommand('copy'); toast('📋 Dirección copiada','success',2000); } catch(e) { toast('No se pudo copiar','error',2000); }
+  document.body.removeChild(ta);
 }
 async function submitPago() {
   if (!currentUser) return toast('Inicia sesión primero','error');
