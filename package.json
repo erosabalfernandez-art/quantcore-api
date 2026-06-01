@@ -10,6 +10,7 @@
   "dependencies": {
     "@supabase/supabase-js": "^2.106.2",
     "cors": "^2.8.6",
-    "express": "^4.22.2"
+    "express": "^4.22.2",
+    "web-push": "^3.6.7"
   }
 }
