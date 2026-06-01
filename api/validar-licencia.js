@@ -24,7 +24,10 @@
     Object.entries(CORS_HEADERS).forEach(([k, v]) => res.setHeader(k, v));
     if (req.method !== 'POST') return res.status(405).json({ valido: false, motivo: 'Método no permitido', codigo: 405 });
 
-    const { token, ea_tipo, mt5_account, version_ea, hwid } = req.body || {};
+    const { token: _tok, ea_tipo: _ea, mt5_account: _mt5, version_ea, hwid } = req.body || {};
+  const token = (_tok||''). trim();
+  const ea_tipo = (_ea||''). trim();
+  const mt5_account = (_mt5||''). trim();
     const ip = req.headers['x-forwarded-for']?.split(',')[0]?.trim() || req.socket?.remoteAddress || 'unknown';
 
     if (!token || !ea_tipo || !mt5_account) {
