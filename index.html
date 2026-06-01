@@ -203,7 +203,63 @@ select.input-dark option{background:#131A26;color:#E2E8F0;}
 .propfirm-step{background:rgba(19,26,38,.8);border:1px solid rgba(30,41,59,.6);border-radius:14px;padding:20px;text-align:center;position:relative;}
 .propfirm-step .step-num{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#2563EB,#1D4ED8);color:#fff;font-size:14px;font-weight:700;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;}
 .inicio-section-divider{text-align:center;padding:12px 0 6px;font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#475569;}
+
+/* ── LIGHT MODE ── */
+html[data-theme="light"] {
+  filter: invert(1) hue-rotate(180deg);
+}
+html[data-theme="light"] img,
+html[data-theme="light"] canvas,
+html[data-theme="light"] video,
+html[data-theme="light"] .hero-chart-svg,
+html[data-theme="light"] [style*="background:url"],
+html[data-theme="light"] [style*="background-image"] {
+  filter: invert(1) hue-rotate(180deg);
+}
+#themeToggleBtn {
+  background: none;
+  border: 1px solid rgba(148,163,184,.3);
+  border-radius: 8px;
+  padding: 6px 10px;
+  cursor: pointer;
+  font-size: 14px;
+  color: #94A3B8;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  transition: all .15s;
+}
+#themeToggleBtn:hover { border-color: rgba(148,163,184,.6); color: #E2E8F0; }
+
 </style>
+<!-- Google Translate -->
+<div id="google_translate_element" style="display:none;position:absolute;"></div>
+<script>
+function googleTranslateElementInit() {
+  new google.translate.TranslateElement({
+    pageLanguage: 'es',
+    includedLanguages: 'en,es',
+    layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
+    autoDisplay: false
+  }, 'google_translate_element');
+}
+function translatePage(lang) {
+  const sel = document.querySelector('.goog-te-combo');
+  if (sel) {
+    sel.value = lang;
+    sel.dispatchEvent(new Event('change'));
+    localStorage.setItem('ft_lang', lang);
+    document.getElementById('langToggleBtn').textContent = lang === 'en' ? 'ES' : 'EN';
+  } else {
+    setTimeout(() => translatePage(lang), 500);
+  }
+}
+window.addEventListener('load', () => {
+  const saved = localStorage.getItem('ft_lang');
+  if (saved && saved !== 'es') setTimeout(() => translatePage(saved), 1500);
+});
+</script>
+<script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 </head>
 <body>
 <!-- COOKIE BANNER -->
@@ -699,6 +755,10 @@ select.input-dark option{background:#131A26;color:#E2E8F0;}
       <span class="text-xs px-2 py-0.5 rounded-full font-bold" style="background:rgba(37,99,235,.15);color:#2563EB;">SUITE</span>
     </div>
     <div class="flex items-center gap-3">
+      <button id="langToggleBtn" onclick="translatePage(this.textContent==='EN'?'en':'es')" title="Translate to English / Español" style="background:none;border:1px solid rgba(148,163,184,.3);border-radius:8px;padding:6px 10px;cursor:pointer;font-size:13px;font-weight:600;color:#94A3B8;">EN</button>
+      <button id="themeToggleBtn" onclick="toggleTheme()" title="Cambiar modo claro/oscuro">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>Oscuro
+      </button>
       <button id="notifPermBtn" onclick="requestPushPermission()" class="hidden text-xs px-3 py-1.5 rounded-lg" style="background:rgba(251,191,36,.1);border:1px solid rgba(251,191,36,.3);color:#FBBF24;">Activar alertas</button>
       <!-- Notification Bell -->
       <div class="relative" id="notifBellWrapper">
@@ -805,7 +865,7 @@ select.input-dark option{background:#131A26;color:#E2E8F0;}
     <main class="flex-1 overflow-y-auto p-5">
 
 
-      <!-- ████ INICIO — BridgeMarkets ████ -->
+      <!-- INICIO -->
       <div id="section-inicio" class="hidden">
 
 
@@ -820,7 +880,7 @@ select.input-dark option{background:#131A26;color:#E2E8F0;}
             <!-- Content -->
             <div class="hero-content">
               <div class="hero-left">
-                <!-- BridgeMarkets Logo SVG -->
+                <!-- Logo -->
                 <div class="hero-logo mb-3">
                   <svg width="44" height="44" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <rect width="44" height="44" rx="10" fill="url(#bm-grad)"/>
@@ -831,7 +891,7 @@ select.input-dark option{background:#131A26;color:#E2E8F0;}
                   </svg>
                   <div>
                     <div class="hero-brand-name">FlowTrade Suite</div>
-                    <div class="hero-brand-sub">powered by BridgeMarkets</div>
+                    
                   </div>
                 </div>
                 <h1 class="hero-title">Opera como un<br/><span class="hero-title-accent">trader profesional</span></h1>
@@ -955,7 +1015,7 @@ select.input-dark option{background:#131A26;color:#E2E8F0;}
     <div class="carousel-card" style="background:linear-gradient(135deg,#4A0000,#DC2626);" onclick="showSection('noticias')">
       <div class="cc-icon"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.92)" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 17 7 10 11 14 15 6 21 9"/><circle cx="21" cy="9" r="2" fill="rgba(255,255,255,0.3)"/></svg></div>
       <div class="cc-title">Índices Sintéticos</div>
-      <div class="cc-desc">VorteX &amp; Fortune — BridgeMarkets 24/7</div>
+      <div class="cc-desc">Índices Sintéticos 24/7</div>
     </div>
     <div class="carousel-card" style="background:linear-gradient(135deg,#312E81,#6366F1);" onclick="showSection('calc-mt5')">
       <div class="cc-icon"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.92)" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4"/><line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/></svg></div>
@@ -1005,7 +1065,7 @@ select.input-dark option{background:#131A26;color:#E2E8F0;}
     <div class="carousel-card" style="background:linear-gradient(135deg,#4A0000,#DC2626);" onclick="showSection('noticias')">
       <div class="cc-icon"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.92)" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 17 7 10 11 14 15 6 21 9"/><circle cx="21" cy="9" r="2" fill="rgba(255,255,255,0.3)"/></svg></div>
       <div class="cc-title">Índices Sintéticos</div>
-      <div class="cc-desc">VorteX &amp; Fortune — BridgeMarkets 24/7</div>
+      <div class="cc-desc">Índices Sintéticos 24/7</div>
     </div>
     <div class="carousel-card" style="background:linear-gradient(135deg,#312E81,#6366F1);" onclick="showSection('calc-mt5')">
       <div class="cc-icon"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.92)" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4"/><line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/></svg></div>
@@ -1021,221 +1081,7 @@ select.input-dark option{background:#131A26;color:#E2E8F0;}
           </div>
         </div>
 
-        <!-- HERO BRIDGEMARKETS -->
-        <div class="bm-hero mb-6">
-          <div style="position:relative;z-index:1;">
-            <div class="bm-badge">
-              <svg width="10" height="10" viewBox="0 0 24 24" fill="#3B82F6"><circle cx="12" cy="12" r="10"/></svg>
-              Broker Recomendado
-            </div>
-            <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:24px;">
-              <div style="flex:1;min-width:260px;">
-                <div style="background:#fff;display:inline-block;padding:10px 18px;border-radius:12px;margin-bottom:20px;">
-                  <img src="data:image/png;base64,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" alt="BridgeMarkets" style="height:44px;display:block;object-fit:contain;"/>
-                </div>
-                <h2 style="font-size:26px;font-weight:800;color:#F1F5F9;line-height:1.25;margin:0 0 12px;">
-                  El broker ideal para<br/><span style="color:#3B82F6;">Índices Sintéticos</span> & Prop Firm
-                </h2>
-                <p style="color:#94A3B8;font-size:14px;line-height:1.7;margin:0 0 24px;max-width:480px;">
-                  BridgeMarkets es la plataforma de trading que combina acceso a mercados sintéticos 24/7, condiciones de spreads competitivos y un programa de fondeo prop firm — todo en un solo lugar. Sin noticias que arruinen tus trades. Sin cierres de mercado.
-                </p>
-                <div style="display:flex;gap:12px;flex-wrap:wrap;">
-                  <a href="https://trading.bridgemarkets.global//register?ref=6af2c3f6-2fdd-47&branchUuid=6bdab320-a2b8-43a5-a218-f" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:8px;background:linear-gradient(135deg,#2563EB,#1D4ED8);color:#fff;font-weight:700;font-size:14px;padding:13px 26px;border-radius:12px;text-decoration:none;transition:all .2s;box-shadow:0 4px 20px rgba(37,99,235,.4);">
-                    Abrir Cuenta Gratis
-                    <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 0 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-                  </a>
-                  <button onclick="showSection('calculadora')" style="display:inline-flex;align-items:center;gap:8px;background:rgba(37,99,235,.1);color:#3B82F6;border:1px solid rgba(37,99,235,.3);font-weight:600;font-size:13px;padding:13px 22px;border-radius:12px;cursor:pointer;transition:all .2s;">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:6px;"><rect x="4" y="2" width="16" height="20" rx="2"/><path d="M8 6h8"/><path d="M8 10h2m4 0h2M8 14h2m4 0h2M8 18h2m4 0h2"/></svg>Calculadora de Riesgo
-                  </button>
-                </div>
-              </div>
-              <div style="flex-shrink:0;display:flex;flex-direction:column;gap:10px;min-width:180px;">
-                
-                <div style="display:flex;align-items:center;gap:10px;background:rgba(30,41,59,.5);border:1px solid rgba(30,41,59,.8);border-radius:10px;padding:10px 14px;">
-                  <span style="display:inline-flex;align-items:center;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
-                  <span style="font-size:12px;font-weight:500;color:#CBD5E1;">Regulado y auditado</span>
-                </div>
-                <div style="display:flex;align-items:center;gap:10px;background:rgba(30,41,59,.5);border:1px solid rgba(30,41,59,.8);border-radius:10px;padding:10px 14px;">
-                  <span style="display:inline-flex;align-items:center;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#F59E0B" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></span>
-                  <span style="font-size:12px;font-weight:500;color:#CBD5E1;">Ejecución instantánea</span>
-                </div>
-                <div style="display:flex;align-items:center;gap:10px;background:rgba(30,41,59,.5);border:1px solid rgba(30,41,59,.8);border-radius:10px;padding:10px 14px;">
-                  <span style="display:inline-flex;align-items:center;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span>
-                  <span style="font-size:12px;font-weight:500;color:#CBD5E1;">Mercado 24/7</span>
-                </div>
-                <div style="display:flex;align-items:center;gap:10px;background:rgba(30,41,59,.5);border:1px solid rgba(30,41,59,.8);border-radius:10px;padding:10px 14px;">
-                  <span style="display:inline-flex;align-items:center;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.5 8h5a2 2 0 1 1 0 4h-5.5M9.5 12H15a2 2 0 1 1 0 4H9.5M10 8v8"/></svg></span>
-                  <span style="font-size:12px;font-weight:500;color:#CBD5E1;">Prop Firm disponible</span>
-                </div>
-                <div style="display:flex;align-items:center;gap:10px;background:rgba(30,41,59,.5);border:1px solid rgba(30,41,59,.8);border-radius:10px;padding:10px 14px;">
-                  <span style="display:inline-flex;align-items:center;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#8B5CF6" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18" stroke-width="3"/></svg></span>
-                  <span style="font-size:12px;font-weight:500;color:#CBD5E1;">MT5 + WebTrader</span>
-                </div>
-                <div style="display:flex;align-items:center;gap:10px;background:rgba(30,41,59,.5);border:1px solid rgba(30,41,59,.8);border-radius:10px;padding:10px 14px;">
-                  <span style="display:inline-flex;align-items:center;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#6366F1" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg></span>
-                  <span style="font-size:12px;font-weight:500;color:#CBD5E1;">Soporte en español</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
 
-        <!-- STATS BAR -->
-        <div class="bm-stat-bar mb-6">
-          
-          <div class="bm-stat-item">
-            <div class="val">24/7</div>
-            <div class="lbl">Mercado abierto</div>
-          </div>
-          <div class="bm-stat-item">
-            <div class="val">0 pip</div>
-            <div class="lbl">Spread mínimo</div>
-          </div>
-          <div class="bm-stat-item">
-            <div class="val">500+</div>
-            <div class="lbl">Instrumentos</div>
-          </div>
-          <div class="bm-stat-item">
-            <div class="val">5 min</div>
-            <div class="lbl">Apertura de cuenta</div>
-          </div>
-        </div>
-
-        <!-- POR QUÉ BRIDGEMARKETS -->
-        <div class="mb-6">
-          <div class="inicio-section-divider">¿Por qué BridgeMarkets?</div>
-          <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mt-3">
-            
-            <div class="benefit-card">
-              <div class="bc-icon" style="background:rgba(37,99,235,.2);">
-                <span style="display:inline-flex;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></span>
-              </div>
-              <h4 style="font-size:13px;font-weight:700;color:#F1F5F9;margin:0 0 6px;">Sin Horarios</h4>
-              <p style="font-size:12px;color:#94A3B8;line-height:1.6;margin:0;">Los índices sintéticos operan los 365 días del año, las 24 horas. Lunes o domingo, siempre hay mercado.</p>
-            </div>
-            <div class="benefit-card">
-              <div class="bc-icon" style="background:rgba(139,92,246,.2);">
-                <span style="display:inline-flex;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="21" x2="21" y2="21"/><line x1="3" y1="10" x2="21" y2="10"/><polyline points="5 10 5 21"/><polyline points="10 10 10 21"/><polyline points="14 10 14 21"/><polyline points="19 10 19 21"/><polygon points="12 2 20 10 4 10"/></svg></span>
-              </div>
-              <h4 style="font-size:13px;font-weight:700;color:#F1F5F9;margin:0 0 6px;">Prop Firm</h4>
-              <p style="font-size:12px;color:#94A3B8;line-height:1.6;margin:0;">Accede a capital institucional. Demuestra tu habilidad y opera con fondos de la firma sin arriesgar tu capital.</p>
-            </div>
-            <div class="benefit-card">
-              <div class="bc-icon" style="background:rgba(16,185,129,.2);">
-                <span style="display:inline-flex;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8B5CF6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></span>
-              </div>
-              <h4 style="font-size:13px;font-weight:700;color:#F1F5F9;margin:0 0 6px;">Sin Noticias</h4>
-              <p style="font-size:12px;color:#94A3B8;line-height:1.6;margin:0;">Los índices sintéticos son inmunes a eventos macroeconómicos. Tu análisis técnico siempre manda.</p>
-            </div>
-            <div class="benefit-card">
-              <div class="bc-icon" style="background:rgba(245,158,11,.2);">
-                <span style="display:inline-flex;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#F59E0B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></span>
-              </div>
-              <h4 style="font-size:13px;font-weight:700;color:#F1F5F9;margin:0 0 6px;">Baja Latencia</h4>
-              <p style="font-size:12px;color:#94A3B8;line-height:1.6;margin:0;">Ejecución de órdenes en milisegundos. Sin requotes, sin slippage excesivo. Ideal para scalping y EA.</p>
-            </div>
-          </div>
-        </div>
-
-        <!-- ÍNDICES SINTÉTICOS -->
-        <div class="mb-6">
-          <div class="inicio-section-divider">Índices Sintéticos BridgeMarkets — Opera 24/7</div>
-          <p style="text-align:center;font-size:13px;color:#64748B;margin:6px 0 16px;">Instrumentos algorítmicos exclusivos de BridgeMarkets. Sin correlación con el mercado real. Volatilidad predecible, spreads bajos, análisis técnico puro.</p>
-          <div class="grid grid-cols-2 lg:grid-cols-3 gap-3">
-            
-          <div class="synth-card" style="background:rgba(59,130,246,.08);border:1px solid rgba(59,130,246,.25);">
-            <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
-              <span class="synth-icon-svg"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12c2-4 4-4 6 0s4 4 6 0 4-4 6 0"/></svg></span>
-              <span style="font-weight:700;font-size:13px;color:#3B82F6;">VorteX20 / VorteX40</span>
-            </div>
-            <p style="font-size:12px;color:#94A3B8;line-height:1.6;margin:0;">Volatilidad fija del 20% y 40%. 2–4 ticks por segundo. Ideal para iniciarse en sintéticos con movimientos controlados y predecibles.</p>
-            <div class="synth-card::after" style="position:absolute;bottom:0;left:0;right:0;height:2px;background:#3B82F6;opacity:.4;border-radius:0 0 14px 14px;"></div>
-          </div>
-          <div class="synth-card" style="background:rgba(99,102,241,.08);border:1px solid rgba(99,102,241,.25);">
-            <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
-              <span class="synth-icon-svg"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#6366F1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></span>
-              <span style="font-weight:700;font-size:13px;color:#6366F1;">VorteX60 / VorteX80</span>
-            </div>
-            <p style="font-size:12px;color:#94A3B8;line-height:1.6;margin:0;">Volatilidad fija del 60% y 80%. 4 ticks por segundo. Rango de movimiento medio-alto. Para traders con experiencia en gestión de riesgo.</p>
-            <div class="synth-card::after" style="position:absolute;bottom:0;left:0;right:0;height:2px;background:#6366F1;opacity:.4;border-radius:0 0 14px 14px;"></div>
-          </div>
-          <div class="synth-card" style="background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.25);">
-            <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
-              <span class="synth-icon-svg"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#EF4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg></span>
-              <span style="font-weight:700;font-size:13px;color:#EF4444;">VorteX100</span>
-            </div>
-            <p style="font-size:12px;color:#94A3B8;line-height:1.6;margin:0;">Volatilidad fija del 100%. 4 ticks por segundo. El más agresivo de los VorteX. Máximo potencial de ganancia y riesgo. Requiere disciplina estricta.</p>
-            <div class="synth-card::after" style="position:absolute;bottom:0;left:0;right:0;height:2px;background:#EF4444;opacity:.4;border-radius:0 0 14px 14px;"></div>
-          </div>
-          <div class="synth-card" style="background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.25);">
-            <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
-              <span class="synth-icon-svg"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 19 8 19 8 13 12 13 12 8 16 8 16 4 20 4"/><line x1="4" y1="4" x2="4" y2="19"/><line x1="4" y1="19" x2="20" y2="19"/></svg></span>
-              <span style="font-weight:700;font-size:13px;color:#10B981;">Fortune 100/250/500/1000</span>
-            </div>
-            <p style="font-size:12px;color:#94A3B8;line-height:1.6;margin:0;">50% sube / 50% baja con step fijo (0.1, 0.25, 0.5 ó 1). Sin gaps ni noticias. El más predecible para sistemas de reversión y scalping mecánico.</p>
-            <div class="synth-card::after" style="position:absolute;bottom:0;left:0;right:0;height:2px;background:#10B981;opacity:.4;border-radius:0 0 14px 14px;"></div>
-          </div>
-          <div class="synth-card" style="background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.25);">
-            <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
-              <span class="synth-icon-svg"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#F59E0B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="3"/><circle cx="8" cy="8" r="1.5" fill="#F59E0B"/><circle cx="16" cy="8" r="1.5" fill="#F59E0B"/><circle cx="12" cy="12" r="1.5" fill="#F59E0B"/><circle cx="8" cy="16" r="1.5" fill="#F59E0B"/><circle cx="16" cy="16" r="1.5" fill="#F59E0B"/></svg></span>
-              <span style="font-weight:700;font-size:13px;color:#F59E0B;">FortuneX200 / X300 / X500</span>
-            </div>
-            <p style="font-size:12px;color:#94A3B8;line-height:1.6;margin:0;">50% sube / 50% baja con multiplicador de step aleatorio (hasta x2, x3 ó x5). Combina la estructura del Fortune con saltos impredecibles. Gestión de riesgo obligatoria.</p>
-            <div class="synth-card::after" style="position:absolute;bottom:0;left:0;right:0;height:2px;background:#F59E0B;opacity:.4;border-radius:0 0 14px 14px;"></div>
-          </div>
-          </div>
-        </div>
-
-        <!-- PROP FIRM -->
-        <div class="mb-6" style="background:linear-gradient(135deg,rgba(37,99,235,.08),rgba(139,92,246,.06));border:1px solid rgba(37,99,235,.2);border-radius:16px;padding:28px;">
-          <div class="inicio-section-divider" style="padding-top:0;">Programa Prop Firm</div>
-          <p style="text-align:center;font-size:13px;color:#64748B;margin:4px 0 20px;">Opera con capital de la firma. Sin riesgo propio. Gana hasta el 80% de las ganancias.</p>
-          <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-5">
-            
-            <div class="propfirm-step">
-              <div class="step-num">1</div>
-              <div style="margin-bottom:8px;display:flex;justify-content:center;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.8)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="13" y2="16"/></svg></div>
-              <h4 style="font-size:13px;font-weight:700;color:#F1F5F9;margin:0 0 6px;">Aplica</h4>
-              <p style="font-size:11px;color:#94A3B8;line-height:1.5;margin:0;">Completa el formulario de evaluación y elige tu tamaño de cuenta</p>
-            </div>
-            <div class="propfirm-step">
-              <div class="step-num">2</div>
-              <div style="margin-bottom:8px;display:flex;justify-content:center;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.8)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg></div>
-              <h4 style="font-size:13px;font-weight:700;color:#F1F5F9;margin:0 0 6px;">Evalúate</h4>
-              <p style="font-size:11px;color:#94A3B8;line-height:1.5;margin:0;">Demuestra tu consistencia cumpliendo los objetivos de profit y drawdown</p>
-            </div>
-            <div class="propfirm-step">
-              <div class="step-num">3</div>
-              <div style="margin-bottom:8px;display:flex;justify-content:center;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.8)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div>
-              <h4 style="font-size:13px;font-weight:700;color:#F1F5F9;margin:0 0 6px;">Fondéate</h4>
-              <p style="font-size:11px;color:#94A3B8;line-height:1.5;margin:0;">Aprueba la evaluación y recibe acceso a la cuenta fondeada</p>
-            </div>
-            <div class="propfirm-step">
-              <div class="step-num">4</div>
-              <div style="margin-bottom:8px;display:flex;justify-content:center;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.8)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></div>
-              <h4 style="font-size:13px;font-weight:700;color:#F1F5F9;margin:0 0 6px;">Retira</h4>
-              <p style="font-size:11px;color:#94A3B8;line-height:1.5;margin:0;">Opera con el capital de la firma y retira hasta el 80% de tus ganancias</p>
-            </div>
-          </div>
-          <div style="text-align:center;">
-            <a href="https://trading.bridgemarkets.global//register?ref=6af2c3f6-2fdd-47&branchUuid=6bdab320-a2b8-43a5-a218-f" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:8px;background:linear-gradient(135deg,#7C3AED,#2563EB);color:#fff;font-weight:700;font-size:14px;padding:13px 32px;border-radius:12px;text-decoration:none;box-shadow:0 4px 24px rgba(124,58,237,.35);">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:6px;"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>Quiero el Prop Firm
-              <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-            </a>
-          </div>
-        </div>
-
-        <!-- FINAL CTA -->
-        <div style="background:linear-gradient(135deg,#0F172A,#131A26);border:1px solid rgba(37,99,235,.2);border-radius:16px;padding:36px;text-align:center;margin-bottom:8px;">
-          <p style="font-size:22px;font-weight:800;color:#F1F5F9;margin:0 0 10px;">¿Listo para operar sin límites?</p>
-          <p style="font-size:14px;color:#64748B;margin:0 0 24px;">Únete a BridgeMarkets hoy. Cuenta demo gratis, spreads desde 0 y mercado abierto las 24 horas.</p>
-          <a href="https://trading.bridgemarkets.global//register?ref=6af2c3f6-2fdd-47&branchUuid=6bdab320-a2b8-43a5-a218-f" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:10px;background:linear-gradient(135deg,#2563EB,#1D4ED8);color:#fff;font-weight:700;font-size:15px;padding:15px 36px;border-radius:14px;text-decoration:none;box-shadow:0 6px 28px rgba(37,99,235,.45);transition:all .2s;">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:6px;"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg>Crear Cuenta en BridgeMarkets
-          </a>
-          <p style="font-size:11px;color:#334155;margin:14px 0 0;">Al registrarte usas el enlace de referido de FlowTrade Suite</p>
-        </div>
-
-      </div>
       <!-- ████ END INICIO ████ -->
 
       <!-- DASHBOARD -->
@@ -1843,7 +1689,7 @@ select.input-dark option{background:#131A26;color:#E2E8F0;}
       <div id="section-calculadora" class="hidden">
         <div class="mb-5">
           <h1 class="text-xl font-bold">🧮 Calculadora de Riesgo Global</h1>
-          <p class="text-xs mt-0.5" style="color:#94A3B8;">Pip values reales por activo — Forex, Metales, Índices, Sintéticos Deriv/Weltrade/BridgeMarkets</p>
+          <p class="text-xs mt-0.5" style="color:#94A3B8;">Pip values reales por activo — Forex, Metales, Índices Sintéticos, Deriv/Weltrade</p>
         </div>
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
           <div class="glass-card rounded-xl p-5">
@@ -1931,20 +1777,20 @@ select.input-dark option{background:#131A26;color:#E2E8F0;}
                     <option value="XRPUSD">XRPUSD (Ripple)</option>
                     <option value="BNBUSD">BNBUSD (BNB)</option>
                   </optgroup>
-                  <optgroup label="BridgeMarkets — VorteX (Volatilidad Fija)">
+                  <optgroup label="Índices Sintéticos — VorteX (Volatilidad Fija)">
                     <option value="VorteX20.">VorteX20 — Volatilidad 20%</option>
                     <option value="VorteX40.">VorteX40 — Volatilidad 40%</option>
                     <option value="VorteX60.">VorteX60 — Volatilidad 60%</option>
                     <option value="VorteX80.">VorteX80 — Volatilidad 80%</option>
                     <option value="VorteX100.">VorteX100 — Volatilidad 100%</option>
                   </optgroup>
-                  <optgroup label="BridgeMarkets — Fortune (Step Fijo)">
+                  <optgroup label="Índices Sintéticos — Fortune (Step Fijo)">
                     <option value="Fortune100.">Fortune100 — Step 0.1</option>
                     <option value="Fortune250.">Fortune250 — Step 0.25</option>
                     <option value="Fortune500.">Fortune500 — Step 0.5</option>
                     <option value="Fortune1000.">Fortune1000 — Step 1</option>
                   </optgroup>
-                  <optgroup label="BridgeMarkets — FortuneX (Step Aleatorio)">
+                  <optgroup label="Índices Sintéticos — FortuneX (Step Aleatorio)">
                     <option value="FortuneX200.">FortuneX200 — Multiplicador x2</option>
                     <option value="FortuneX300.">FortuneX300 — Multiplicador x3</option>
                     <option value="FortuneX500.">FortuneX500 — Multiplicador x5</option>
@@ -2795,6 +2641,7 @@ async function toggleMaintenanceMode() {
 let currentUser     = null;
 let currentPerfil   = null;
 let isAdmin         = false;
+let _appBootstrapping = false; // prevents double loadAppForUser on reload
 let allUsersCache   = [];
 let maintenanceActive = false;
 
@@ -3523,7 +3370,7 @@ const PIP_VALUE_TABLE = {
   HK50:0.13,HK33:0.13,
   // Criptomonedas (contratos micro/mini)
   BTCUSD:1,ETHUSD:0.1,LTCUSD:0.05,XRPUSD:0.01,BNBUSD:0.05,
-  // ── Sintéticos BridgeMarkets ────────────────────────────────────────────────
+  // ── Índices Sintéticos ──────────────────────────────────────────────────────
   // VorteX — Volatilidad fija (pip proporcional a % volatilidad)
   'VorteX20.':0.2,'VORTEX20':0.2,
   'VorteX40.':0.4,'VORTEX40':0.4,
@@ -4883,6 +4730,17 @@ let pendingAdminImage = null;
 // ═══════════════════════════════════════════════════════════════
 function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
 function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+function closeAllOverlays() {
+  ['modalLogout','modalMt5','modalPago','modalAddTrade','modalTradeDetail','modalChat',
+   'modalPrivacy','modalCookies','modalTerms','newsExpandOverlay','authOverlay'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el && !el.classList.contains('hidden')) el.classList.add('hidden');
+  });
+  closeChatbot && closeChatbot();
+}
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') closeAllOverlays();
+});
 function toggleUserMenu() { document.getElementById('userMenu').classList.toggle('hidden'); }
 function closeUserMenu() { document.getElementById('userMenu').classList.add('hidden'); }
 function copyToken() { const t=(currentPerfil?.token_licencia||''). trim(); if(!t) return toast('Token no disponible','error'); navigator.clipboard.writeText(t).then(()=>toast('Token copiado ✓','success')).catch(()=>toast('No se pudo copiar','error')); }
@@ -5534,7 +5392,8 @@ async function mt5SimulateReceive() {
     }
     if (!session) {
       showLanding();
-    } else {
+    } else if (!_appBootstrapping) {
+      _appBootstrapping = true;
       try {
         await loadAppForUser(session.user);
         document.getElementById('landingPage').classList.add('hidden');
@@ -5565,6 +5424,28 @@ function acceptCookies() {
   localStorage.setItem('cookiesAccepted', 'true');
   document.getElementById('cookieBanner').classList.add('hidden');
 }
+
+
+function toggleTheme() {
+  const html = document.documentElement;
+  const isLight = html.getAttribute('data-theme') === 'light';
+  html.setAttribute('data-theme', isLight ? 'dark' : 'light');
+  localStorage.setItem('ft_theme', isLight ? 'dark' : 'light');
+  const btn = document.getElementById('themeToggleBtn');
+  if (btn) btn.innerHTML = isLight
+    ? '<svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>Claro'
+    : '<svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>Oscuro';
+}
+// Apply saved theme on load
+(function(){
+  const saved = localStorage.getItem('ft_theme') || 'dark';
+  document.documentElement.setAttribute('data-theme', saved);
+  window.addEventListener('DOMContentLoaded', () => {
+    const btn = document.getElementById('themeToggleBtn');
+    if (!btn) return;
+    if (saved === 'light') btn.innerHTML = '<svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>Claro';
+  });
+})();
 
 function toggleLandingFAQ(btn) {
   const item = btn.closest('.faq-item');
@@ -5854,9 +5735,10 @@ function forceClearSession() {
   sb.auth.onAuthStateChange(async (event, session) => {
     if (session?.user) {
       resetTimers();
-      if ((event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED' || event === 'INITIAL_SESSION') && !currentUser) {
+      if ((event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED' || event === 'INITIAL_SESSION') && !currentUser && !_appBootstrapping) {
+        _appBootstrapping = true;
         await loadAppForUser(session.user);
-        showSection('inicio');
+        if (event !== 'TOKEN_REFRESHED') showSection('inicio');
       }
     } else {
       clearTimeout(inactivityTimer);
