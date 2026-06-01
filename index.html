@@ -1566,7 +1566,11 @@ select.input-dark option{background:#131A26;color:#E2E8F0;}
           <button id="adminTab-licencias" onclick="showAdminTab('licencias')" class="px-4 py-2 rounded-xl text-xs font-semibold btn-outline">Licencias EA</button>
           <button id="adminTab-logslic" onclick="showAdminTab('logslic')" class="px-4 py-2 rounded-xl text-xs font-semibold btn-outline">Logs</button>
           <button id="adminTab-estadisticas" onclick="showAdminTab('estadisticas')" class="px-4 py-2 rounded-xl text-xs font-semibold btn-outline">Estadísticas de la Plataforma</button>
-          <button id="adminTab-referidos" onclick="showAdminTab('referidos')" class="px-4 py-2 rounded-xl text-xs font-semibold btn-outline">Referidos</button>
+          <button id="adminTab-referidos" onclick="showAdminTab('referidos')" class="px-4 py-2 rounded-xl text-xs font-semibold btn-outline">
+            <button id="adminTab-mt5security" onclick="showAdminTab('mt5security')" class="px-4 py-2 rounded-xl text-xs font-semibold btn-outline">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="inline mr-1" style="vertical-align:-2px"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              Seguridad MT5
+            </button>Referidos</button>
         </div>
         <!-- Tab: Usuarios -->
         <div id="adminContent-usuarios">
@@ -1738,9 +1742,59 @@ select.input-dark option{background:#131A26;color:#E2E8F0;}
             </div>
           </div>
         </div>
-      </div>
+          <!-- Tab: Seguridad MT5 -->
+          <div id="adminContent-mt5security" class="hidden">
+            <!-- Alertas de fraude -->
+            <div class="glass-card rounded-xl overflow-hidden mb-4" style="border-color:rgba(239,68,68,.2);">
+              <div class="p-4 border-b flex items-center justify-between" style="border-color:rgba(30,41,59,.5);">
+                <div class="flex items-center gap-2">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#EF4444" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                  <h3 class="font-semibold text-sm" style="color:#EF4444;">Alertas de Fraude / Seguridad</h3>
+                </div>
+                <button onclick="loadAlertasFraude()" class="btn-blue text-xs px-3 py-2 rounded-lg">↺ Actualizar</button>
+              </div>
+              <div class="overflow-x-auto">
+                <table class="w-full text-xs">
+                  <thead><tr style="border-bottom:1px solid rgba(30,41,59,.5);">
+                    <th class="text-left px-4 py-3 font-semibold uppercase tracking-wider" style="color:#475569;">Fecha</th>
+                    <th class="text-left px-4 py-3 font-semibold uppercase tracking-wider" style="color:#475569;">Usuario</th>
+                    <th class="text-left px-4 py-3 font-semibold uppercase tracking-wider" style="color:#475569;">Tipo</th>
+                    <th class="text-left px-4 py-3 font-semibold uppercase tracking-wider" style="color:#475569;">Detalle</th>
+                    <th class="text-left px-4 py-3 font-semibold uppercase tracking-wider" style="color:#475569;">IP</th>
+                    <th class="text-right px-4 py-3" style="color:#475569;">Acción</th>
+                  </tr></thead>
+                  <tbody id="alertasFraudeTable"><tr><td colspan="6" class="text-center py-10" style="color:#475569;">Haz clic en Actualizar</td></tr></tbody>
+                </table>
+              </div>
+            </div>
+            <!-- Cuentas MT5 vinculadas / gestión unlock -->
+            <div class="glass-card rounded-xl overflow-hidden">
+              <div class="p-4 border-b flex items-center justify-between" style="border-color:rgba(30,41,59,.5);">
+                <div class="flex items-center gap-2">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                  <h3 class="font-semibold text-sm">Cuentas MT5 Vinculadas</h3>
+                </div>
+                <button onclick="loadMt5Vinculadas()" class="btn-blue text-xs px-3 py-2 rounded-lg">↺ Actualizar</button>
+              </div>
+              <div class="overflow-x-auto">
+                <table class="w-full text-xs">
+                  <thead><tr style="border-bottom:1px solid rgba(30,41,59,.5);">
+                    <th class="text-left px-4 py-3 font-semibold uppercase tracking-wider" style="color:#475569;">Usuario</th>
+                    <th class="text-left px-4 py-3 font-semibold uppercase tracking-wider" style="color:#475569;">Plan</th>
+                    <th class="text-left px-4 py-3 font-semibold uppercase tracking-wider" style="color:#475569;">Cuenta MT5</th>
+                    <th class="text-left px-4 py-3 font-semibold uppercase tracking-wider" style="color:#475569;">Bloqueada</th>
+                    <th class="text-left px-4 py-3 font-semibold uppercase tracking-wider" style="color:#475569;">Fecha registro</th>
+                    <th class="text-left px-4 py-3 font-semibold uppercase tracking-wider" style="color:#475569;">Último heartbeat</th>
+                    <th class="text-right px-4 py-3" style="color:#475569;">Acción</th>
+                  </tr></thead>
+                  <tbody id="mt5VinculadasTable"><tr><td colspan="7" class="text-center py-10" style="color:#475569;">Haz clic en Actualizar</td></tr></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
 
-      <!-- CALCULADORA DE RIESGO -->
+        <!-- CALCULADORA DE RIESGO -->
       <div id="section-calculadora" class="hidden">
         <div class="mb-5">
           <h1 class="text-xl font-bold">🧮 Calculadora de Riesgo Global</h1>
@@ -2242,10 +2296,12 @@ select.input-dark option{background:#131A26;color:#E2E8F0;}
           <!-- Download card -->
           <div class="glass-card rounded-xl p-6" style="border-color:rgba(37,99,235,.25);">
             <div class="flex items-center gap-3 mb-4">
-              <div class="w-11 h-11 rounded-xl flex items-center justify-center text-2xl" style="background:rgba(37,99,235,.12);">🌉</div>
+              <div class="w-11 h-11 rounded-xl flex items-center justify-center" style="background:rgba(37,99,235,.12);">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                </div>
               <div>
                 <h3 class="font-semibold text-sm">EA Data Bridge</h3>
-                <p class="text-xs" style="color:#94A3B8;">v1.0 — Todos los planes (gratuito)</p>
+                <p class="text-xs" style="color:#94A3B8;">v3.0 — Todos los planes incluidos</p>
               </div>
             </div>
             <p class="text-xs mb-4" style="color:#94A3B8;">Lee tu historial de trades cerrados y lo envía automáticamente a tu diario. Sin capturas, sin intervención manual.</p>
@@ -2263,7 +2319,10 @@ select.input-dark option{background:#131A26;color:#E2E8F0;}
 
           <!-- Connection status card -->
           <div class="glass-card rounded-xl p-6">
-            <h3 class="font-semibold text-sm mb-4">📡 Estado de Conexión</h3>
+            <h3 class="font-semibold text-sm mb-4" style="display:flex;align-items:center;gap:6px;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg>
+                Estado de Conexión
+              </h3>
             <div id="mt5StatusBox" class="rounded-xl p-4 mb-4 flex items-center gap-3" style="background:rgba(30,41,59,.5);border:1px solid rgba(30,41,59,.8);">
               <div id="mt5StatusDot" class="w-3 h-3 rounded-full flex-shrink-0" style="background:#475569;"></div>
               <div>
@@ -2281,10 +2340,17 @@ select.input-dark option{background:#131A26;color:#E2E8F0;}
                 <p id="mt5LastSync" class="text-sm font-semibold" style="color:#94A3B8;">—</p>
               </div>
             </div>
-            <button onclick="mt5SimulateReceive()" class="btn-blue w-full py-2.5 rounded-xl text-sm font-semibold mb-2">
-              ⚡ Simular recepción de datos
-            </button>
-            <p class="text-xs text-center" style="color:#475569;">Añade 10 trades de ejemplo al diario para probar las métricas</p>
+            <!-- Cuenta MT5 vinculada -->
+              <div id="mt5LinkedAccountBox" class="rounded-xl p-3 flex items-center gap-3" style="background:rgba(30,41,59,.4);border:1px solid rgba(30,41,59,.6);">
+                <div id="mt5LockIcon" style="flex-shrink:0;">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#475569" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                </div>
+                <div class="flex-1 min-w-0">
+                  <p class="text-xs font-semibold" style="color:#94A3B8;">Cuenta MT5 Vinculada</p>
+                  <p id="mt5LinkedAccountNum" class="text-sm font-bold truncate" style="color:#E2E8F0;">—</p>
+                  <p id="mt5LinkedAccountNote" class="text-xs mt-0.5" style="color:#475569;">Sin cuenta vinculada aún. El EA la registrará automáticamente al primer envío.</p>
+                </div>
+              </div>
           </div>
         </div>
 
