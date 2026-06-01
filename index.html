@@ -216,6 +216,12 @@ html[data-theme="light"] [style*="background:url"],
 html[data-theme="light"] [style*="background-image"] {
   filter: invert(1) hue-rotate(180deg);
 }
+/* Fix: backdrop-filter breaks under filter:invert on parent */
+html[data-theme="light"] .glass-card,
+html[data-theme="light"] .glass-nav {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
 #themeToggleBtn {
   background: none;
   border: 1px solid rgba(148,163,184,.3);
@@ -243,20 +249,28 @@ function googleTranslateElementInit() {
     autoDisplay: false
   }, 'google_translate_element');
 }
-function translatePage(lang) {
+function translatePage(lang, _retries) {
   const sel = document.querySelector('.goog-te-combo');
   if (sel) {
     sel.value = lang;
     sel.dispatchEvent(new Event('change'));
     localStorage.setItem('ft_lang', lang);
-    document.getElementById('langToggleBtn').textContent = lang === 'en' ? 'ES' : 'EN';
-  } else {
-    setTimeout(() => translatePage(lang), 500);
+    const label = lang === 'en' ? 'ES' : 'EN';
+    const b1 = document.getElementById('langToggleBtn');
+    const b2 = document.getElementById('langToggleBtnLanding');
+    if (b1) b1.textContent = label;
+    if (b2) b2.textContent = label;
+  } else if ((_retries||0) < 20) {
+    setTimeout(() => translatePage(lang, (_retries||0)+1), 500);
   }
 }
 window.addEventListener('load', () => {
   const saved = localStorage.getItem('ft_lang');
-  if (saved && saved !== 'es') setTimeout(() => translatePage(saved), 1500);
+  if (saved && saved !== 'es') {
+    const b2 = document.getElementById('langToggleBtnLanding');
+    if (b2) b2.textContent = 'ES';
+    setTimeout(() => translatePage(saved), 1500);
+  }
 });
 </script>
 <script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
@@ -289,9 +303,10 @@ window.addEventListener('load', () => {
         <span style="font-size:11px;padding:2px 10px;border-radius:20px;font-weight:700;background:rgba(37,99,235,.15);color:#2563EB;">SUITE</span>
       </div>
       <div style="display:flex;align-items:center;gap:12px;">
-        <button onclick="showAuthFromLanding('login')" class="btn-land-s" style="padding:8px 18px;border-radius:12px;font-size:13px;">Iniciar sesion</button>
-        <button onclick="showAuthFromLanding('register')" class="btn-land-p" style="padding:8px 18px;border-radius:12px;font-size:13px;">Registrarse gratis</button>
-      </div>
+          <button id="langToggleBtnLanding" onclick="translatePage(this.textContent==='EN'?'en':'es')" title="Traducir / Translate" style="background:none;border:1px solid rgba(148,163,184,.3);border-radius:8px;padding:6px 12px;cursor:pointer;font-size:12px;color:#94A3B8;font-weight:600;transition:all .15s;">EN</button>
+          <button onclick="showAuthFromLanding('login')" class="btn-land-s" style="padding:8px 18px;border-radius:12px;font-size:13px;">Iniciar sesion</button>
+          <button onclick="showAuthFromLanding('register')" class="btn-land-p" style="padding:8px 18px;border-radius:12px;font-size:13px;">Registrarse gratis</button>
+        </div>
     </div>
   </nav>
 
