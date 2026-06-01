@@ -2649,6 +2649,146 @@ const PAYMENT_INFO  = { pix:'erosabalfernandez@gmail.com', paypal:'cuentasbrasil
 // SUPABASE CLIENT + GLOBAL STATE
 // ═══════════════════════════════════════════════════════════════
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+// ═══════════════════════════════════════════════════════════════
+// GLOBAL VARS (journal + IDB)
+// ═══════════════════════════════════════════════════════════════
+let journalTrades = [];
+let idb;
+
+// ═══════════════════════════════════════════════════════════════
+// TOAST
+// ═══════════════════════════════════════════════════════════════
+function toast(msg, type='info', dur=4000) {
+  const c = document.getElementById('toastContainer');
+  const d = document.createElement('div');
+  d.className = `toast toast-${type}`;
+  d.textContent = msg;
+  c.appendChild(d);
+  setTimeout(() => d.remove(), dur);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// INDEXED DB
+// ═══════════════════════════════════════════════════════════════
+async function openIDB() {
+  return new Promise((res, rej) => {
+    const req = indexedDB.open('FlowTradeDB', 1);
+    req.onupgradeneeded = e => {
+      const db = e.target.result;
+      if (!db.objectStoreNames.contains('trades')) db.createObjectStore('trades', { keyPath: 'id' });
+    };
+    req.onsuccess = e => { idb = e.target.result; res(idb); };
+    req.onerror = () => rej(req.error);
+  });
+}
+
+async function idbPut(obj) {
+  return new Promise((res, rej) => {
+    const tx = idb.transaction('trades', 'readwrite');
+    tx.objectStore('trades').put(obj).onsuccess = e => res(e.target.result);
+    tx.onerror = () => rej(tx.error);
+  });
+}
+
+async function idbGetAll() {
+  return new Promise((res, rej) => {
+    const tx = idb.transaction('trades', 'readonly');
+    const req = tx.objectStore('trades').getAll();
+    req.onsuccess = e => res(e.target.result || []);
+    req.onerror = () => rej(req.error);
+  });
+}
+
+async function idbDelete(id) {
+  return new Promise((res, rej) => {
+    const tx = idb.transaction('trades', 'readwrite');
+    tx.objectStore('trades').delete(id).onsuccess = () => res();
+    tx.onerror = () => rej(tx.error);
+  });
+}
+
+async function idbGetAllTrades() { return idbGetAll(); }
+
+// ═══════════════════════════════════════════════════════════════
+// JOURNAL + DASHBOARD
+// ═══════════════════════════════════════════════════════════════
+async function loadJournal() {
+  journalTrades = await idbGetAll();
+  journalTrades.sort((a,b)=>new Date(b.fecha)-new Date(a.fecha));
+  updateDashboardMetrics();
+  const perfil = currentPerfil;
+  if (perfil?.compartir_estadisticas && journalTrades.length>=10) syncStatsToSupabase();
+}
+
+function updateDashboardMetrics() {
+  const trades = journalTrades;
+  if (!trades.length) {
+    ['kpiWinRate','kpiNetProfit','kpiProfitFactor','kpiDrawdown'].forEach(id=>document.getElementById(id).textContent='—');
+    document.getElementById('kpiTotal').textContent='0';
+    updateEquityChart([]);
+    document.getElementById('assetPerf').innerHTML='<p style="color:#475569;font-size:12px;">Sin datos aún. Importa trades desde el Diario.</p>';
+    return;
+  }
+  const wins = trades.filter(t=>t.resultadoUSD>0);
+  const losses = trades.filter(t=>t.resultadoUSD<0);
+  const wr = (wins.length/trades.length*100).toFixed(1);
+  const netProfit = trades.reduce((s,t)=>s+t.resultadoUSD,0);
+  const grossWin = wins.reduce((s,t)=>s+t.resultadoUSD,0);
+  const grossLoss = Math.abs(losses.reduce((s,t)=>s+t.resultadoUSD,0));
+  const pf = grossLoss>0 ? (grossWin/grossLoss).toFixed(2) : grossWin>0?'∞':'0.00';
+  // Drawdown
+  let peak=0, dd=0, running=0;
+  [...trades].sort((a,b)=>new Date(a.fecha)-new Date(b.fecha)).forEach(t=>{ running+=t.resultadoUSD; peak=Math.max(peak,running); if(peak>0) dd=Math.max(dd,(peak-running)/peak*100); });
+  document.getElementById('kpiWinRate').textContent = wr+'%';
+  const profEl = document.getElementById('kpiNetProfit');
+  profEl.textContent = (netProfit>=0?'+':'')+'$'+Math.abs(netProfit).toFixed(2);
+  profEl.style.color = netProfit>=0?'#2563EB':'#EF4444';
+  document.getElementById('kpiProfitFactor').textContent = pf;
+  document.getElementById('kpiDrawdown').textContent = dd.toFixed(1)+'%';
+  document.getElementById('kpiTotal').textContent = trades.length;
+
+  const sorted = [...trades].sort((a,b)=>new Date(a.fecha)-new Date(b.fecha));
+  updateEquityChart(sorted);
+
+  // Asset performance
+  const assetMap={};
+  trades.forEach(t=>{ if(!assetMap[t.activo]) assetMap[t.activo]={pnl:0,count:0}; assetMap[t.activo].pnl+=t.resultadoUSD; assetMap[t.activo].count++; });
+  const assetArr=Object.entries(assetMap).sort((a,b)=>b[1].pnl-a[1].pnl).slice(0,5);
+  document.getElementById('assetPerf').innerHTML = assetArr.map(([a,v])=>`
+    <div class="flex justify-between items-center py-2 border-b" style="border-color:rgba(30,41,59,.4);font-size:12px;">
+      <span class="font-semibold mono">${esc(a)}</span>
+      <div class="text-right"><span class="font-bold ${v.pnl>=0?'profit':'loss'}">${v.pnl>=0?'+':''}${v.pnl.toFixed(2)}</span><span style="color:#475569;font-size:10px;margin-left:6px;">${v.count}t</span></div>
+    </div>`).join('') || '<p style="color:#475569;font-size:12px;">Sin datos.</p>';
+}
+
+// ═══════════════════════════════════════════════════════════════
+// NOTIFICATIONS + MAINTENANCE
+// ═══════════════════════════════════════════════════════════════
+function sendPushNotification(title, body, icon='') {
+  if (Notification.permission !== 'granted') return;
+  const n = new Notification(title, { body, icon: icon || '' });
+  n.onclick = () => { window.focus(); n.close(); };
+  setTimeout(() => n.close(), 8000);
+  toast(`🔔 ${title}: ${body}`, 'info', 5000);
+}
+
+function bypassMaintenance() {
+  document.getElementById('modalMaintenance').classList.add('hidden');
+}
+
+async function toggleMaintenanceMode() {
+  if (!isAdmin) return;
+  const newVal = !maintenanceActive;
+  const { error } = await sb.from('configuracion_plataforma').upsert({ clave:'modo_mantenimiento', valor: String(newVal) });
+  if (error) return toast('Error: '+error.message,'error');
+  maintenanceActive = newVal;
+  document.getElementById('maintenanceStatus').textContent = newVal ? 'ON' : 'OFF';
+  document.getElementById('maintenanceToggleBtn').style.color = newVal ? '#EF4444' : '';
+  toast('Modo mantenimiento '+(newVal?'activado':'desactivado'), newVal?'error':'success');
+}
+
+
 let currentUser     = null;
 let currentPerfil   = null;
 let isAdmin         = false;
