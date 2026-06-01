@@ -2658,47 +2658,79 @@ function toast(msg, type='info', dur=4000) {
 }
 
 // ═══════════════════════════════════════════════════════════════
-// INDEXED DB
 // ═══════════════════════════════════════════════════════════════
-async function openIDB() {
-  return new Promise((res, rej) => {
-    const req = indexedDB.open('FlowTradeDB', 1);
-    req.onupgradeneeded = e => {
-      const db = e.target.result;
-      if (!db.objectStoreNames.contains('trades')) db.createObjectStore('trades', { keyPath: 'id' });
-    };
-    req.onsuccess = e => { idb = e.target.result; res(idb); };
-    req.onerror = () => rej(req.error);
-  });
-}
+  // JOURNAL STORAGE — Supabase (migrado desde IndexedDB)
+  // ═══════════════════════════════════════════════════════════════
+  async function openIDB() { return true; }
 
-async function idbPut(obj) {
-  return new Promise((res, rej) => {
-    const tx = idb.transaction('trades', 'readwrite');
-    tx.objectStore('trades').put(obj).onsuccess = e => res(e.target.result);
-    tx.onerror = () => rej(tx.error);
-  });
-}
+  async function idbPut(obj) {
+    if (!currentUser) return;
+    try {
+      await sb.from('diario_trades').upsert({
+        id: String(obj.id),
+        usuario_id: currentUser.id,
+        fecha: obj.fecha,
+        data: obj
+      }, { onConflict: 'id' });
+    } catch(e) { console.warn('idbPut error:', e); }
+  }
 
-async function idbGetAll() {
-  return new Promise((res, rej) => {
-    const tx = idb.transaction('trades', 'readonly');
-    const req = tx.objectStore('trades').getAll();
-    req.onsuccess = e => res(e.target.result || []);
-    req.onerror = () => rej(req.error);
-  });
-}
+  async function idbGetAll() {
+    if (!currentUser) return [];
+    try {
+      const { data, error } = await sb.from('diario_trades')
+        .select('data')
+        .eq('usuario_id', currentUser.id)
+        .order('fecha', { ascending: false });
+      if (error) { console.warn('idbGetAll error:', error); return []; }
+      return (data || []).map(r => r.data);
+    } catch(e) { console.warn('idbGetAll error:', e); return []; }
+  }
 
-async function idbDelete(id) {
-  return new Promise((res, rej) => {
-    const tx = idb.transaction('trades', 'readwrite');
-    tx.objectStore('trades').delete(id).onsuccess = () => res();
-    tx.onerror = () => rej(tx.error);
-  });
-}
+  async function idbDelete(id) {
+    if (!currentUser) return;
+    try {
+      await sb.from('diario_trades').delete()
+        .eq('id', String(id))
+        .eq('usuario_id', currentUser.id);
+    } catch(e) { console.warn('idbDelete error:', e); }
+  }
 
-async function idbGetAllTrades() { return idbGetAll(); }
+  async function idbGetAllTrades() { return idbGetAll(); }
 
+  async function migrateIndexedDBToSupabase() {
+    if (!currentUser) return;
+    const migKey = 'idb_migrated_v1_' + currentUser.id;
+    if (localStorage.getItem(migKey)) return;
+    try {
+      const idbDb = await new Promise((res) => {
+        const req = indexedDB.open('FlowTradeDB', 1);
+        req.onsuccess = e => res(e.target.result);
+        req.onerror = () => res(null);
+        req.onupgradeneeded = e => {
+          const db = e.target.result;
+          if (!db.objectStoreNames.contains('trades')) db.createObjectStore('trades', { keyPath: 'id' });
+          res(db);
+        };
+      });
+      if (!idbDb) { localStorage.setItem(migKey, '1'); return; }
+      const localTrades = await new Promise((res) => {
+        try {
+          const tx = idbDb.transaction('trades', 'readonly');
+          const req = tx.objectStore('trades').getAll();
+          req.onsuccess = e => res(e.target.result || []);
+          req.onerror = () => res([]);
+        } catch(_) { res([]); }
+      });
+      if (localTrades.length > 0) {
+        const rows = localTrades.map(t => ({ id: String(t.id), usuario_id: currentUser.id, fecha: t.fecha, data: t }));
+        await sb.from('diario_trades').upsert(rows, { onConflict: 'id' }).catch(() => {});
+        toast(localTrades.length + ' trades migrados a la nube automaticamente', 'success', 5000);
+      }
+      localStorage.setItem(migKey, '1');
+    } catch(e) { console.warn('Migration error:', e); }
+  }
+  
 // ═══════════════════════════════════════════════════════════════
 // JOURNAL + DASHBOARD
 // ═══════════════════════════════════════════════════════════════
