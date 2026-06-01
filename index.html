@@ -5136,36 +5136,50 @@ async function mt5SimulateReceive() {
 // INIT
 // ═══════════════════════════════════════════════════════════════
 (async()=>{
-  try { await openIDB(); } catch(e) {}
-  const {data:{session}}=await sb.auth.getSession();
-  if (!session) {
-    document.getElementById('landingPage').classList.remove('hidden');
-    document.getElementById('authScreen').classList.add('hidden');
-    document.getElementById('mainApp').classList.add('hidden');
-    document.getElementById('chatBubble').classList.add('hidden');
-    document.getElementById('helpBubble').classList.add('hidden');
-  } else {
-    await loadAppForUser(session.user);
-    document.getElementById('landingPage').classList.add('hidden');
-    document.getElementById('authOverlay').classList.add('hidden');
-    const _savedSection = localStorage.getItem('flowtrade_last_section');
-    const _validSections = ['inicio','dashboard','diario','planes','perfil','admin',
-      'calculadora','calc-mt5','noticias','referidos','ranking','logros','descargas','conectarmt5'];
-    showSection((_savedSection && _validSections.includes(_savedSection)) ? _savedSection : 'inicio');
-  }
-  updatePayInstructions();
-  // Check maintenance on load (public check)
-  try {
-    const {data}=await sb.from('configuracion_plataforma').select('valor').eq('clave','modo_mantenimiento').single();
-    if (data?.valor==='true' && !session) {
-      document.getElementById('modalMaintenance').classList.remove('hidden');
+    function showLanding() {
+      document.getElementById('landingPage').classList.remove('hidden');
+      document.getElementById('authScreen').classList.add('hidden');
+      document.getElementById('mainApp').classList.add('hidden');
+      document.getElementById('chatBubble').classList.add('hidden');
+      document.getElementById('helpBubble').classList.add('hidden');
     }
-  } catch(e){}
-  // Cookie banner
-  if (!localStorage.getItem('cookiesAccepted')) {
-    setTimeout(function(){ document.getElementById('cookieBanner').classList.remove('hidden'); }, 1500);
-  }
-})();
+    try { await openIDB(); } catch(e) {}
+    let session = null;
+    try {
+      const result = await sb.auth.getSession();
+      session = result?.data?.session ?? null;
+    } catch(e) {
+      showLanding();
+      return;
+    }
+    if (!session) {
+      showLanding();
+    } else {
+      try {
+        await loadAppForUser(session.user);
+        document.getElementById('landingPage').classList.add('hidden');
+        document.getElementById('authOverlay').classList.add('hidden');
+        const _savedSection = localStorage.getItem('flowtrade_last_section');
+        const _validSections = ['inicio','dashboard','diario','planes','perfil','admin',
+          'calculadora','calc-mt5','noticias','referidos','ranking','logros','descargas','conectarmt5'];
+        showSection((_savedSection && _validSections.includes(_savedSection)) ? _savedSection : 'inicio');
+      } catch(e) {
+        showLanding();
+      }
+    }
+    try { updatePayInstructions(); } catch(e) {}
+    // Check maintenance on load (public check)
+    try {
+      const {data}=await sb.from('configuracion_plataforma').select('valor').eq('clave','modo_mantenimiento').single();
+      if (data?.valor==='true' && !session) {
+        document.getElementById('modalMaintenance').classList.remove('hidden');
+      }
+    } catch(e){}
+    // Cookie banner
+    if (!localStorage.getItem('cookiesAccepted')) {
+      setTimeout(function(){ document.getElementById('cookieBanner').classList.remove('hidden'); }, 1500);
+    }
+  })();
 
 function acceptCookies() {
   localStorage.setItem('cookiesAccepted', 'true');
