@@ -1641,9 +1641,23 @@ select.input-dark option{background:#131A26;color:#E2E8F0;}
                 <p id="adminChatHeader" class="font-semibold text-xs">Selecciona una conversación</p>
               </div>
               <div id="adminChatMessages" class="flex-1 overflow-y-auto p-3 flex flex-col gap-2"></div>
-              <div class="p-3 border-t flex gap-2" style="border-color:rgba(30,41,59,.5);">
-                <input id="adminChatInput" class="input-dark flex-1 px-3 py-2 rounded-xl text-sm" placeholder="Responder..." onkeydown="if(event.key==='Enter')sendAdminMessage()"/>
-                <button onclick="sendAdminMessage()" class="btn-green px-3 py-2 rounded-xl text-sm">→</button>
+              <div class="p-3 border-t" style="border-color:rgba(30,41,59,.5);">
+                <!-- Admin image preview -->
+                <div id="adminImgPreviewRow" class="hidden mb-2 flex items-center gap-2">
+                  <div class="relative inline-block">
+                    <img id="adminImgPreview" src="" class="rounded-lg object-cover" style="max-height:56px;max-width:100px;border:1px solid rgba(37,99,235,.3);"/>
+                    <button onclick="cancelAdminChatImage()" class="absolute -top-1 -right-1 rounded-full flex items-center justify-center" style="background:#EF4444;width:16px;height:16px;border:none;cursor:pointer;color:white;font-size:10px;line-height:1;">✕</button>
+                  </div>
+                  <span class="text-xs" style="color:#94A3B8;">Imagen lista</span>
+                </div>
+                <div class="flex gap-2">
+                  <label class="btn-ghost cursor-pointer p-2" title="Adjuntar imagen">
+                    <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                    <input type="file" accept="image/*" class="hidden" onchange="attachAdminChatImage(event)"/>
+                  </label>
+                  <input id="adminChatInput" class="input-dark flex-1 px-3 py-2 rounded-xl text-sm" placeholder="Responder..." onkeydown="if(event.key==='Enter')sendAdminMessage()"/>
+                  <button onclick="sendAdminMessage()" class="btn-green px-3 py-2 rounded-xl text-sm">→</button>
+                </div>
               </div>
             </div>
           </div>
@@ -5278,17 +5292,57 @@ async function openAdminConv(convId,nombre) {
   await sb.from('mensajes').update({leido:true}).eq('conversacion_id',convId).eq('remitente_tipo','user').eq('leido',false);
   loadAdminConversations();
 }
-async function sendAdminMessage() {
-  if (!adminSelectedConvId||!isAdmin) return;
-  const input=document.getElementById('adminChatInput');
-  const text=input.value.trim(); if (!text) return;
-  const {error}=await sb.from('mensajes').insert({conversacion_id:adminSelectedConvId,remitente_id:currentUser.id,remitente_tipo:'admin',mensaje:text});
-  if (error) return toast('Error: '+error.message,'error');
-  await sb.from('conversaciones').update({ultimo_mensaje_en:new Date().toISOString()}).eq('id',adminSelectedConvId);
-  input.value='';
-  const msgs=await loadChatMessages(adminSelectedConvId);
-  renderChatMessages(msgs,'adminChatMessages');
-}
+let pendingAdminImage = null;
+  function attachAdminChatImage(event) {
+    pendingAdminImage = event.target.files[0];
+    if (!pendingAdminImage) return;
+    var reader = new FileReader();
+    reader.onload = function(e) {
+      var img = document.getElementById('adminImgPreview');
+      var row = document.getElementById('adminImgPreviewRow');
+      if (img) img.src = e.target.result;
+      if (row) row.classList.remove('hidden');
+    };
+    reader.readAsDataURL(pendingAdminImage);
+  }
+  function cancelAdminChatImage() {
+    pendingAdminImage = null;
+    var row = document.getElementById('adminImgPreviewRow');
+    var img = document.getElementById('adminImgPreview');
+    if (row) row.classList.add('hidden');
+    if (img) img.src = '';
+  }
+  async function sendAdminMessage() {
+    if (!adminSelectedConvId || !isAdmin) return;
+    const input = document.getElementById('adminChatInput');
+    const text = input.value.trim();
+    const imgToSend = pendingAdminImage;
+    if (!text && !imgToSend) return;
+    // Optimistic UI
+    const chatC = document.getElementById('adminChatMessages');
+    if (chatC) {
+      var d = document.createElement('div');
+      d.className = 'flex justify-end';
+      var imgTag = imgToSend ? '<img src="'+URL.createObjectURL(imgToSend)+'" class="rounded-lg mb-1 object-cover" style="max-height:120px;max-width:200px;"/>' : '';
+      d.innerHTML = '<div class="chat-msg-user p-3" style="max-width:75%;">'+imgTag+(text?'<p style="font-size:13px;">'+esc(text)+'</p>':'')+'<p style="font-size:10px;color:#475569;margin-top:4px;text-align:right;">'+new Date().toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'})+'</p></div>';
+      chatC.appendChild(d);
+      chatC.scrollTop = chatC.scrollHeight;
+    }
+    cancelAdminChatImage();
+    input.value = '';
+    // Upload image
+    let imagen_url = null;
+    if (imgToSend) {
+      const fn = 'chat/admin/'+Date.now()+'.jpg';
+      const {data:upData} = await sb.storage.from('chat-images').upload(fn, imgToSend, {upsert:true});
+      if (upData) { const {data:url} = sb.storage.from('chat-images').getPublicUrl(fn); imagen_url = url.publicUrl; }
+    }
+    const {error} = await sb.from('mensajes').insert({conversacion_id:adminSelectedConvId, remitente_id:currentUser.id, remitente_tipo:'admin', mensaje:text||'[imagen]', imagen_url});
+    if (error) return toast('Error: '+error.message, 'error');
+    await sb.from('conversaciones').update({ultimo_mensaje_en:new Date().toISOString()}).eq('id',adminSelectedConvId);
+    const msgs = await loadChatMessages(adminSelectedConvId);
+    renderChatMessages(msgs, 'adminChatMessages');
+  }
 
 // ═══════════════════════════════════════════════════════════════
 // UI HELPERS
