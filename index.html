@@ -2650,6 +2650,7 @@ function showSection(id) {
   const navEl = document.getElementById('nav-' + id);
   if (navEl) navEl.classList.add('active');
   window.scrollTo(0, 0);
+  localStorage.setItem('flowtrade_last_section', id);
   try { if (id==='ranking')    loadRanking(); }       catch(_){}
   try { if (id==='referidos')  loadReferralData(); }  catch(_){}
   try { if (id==='logros')     loadAchievements(); }  catch(_){}
@@ -5091,7 +5092,10 @@ async function mt5SimulateReceive() {
     await loadAppForUser(session.user);
     document.getElementById('landingPage').classList.add('hidden');
     document.getElementById('authOverlay').classList.add('hidden');
-    showSection('inicio');
+    const _savedSection = localStorage.getItem('flowtrade_last_section');
+    const _validSections = ['inicio','dashboard','diario','planes','perfil','admin',
+      'calculadora','calc-mt5','noticias','referidos','ranking','logros','descargas','conectarmt5'];
+    showSection((_savedSection && _validSections.includes(_savedSection)) ? _savedSection : 'inicio');
   }
   updatePayInstructions();
   // Check maintenance on load (public check)
@@ -5301,6 +5305,7 @@ async function handleOverlayForgotPassword() {
 async function handleLogout() {
   try { await sb.auth.signOut({ scope: 'local' }); } catch(_) {}
   Object.keys(localStorage).forEach(k => { if (k.startsWith('sb-')) localStorage.removeItem(k); });
+  localStorage.removeItem('flowtrade_last_section');
   currentUser   = null;
   currentPerfil = null;
   isAdmin       = false;
