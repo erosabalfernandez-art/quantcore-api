@@ -2611,6 +2611,77 @@ const FINNHUB_KEY   = 'd8dq7fpr01qhm4agkptgd8dq7fpr01qhm4agkpu0';
 const FINNHUB_CACHE_KEY = 'finnhub_calendar_v2';
 const FINNHUB_CACHE_TTL = 3600000;
 const PAYMENT_INFO  = { pix:'erosabalfernandez@gmail.com', paypal:'cuentasbrasil033@gmail.com', usdt_bep20:'0x24252ef84f8b4665170c199595ce326bb4709a0f', usdc_bep20:'0x24252ef84f8b4665170c199595ce326bb4709a0f' };
+
+// ═══════════════════════════════════════════════════════════════
+// SUPABASE CLIENT + GLOBAL STATE
+// ═══════════════════════════════════════════════════════════════
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+let currentUser     = null;
+let currentPerfil   = null;
+let isAdmin         = false;
+let allUsersCache   = [];
+let maintenanceActive = false;
+
+// ═══════════════════════════════════════════════════════════════
+// SHOW SECTION
+// ═══════════════════════════════════════════════════════════════
+const ALL_SECTIONS = ['inicio','dashboard','diario','planes','perfil','admin',
+  'calculadora','calc-mt5','noticias','referidos','ranking','logros','descargas','conectarmt5'];
+
+function showSection(id) {
+  const mainApp = document.getElementById('mainApp');
+  if (mainApp) mainApp.classList.remove('hidden');
+  const lp = document.getElementById('landingPage');
+  if (lp) lp.classList.add('hidden');
+  const ao = document.getElementById('authOverlay');
+  if (ao) ao.classList.add('hidden');
+  const cb = document.getElementById('chatBubble');
+  if (cb) cb.classList.remove('hidden');
+  const hb = document.getElementById('helpBubble');
+  if (hb) hb.classList.remove('hidden');
+  ALL_SECTIONS.forEach(s => {
+    const el  = document.getElementById('section-' + s);
+    if (el)  el.classList.add('hidden');
+    const nav = document.getElementById('nav-' + s);
+    if (nav) nav.classList.remove('active');
+  });
+  const secEl = document.getElementById('section-' + id);
+  if (secEl) secEl.classList.remove('hidden');
+  const navEl = document.getElementById('nav-' + id);
+  if (navEl) navEl.classList.add('active');
+  window.scrollTo(0, 0);
+  try { if (id==='ranking')    loadRanking(); }       catch(_){}
+  try { if (id==='referidos')  loadReferralData(); }  catch(_){}
+  try { if (id==='logros')     loadAchievements(); }  catch(_){}
+  try { if (id==='descargas')  loadDescargasToken(); } catch(_){}
+  try { if (id==='dashboard')  updateDashboardMetrics(); } catch(_){}
+  try { if (id==='perfil')     loadProfile(); }       catch(_){}
+  try { if (id==='admin')    { loadAllUsers(); loadPagos(); checkMaintenanceModeStatus(); } } catch(_){}
+  try { if (id==='noticias' && typeof initNoticias==='function') initNoticias(); } catch(_){}
+  try { if (id==='conectarmt5') loadMt5Metrics(); }  catch(_){}
+  try { if (id==='diario')     loadJournal(); }       catch(_){}
+}
+
+// ═══════════════════════════════════════════════════════════════
+// LOAD APP FOR AUTHENTICATED USER
+// ═══════════════════════════════════════════════════════════════
+async function loadAppForUser(user) {
+  currentUser = user;
+  window.currentUser = user;
+  try {
+    const {data:p} = await sb.from('perfiles').select('*').eq('id', user.id).single();
+    currentPerfil = p || null;
+    isAdmin = (p && p.rol === 'admin') || false;
+    const adminNav = document.getElementById('nav-admin');
+    if (adminNav) adminNav.classList.toggle('hidden', !isAdmin);
+    const userNameEl = document.getElementById('userName');
+    if (userNameEl && p) userNameEl.textContent = p.nombre || user.email || '';
+    const userEmailEl = document.getElementById('userEmail');
+    if (userEmailEl) userEmailEl.textContent = user.email || '';
+    const planBadge = document.getElementById('userPlanBadge');
+    if (planBadge && p) planBadge.textContent = (p.plan||'gratis').charAt(0).toUpperCase()+(p.plan||'gratis').slice(1);
+  } catch(e) { console.warn('loadAppForUser profile error:', e); }
+}
 function openPayModal(plan) {
   document.getElementById('pagoSelectedPlan').value = plan;
   updatePayInstructions();
@@ -5017,6 +5088,7 @@ async function mt5SimulateReceive() {
     document.getElementById('chatBubble').classList.add('hidden');
     document.getElementById('helpBubble').classList.add('hidden');
   } else {
+    await loadAppForUser(session.user);
     document.getElementById('landingPage').classList.add('hidden');
     document.getElementById('authOverlay').classList.add('hidden');
     showSection('inicio');
@@ -5088,6 +5160,8 @@ async function handleOverlayLogin() {
     if (error) { msg.textContent = error.message; msg.classList.remove('hidden'); return; }
     const {data:p} = await sb.from('perfiles').select('bloqueado').eq('id', data.user.id).single();
     if (p?.bloqueado) { await sb.auth.signOut(); msg.textContent = '⛔ Cuenta suspendida. Contacta con nuestro equipo.'; msg.classList.remove('hidden'); return; }
+    await loadAppForUser(data.user);
+    showSection('inicio');
   } catch(e) { msg.textContent = '🌐 Error de red. Comprueba tu conexión.'; msg.classList.remove('hidden'); }
   finally { btn.disabled = false; btn.textContent = 'Entrar a la plataforma'; }
 }
@@ -5222,6 +5296,32 @@ async function handleOverlayForgotPassword() {
 })();
 
 // ═══════════════════════════════════════════════════════════════
+// AUTH ACTIONS
+// ═══════════════════════════════════════════════════════════════
+async function handleLogout() {
+  try { await sb.auth.signOut({ scope: 'local' }); } catch(_) {}
+  Object.keys(localStorage).forEach(k => { if (k.startsWith('sb-')) localStorage.removeItem(k); });
+  currentUser   = null;
+  currentPerfil = null;
+  isAdmin       = false;
+  window.location.reload();
+}
+
+function resumeSession() {
+  const banner = document.getElementById('sessionResumeBanner');
+  if (banner) banner.classList.add('hidden');
+  // Session is already in localStorage — just reload to re-initialize
+  window.location.reload();
+}
+
+function forceClearSession() {
+  Object.keys(localStorage).forEach(k => { if (k.startsWith('sb-')) localStorage.removeItem(k); });
+  const banner = document.getElementById('sessionResumeBanner');
+  if (banner) banner.classList.add('hidden');
+  window.location.reload();
+}
+
+// ═══════════════════════════════════════════════════════════════
 // AUTO-LOGOUT POR INACTIVIDAD
 // ═══════════════════════════════════════════════════════════════
 (function() {
@@ -5249,9 +5349,18 @@ async function handleOverlayForgotPassword() {
     document.addEventListener(ev, resetTimers, { passive: true })
   );
 
-  sb.auth.onAuthStateChange((event, session) => {
-    if (session?.user) { resetTimers(); }
-    else { clearTimeout(inactivityTimer); clearTimeout(warningTimer); }
+  sb.auth.onAuthStateChange(async (event, session) => {
+    if (session?.user) {
+      resetTimers();
+      if (event === 'SIGNED_IN' && !currentUser) {
+        await loadAppForUser(session.user);
+        showSection('inicio');
+      }
+    } else {
+      clearTimeout(inactivityTimer);
+      clearTimeout(warningTimer);
+      currentUser = null; currentPerfil = null; isAdmin = false;
+    }
   });
 })();
 </script>
