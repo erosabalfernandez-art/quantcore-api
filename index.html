@@ -2922,7 +2922,8 @@ async function loadAppForUser(user) {
       sidebarTok.textContent = p.token_licencia.slice(0, 20) + '…';
       sidebarTok.title = p.token_licencia; // full token on hover
     }
-  } catch(e) { console.warn('loadAppForUser profile error:', e); }
+  } catch(e) { console.warn('loadAppForUser profile error:', e); 
+  setTimeout(() => migrateIndexedDBToSupabase(), 3000);}
 }
 function openPayModal(plan) {
   document.getElementById('pagoSelectedPlan').value = plan;
