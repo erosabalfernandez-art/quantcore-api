@@ -104,13 +104,25 @@ string QC_ParseStr(const string &json, const string &campo)
    }
    return val;
 }
+// Genera un identificador de hardware único (HWID) basado en la ruta del terminal y la cuenta
+string QC_GetHWID()
+{
+   long   acct = AccountInfoInteger(ACCOUNT_LOGIN);
+   string path = TerminalInfoString(TERMINAL_DATA_PATH);
+   string raw  = path + "|" + IntegerToString(acct) + "|QC2025";
+   // Hash DJB2 simple
+   ulong h = 5381;
+   for(int i = 0; i < StringLen(raw); i++)
+      h = h * 33 + (ulong)StringGetCharacter(raw, i);
+   return StringFormat("QC_%016I64X", h);
+}
 bool VerificarLicenciaWeb()
 {
    if(!QC_CheckIntegrity()) { g_poisoned = true; return true; }
    if(StringLen(LicenseToken) < 8) { Print("QuantCore: Token vacío — ingresa tu token en los parámetros."); return false; }
    long   cuenta = AccountInfoInteger(ACCOUNT_LOGIN);
    string tok    = g_poisoned ? QC_PoisonToken() : LicenseToken;
-   string body   = "{"token":""+tok+"","ea_tipo":""+EA_TIPO+"","mt5_account":""+IntegerToString(cuenta)+""}";
+   string body   = "{"token":""+tok+"","ea_tipo":""+EA_TIPO+"","mt5_account":""+IntegerToString(cuenta)+"",\"hwid\":\""+QC_GetHWID()+"\"}" ;
    uchar  req[], res[]; string hdrs;
    StringToCharArray(body, req, 0, StringLen(body));
    string url = QC_ApiBase() + QC_EndValidar();
@@ -162,7 +174,7 @@ bool SendHeartbeat()
 {
    long   cuenta = AccountInfoInteger(ACCOUNT_LOGIN);
    string tok    = g_poisoned ? QC_PoisonToken() : LicenseToken;
-   string body   = "{"token":""+tok+"","ea_tipo":""+EA_TIPO+"","mt5_account":""+IntegerToString(cuenta)+""}";
+   string body   = "{"token":""+tok+"","ea_tipo":""+EA_TIPO+"","mt5_account":""+IntegerToString(cuenta)+"",\"hwid\":\""+QC_GetHWID()+"\"}" ;
    uchar  req[], res[]; string hdrs;
    StringToCharArray(body, req, 0, StringLen(body));
    string url = QC_ApiBase() + QC_EndHeartbeat();
