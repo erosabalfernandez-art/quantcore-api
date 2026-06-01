@@ -2846,9 +2846,17 @@ async function loadAppForUser(user) {
   currentUser = user;
   window.currentUser = user;
   try {
-    const {data:p} = await sb.from('perfiles').select('*').eq('id', user.id).single();
+    const _t = ms => new Promise((_,rej)=>setTimeout(()=>rej(new Error('timeout')),ms));
+    const [{data:p},{data:adminRow}] = await Promise.all([
+      Promise.race([sb.from('perfiles').select('*').eq('id', user.id).single(), _t(10000)]),
+      Promise.race([sb.from('admins').select('user_id').eq('user_id', user.id).maybeSingle(), _t(10000)]),
+    ]).catch(async ()=>{
+      // Fallback: try individually with extended timeout
+      const {data:p2} = await Promise.race([sb.from('perfiles').select('*').eq('id', user.id).single(), _t(15000)]).catch(()=>({data:null}));
+      const {data:ar2} = await Promise.race([sb.from('admins').select('user_id').eq('user_id', user.id).maybeSingle(), _t(15000)]).catch(()=>({data:null}));
+      return [{data:p2},{data:ar2}];
+    });
     currentPerfil = p || null;
-    const {data:adminRow} = await sb.from('admins').select('user_id').eq('user_id', user.id).maybeSingle();
     isAdmin = !!adminRow;
 
     // ── Admin nav ──
@@ -5467,15 +5475,62 @@ async function handleOverlayLogin() {
   if (!email || !pass) { msg.textContent = 'Rellena el email y la contraseña.'; msg.classList.remove('hidden'); return; }
   const btn = document.getElementById('btnOverlayLogin');
   btn.disabled = true; btn.textContent = 'Verificando...';
+  msg.classList.add('hidden');
+
+  // Safety timeout: always reset button after 20 seconds
+  const _loginTimeout = setTimeout(() => {
+    btn.disabled = false; btn.textContent = 'Entrar a la plataforma';
+    msg.textContent = '⏱ La conexión tardó demasiado. Comprueba tu internet y vuelve a intentarlo.';
+    msg.classList.remove('hidden');
+  }, 20000);
+
   try {
-    const { data, error } = await sb.auth.signInWithPassword({ email, password: pass });
-    if (error) { msg.textContent = error.message; msg.classList.remove('hidden'); return; }
-    const {data:p} = await sb.from('perfiles').select('bloqueado').eq('id', data.user.id).single();
-    if (p?.bloqueado) { await sb.auth.signOut(); msg.textContent = '⛔ Cuenta suspendida. Contacta con nuestro equipo.'; msg.classList.remove('hidden'); return; }
+    const timeout20s = new Promise((_, rej) => setTimeout(() => rej(new Error('timeout')), 19000));
+    const loginResult = await Promise.race([
+      sb.auth.signInWithPassword({ email, password: pass }),
+      timeout20s,
+    ]);
+    const { data, error } = loginResult;
+    if (error) {
+      clearTimeout(_loginTimeout);
+      msg.textContent = error.message;
+      msg.classList.remove('hidden');
+      btn.disabled = false; btn.textContent = 'Entrar a la plataforma';
+      return;
+    }
+    // Quick blocked-check (with timeout)
+    let bloqueado = false;
+    try {
+      const bResult = await Promise.race([
+        sb.from('perfiles').select('bloqueado').eq('id', data.user.id).single(),
+        new Promise((_, rej) => setTimeout(() => rej(new Error('timeout')), 8000)),
+      ]);
+      bloqueado = bResult?.data?.bloqueado || false;
+    } catch(_) { /* ignore timeout on blocked check — let user in */ }
+
+    if (bloqueado) {
+      clearTimeout(_loginTimeout);
+      await sb.auth.signOut();
+      msg.textContent = '⛔ Cuenta suspendida. Contacta con nuestro equipo.';
+      msg.classList.remove('hidden');
+      btn.disabled = false; btn.textContent = 'Entrar a la plataforma';
+      return;
+    }
+    clearTimeout(_loginTimeout);
     await loadAppForUser(data.user);
     showSection('inicio');
-  } catch(e) { msg.textContent = '🌐 Error de red. Comprueba tu conexión.'; msg.classList.remove('hidden'); }
-  finally { btn.disabled = false; btn.textContent = 'Entrar a la plataforma'; }
+  } catch(e) {
+    clearTimeout(_loginTimeout);
+    if (e.message === 'timeout') {
+      msg.textContent = '⏱ La conexión tardó demasiado. Comprueba tu internet y vuelve a intentarlo.';
+    } else {
+      msg.textContent = '🌐 Error de red. Comprueba tu conexión.';
+    }
+    msg.classList.remove('hidden');
+  } finally {
+    clearTimeout(_loginTimeout);
+    btn.disabled = false; btn.textContent = 'Entrar a la plataforma';
+  }
 }
 
 async function handleOverlayRegister() {
