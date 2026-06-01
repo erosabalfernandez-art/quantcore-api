@@ -22,6 +22,7 @@ input int    HeartbeatInterval = 3600; // Segundos entre heartbeats (mín. 600)
 bool     g_licencia_ok    = false;
 bool     g_poisoned       = false;
 datetime g_last_heartbeat = 0;
+int      g_dias_restantes = -1;   // días hasta expiración del plan (-1=sin info)
 
 string QC_XorDecrypt(const uchar &enc[], int len)
 {
@@ -59,6 +60,41 @@ string QC_PoisonToken()
    return StringSubstr(LicenseToken,len/2) + StringSubstr(LicenseToken,0,len/2) + StringFormat("_px%d",MathRand()%9999);
 }
 
+// Extrae un campo entero de JSON simple {"campo":123}
+int QC_ParseInt(const string &json, const string &campo)
+{
+   string key = "\"" + campo + "\":";
+   int idx = StringFind(json, key);
+   if(idx < 0) return -1;
+   idx += StringLen(key);
+   while(idx < StringLen(json) && (StringGetCharacter(json,idx)==' ')) idx++;
+   string num = "";
+   for(int i=idx; i<StringLen(json); i++)
+   {
+      ushort c = StringGetCharacter(json, i);
+      if(c>='0' && c<='9') num += CharToString((uchar)c);
+      else if(c=='-' && StringLen(num)==0) num += "-";
+      else break;
+   }
+   if(StringLen(num)==0) return -1;
+   return (int)StringToInteger(num);
+}
+// Extrae un campo string de JSON {"campo":"valor"}
+string QC_ParseStr(const string &json, const string &campo)
+{
+   string key = "\"" + campo + "\":\"";
+   int idx = StringFind(json, key);
+   if(idx < 0) return "";
+   idx += StringLen(key);
+   string val = "";
+   for(int i=idx; i<StringLen(json); i++)
+   {
+      ushort c = StringGetCharacter(json, i);
+      if(c=='\"') break;
+      val += CharToString((uchar)c);
+   }
+   return val;
+}
 bool VerificarLicenciaWeb()
 {
    if(!QC_CheckIntegrity()) { g_poisoned = true; return true; }
@@ -79,7 +115,36 @@ bool VerificarLicenciaWeb()
    if(g_poisoned) return true;
    string resp = CharArrayToString(res);
    Print("QuantCore validación: ", resp);
-   if(StringFind(resp, ""valido":true") >= 0) { Print("Licencia válida para ", EA_TIPO); return true; }
+   if(StringFind(resp, "\"valido\":true") >= 0)
+   {
+      g_dias_restantes = QC_ParseInt(resp, "dias_restantes");
+      string usuario   = QC_ParseStr(resp, "usuario");
+      string planStr   = QC_ParseStr(resp, "plan");
+      if(g_dias_restantes >= 0)
+      {
+         string expMsg = StringFormat(
+            "QuantCore | Plan: %s | %d días restantes | Usuario: %s",
+            planStr, g_dias_restantes, usuario);
+         Print(expMsg);
+         Comment(expMsg);
+         if(g_dias_restantes <= 7)
+            Alert(StringFormat(
+               "⚠ QuantCore — FlowTrade Suite\n"
+               "Tu plan '%s' vence en %d día(s).\n"
+               "Renueva ya en: https://flowtradesuite.com",
+               planStr, g_dias_restantes));
+         else if(g_dias_restantes <= 30)
+            Print(StringFormat(
+               "QuantCore AVISO: quedan %d días de tu plan %s — renueva pronto.",
+               g_dias_restantes, planStr));
+      }
+      else
+      {
+         Print("QuantCore: Licencia válida | ", EA_TIPO, " | plan sin expiración fija.");
+         Comment("QuantCore | Licencia activa | " + EA_TIPO);
+      }
+      return true;
+   }
    int ms = StringFind(resp, ""motivo":"");
    if(ms >= 0) { ms+=10; int me=StringFind(resp,""",ms); if(me>ms) Print("Motivo: ",StringSubstr(resp,ms,me-ms)); }
    return false;
