@@ -1597,11 +1597,11 @@ select.input-dark option{background:#131A26;color:#E2E8F0;}
           <button id="adminTab-licencias" onclick="showAdminTab('licencias')" class="px-4 py-2 rounded-xl text-xs font-semibold btn-outline">Licencias EA</button>
           <button id="adminTab-logslic" onclick="showAdminTab('logslic')" class="px-4 py-2 rounded-xl text-xs font-semibold btn-outline">Logs</button>
           <button id="adminTab-estadisticas" onclick="showAdminTab('estadisticas')" class="px-4 py-2 rounded-xl text-xs font-semibold btn-outline">Estadísticas de la Plataforma</button>
-          <button id="adminTab-referidos" onclick="showAdminTab('referidos')" class="px-4 py-2 rounded-xl text-xs font-semibold btn-outline">
-            <button id="adminTab-mt5security" onclick="showAdminTab('mt5security')" class="px-4 py-2 rounded-xl text-xs font-semibold btn-outline">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="inline mr-1" style="vertical-align:-2px"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-              Seguridad MT5
-            </button>Referidos</button>
+          <button id="adminTab-referidos" onclick="showAdminTab('referidos')" class="px-4 py-2 rounded-xl text-xs font-semibold btn-outline">Referidos</button>
+          <button id="adminTab-mt5security" onclick="showAdminTab('mt5security')" class="px-4 py-2 rounded-xl text-xs font-semibold btn-outline">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="inline mr-1" style="vertical-align:-2px"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            Seguridad MT5
+          </button>
         </div>
         <!-- Tab: Usuarios -->
         <div id="adminContent-usuarios">
@@ -2227,9 +2227,9 @@ select.input-dark option{background:#131A26;color:#E2E8F0;}
         <div class="glass-card rounded-xl p-5">
           <h3 class="font-semibold text-sm mb-4">Comisiones por plan</h3>
           <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
-            <div class="p-4 rounded-xl text-center" style="background:rgba(30,41,59,.5);"><div class="text-xs font-semibold mb-2" style="color:#94A3B8;">Plan Gratis</div><div class="text-2xl font-bold" style="color:#2563EB;">5%</div><div class="text-xs mt-1" style="color:#475569;">por referido Premium</div></div>
-            <div class="p-4 rounded-xl text-center" style="background:rgba(59,130,246,.08);border:1px solid rgba(59,130,246,.2);"><div class="text-xs font-semibold mb-2" style="color:#60A5FA;">Plan Premium</div><div class="text-2xl font-bold" style="color:#60A5FA;">10%</div><div class="text-xs mt-1" style="color:#475569;">por referido Premium/Elite</div></div>
-            <div class="p-4 rounded-xl text-center" style="background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.2);"><div class="text-xs font-semibold mb-2" style="color:#FBBF24;">Plan Elite</div><div class="text-2xl font-bold" style="color:#FBBF24;">15%</div><div class="text-xs mt-1" style="color:#475569;">por referido de cualquier plan</div></div>
+            <div class="p-4 rounded-xl text-center" style="background:rgba(30,41,59,.5);"><div class="text-xs font-semibold mb-2" style="color:#94A3B8;">Plan Gratis</div><div class="text-2xl font-bold" style="color:#2563EB;">20%</div><div class="text-xs mt-1" style="color:#475569;">por cada referido con plan</div></div>
+            <div class="p-4 rounded-xl text-center" style="background:rgba(59,130,246,.08);border:1px solid rgba(59,130,246,.2);"><div class="text-xs font-semibold mb-2" style="color:#60A5FA;">Plan Premium</div><div class="text-2xl font-bold" style="color:#60A5FA;">40%</div><div class="text-xs mt-1" style="color:#475569;">por cada referido con plan</div></div>
+            <div class="p-4 rounded-xl text-center" style="background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.2);"><div class="text-xs font-semibold mb-2" style="color:#FBBF24;">Plan Elite</div><div class="text-2xl font-bold" style="color:#FBBF24;">60%</div><div class="text-xs mt-1" style="color:#475569;">por cada referido con plan</div></div>
           </div>
         </div>
       </div>
@@ -2834,7 +2834,7 @@ function showSection(id) {
   try { if (id==='dashboard')  updateDashboardMetrics(); } catch(_){}
   try { if (id==='perfil')     loadProfile(); }       catch(_){}
   try { if (id==='admin')    { loadAllUsers(); loadPagos(); checkMaintenanceModeStatus(); } } catch(_){}
-  try { if (id==='noticias' && typeof initNoticias==='function') initNoticias(); } catch(_){}
+  try { if (id==='noticias') { renderNewsCalendar(); updateSessionClocks(); } } catch(_){}
   try { if (id==='conectarmt5') loadMt5Metrics(); }  catch(_){}
   try { if (id==='diario')     loadJournal(); }       catch(_){}
 }
@@ -2845,11 +2845,20 @@ function showSection(id) {
 async function loadAppForUser(user) {
   currentUser = user;
   window.currentUser = user;
+  // Mostrar app inmediatamente con datos básicos del session
+  const _mainApp = document.getElementById('mainApp');
+  const _landing = document.getElementById('landingPage');
+  const _auth = document.getElementById('authScreen');
+  if(_mainApp) _mainApp.classList.remove('hidden');
+  if(_landing) _landing.classList.add('hidden');
+  if(_auth) _auth.classList.add('hidden');
+  const _cb = document.getElementById('chatBubble');
+  if(_cb) _cb.classList.remove('hidden');
   try {
     const _t = ms => new Promise((_,rej)=>setTimeout(()=>rej(new Error('timeout')),ms));
     const [{data:p},{data:adminRow}] = await Promise.all([
-      Promise.race([sb.from('perfiles').select('*').eq('id', user.id).single(), _t(10000)]),
-      Promise.race([sb.from('admins').select('user_id').eq('user_id', user.id).maybeSingle(), _t(10000)]),
+      Promise.race([sb.from('perfiles').select('*').eq('id', user.id).single(), _t(5000)]),
+      Promise.race([sb.from('admins').select('user_id').eq('user_id', user.id).maybeSingle(), _t(5000)]),
     ]).catch(async ()=>{
       // Fallback: try individually with extended timeout
       const {data:p2} = await Promise.race([sb.from('perfiles').select('*').eq('id', user.id).single(), _t(15000)]).catch(()=>({data:null}));
@@ -3355,7 +3364,7 @@ async function loadDescargasToken() {
 function copyDescargasToken() {
   const el=document.getElementById('descargasToken');
   if (!el) return;
-  navigator.clipboard.writeText(el.textContent).then(()=>toast('Token copiado','success'));
+  navigator.clipboard.writeText((el.textContent||'').trim()).then(()=>toast('Token copiado ✓','success'));
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -4640,7 +4649,7 @@ function renderChatMessages(msgs, containerId='chatMessages') {
     const time=new Date(m.enviado_en).toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'});
     return `<div class="flex ${isMe?'justify-end':'justify-start'}">
       <div class="${isMe?'chat-msg-user':'chat-msg-admin'} p-3 max-w-xs" style="max-width:75%;">
-        ${m.imagen_url?`<img src="${esc(m.imagen_url)}" class="rounded-lg mb-1 max-h-32 object-cover"/>`:''}
+        ${m.imagen_url?`<div style="position:relative;display:inline-block;margin-bottom:4px;"><a href="${esc(m.imagen_url)}" target="_blank" rel="noopener" title="Ver imagen"><img src="${esc(m.imagen_url)}" class="rounded-lg object-cover cursor-pointer" style="max-height:130px;max-width:210px;display:block;" onerror="this.parentNode.parentNode.style.display='none'"/></a><a href="${esc(m.imagen_url)}" download target="_blank" style="position:absolute;bottom:4px;right:4px;background:rgba(0,0,0,.65);border-radius:6px;padding:2px 7px;font-size:10px;color:#fff;text-decoration:none;line-height:1.6;" title="Descargar imagen">&#11015;</a></div>`:''}
         <p style="font-size:13px;">${esc(m.mensaje||'')}</p>
         <p style="font-size:10px;color:#475569;margin-top:4px;text-align:${isMe?'right':'left'};">${time}</p>
       </div>
@@ -4874,8 +4883,8 @@ function openModal(id) { document.getElementById(id).classList.remove('hidden');
 function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
 function toggleUserMenu() { document.getElementById('userMenu').classList.toggle('hidden'); }
 function closeUserMenu() { document.getElementById('userMenu').classList.add('hidden'); }
-function copyToken() { const t=currentPerfil?.token_licencia; if(!t) return toast('Token no disponible','error'); navigator.clipboard.writeText(t).then(()=>toast('Token copiado','success')).catch(()=>toast('No se pudo copiar','error')); }
-function copyProfileToken() { const t=document.getElementById('profileToken')?.textContent; if(!t||t==='—') return toast('Token no disponible','error'); navigator.clipboard.writeText(t).then(()=>toast('Token copiado','success')); }
+function copyToken() { const t=(currentPerfil?.token_licencia||''). trim(); if(!t) return toast('Token no disponible','error'); navigator.clipboard.writeText(t).then(()=>toast('Token copiado ✓','success')).catch(()=>toast('No se pudo copiar','error')); }
+function copyProfileToken() { const t=(document.getElementById('profileToken')?.textContent||''). trim(); if(!t||t==='—') return toast('Token no disponible','error'); navigator.clipboard.writeText(t).then(()=>toast('Token copiado ✓','success')); }
 function cap(s){return s?s.charAt(0).toUpperCase()+s.slice(1):'';}
 function esc(s){return s!=null?String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'):'';}
 function escA(s){return s?String(s).replace(/'/g,"&#39;"):'';}
