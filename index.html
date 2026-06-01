@@ -144,9 +144,10 @@ select.input-dark option{background:#131A26;color:#E2E8F0;}
 .carousel-track{display:flex;gap:16px;width:max-content;animation:carouselScroll 40s linear infinite;}
 .carousel-track:hover{animation-play-state:paused;}
 @keyframes carouselScroll{0%{transform:translateX(0);}100%{transform:translateX(-50%);}}
-.carousel-card{flex-shrink:0;width:220px;height:130px;border-radius:14px;padding:18px;cursor:pointer;position:relative;overflow:hidden;transition:transform .2s,box-shadow .2s;border:1px solid rgba(255,255,255,.07);}
+.carousel-card{flex-shrink:0;width:230px;height:140px;border-radius:16px;padding:18px;cursor:pointer;position:relative;overflow:hidden;transition:transform .25s,box-shadow .25s;border:1px solid rgba(255,255,255,.1);box-shadow:0 4px 24px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.08);}
 .carousel-card:hover{transform:translateY(-4px) scale(1.02);box-shadow:0 12px 40px rgba(0,0,0,.5);}
-.carousel-card .cc-icon{font-size:26px;margin-bottom:8px;}
+.carousel-card .cc-icon{width:44px;height:44px;margin-bottom:10px;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,0.1);border-radius:10px;border:1px solid rgba(255,255,255,0.12);padding:9px;box-shadow:0 2px 8px rgba(0,0,0,0.2);}
+  .synth-icon-svg{display:flex;align-items:center;justify-content:center;width:36px;height:36px;background:rgba(255,255,255,0.06);border-radius:8px;padding:6px;border:1px solid rgba(255,255,255,0.08);}
 .carousel-card .cc-title{font-size:13px;font-weight:700;color:#fff;margin-bottom:3px;}
 .carousel-card .cc-desc{font-size:11px;color:rgba(255,255,255,.6);line-height:1.4;}
 .carousel-card::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.06) 0%,transparent 60%);}
@@ -765,102 +766,102 @@ select.input-dark option{background:#131A26;color:#E2E8F0;}
           <div class="carousel-outer">
             <div class="carousel-track" id="carouselTrack">
     <div class="carousel-card" style="background:linear-gradient(135deg,#1E3A5F,#2563EB);" onclick="showSection('dashboard')">
-      <div class="cc-icon">📊</div>
+      <div class="cc-icon"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.92)" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div>
       <div class="cc-title">Dashboard</div>
       <div class="cc-desc">Equity en tiempo real, KPIs y curva de rendimiento</div>
     </div>
     <div class="carousel-card" style="background:linear-gradient(135deg,#064E3B,#059669);" onclick="showSection('diario')">
-      <div class="cc-icon">📓</div>
+      <div class="cc-icon"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.92)" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><line x1="12" y1="7" x2="17" y2="7"/><line x1="12" y1="11" x2="17" y2="11"/><line x1="12" y1="15" x2="17" y2="15"/><line x1="8" y1="7" x2="9" y2="7" stroke-width="2.5"/><line x1="8" y1="11" x2="9" y2="11" stroke-width="2.5"/><line x1="8" y1="15" x2="9" y2="15" stroke-width="2.5"/></svg></div>
       <div class="cc-title">Diario de Trades</div>
       <div class="cc-desc">Registra, filtra y analiza cada operación</div>
     </div>
     <div class="carousel-card" style="background:linear-gradient(135deg,#3B0764,#7C3AED);" onclick="showSection('calculadora')">
-      <div class="cc-icon">🧮</div>
+      <div class="cc-icon"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.92)" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2"/><path d="M8 6h8"/><path d="M8 10h2m4 0h2M8 14h2m4 0h2M8 18h2m4 0h2"/></svg></div>
       <div class="cc-title">Calculadora</div>
       <div class="cc-desc">Tamaño de lote exacto con gestión de riesgo</div>
     </div>
     <div class="carousel-card" style="background:linear-gradient(135deg,#78350F,#D97706);" onclick="showSection('noticias')">
-      <div class="cc-icon">📰</div>
+      <div class="cc-icon"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.92)" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></div>
       <div class="cc-title">Noticias</div>
       <div class="cc-desc">Calendario macro, Forex, Cripto y Mercados</div>
     </div>
     <div class="carousel-card" style="background:linear-gradient(135deg,#1E1B4B,#4338CA);" onclick="showSection('ranking')">
-      <div class="cc-icon">🏆</div>
+      <div class="cc-icon"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.92)" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H2v11h4V9z"/><path d="M14 5h-4v15h4V5z"/><path d="M22 1h-4v19h4V1z"/></svg></div>
       <div class="cc-title">Ranking</div>
       <div class="cc-desc">Compite con los mejores traders de la plataforma</div>
     </div>
     <div class="carousel-card" style="background:linear-gradient(135deg,#164E63,#0891B2);" onclick="showSection('descargas')">
-      <div class="cc-icon">⚙️</div>
+      <div class="cc-icon"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.92)" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><polyline points="8 21 12 17 16 21"/><line x1="2" y1="17" x2="22" y2="17"/><line x1="7" y1="8" x2="7.01" y2="8" stroke-width="2.5"/><line x1="12" y1="8" x2="15" y2="8"/><line x1="7" y1="11" x2="7.01" y2="11" stroke-width="2.5"/><line x1="12" y1="11" x2="15" y2="11"/></svg></div>
       <div class="cc-title">EAs & Descargas</div>
       <div class="cc-desc">Expert Advisors exclusivos para MT5</div>
     </div>
     <div class="carousel-card" style="background:linear-gradient(135deg,#1A2E05,#65A30D);" onclick="showSection('conectarmt5')">
-      <div class="cc-icon">🔗</div>
+      <div class="cc-icon"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.92)" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="12" r="3"/><circle cx="18" cy="6" r="3"/><circle cx="18" cy="18" r="3"/><line x1="8.59" y1="10.51" x2="15.42" y2="7.49"/><line x1="8.59" y1="13.49" x2="15.42" y2="16.51"/></svg></div>
       <div class="cc-title">Conectar MT5</div>
       <div class="cc-desc">Sincroniza tu cuenta MetaTrader 5 en tiempo real</div>
     </div>
     <div class="carousel-card" style="background:linear-gradient(135deg,#4A0000,#DC2626);" onclick="showSection('noticias')">
-      <div class="cc-icon">💎</div>
+      <div class="cc-icon"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.92)" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 17 7 10 11 14 15 6 21 9"/><circle cx="21" cy="9" r="2" fill="rgba(255,255,255,0.3)"/></svg></div>
       <div class="cc-title">Índices Sintéticos</div>
-      <div class="cc-desc">Boom, Crash, Volatility — opera 24/7 sin noticias</div>
+      <div class="cc-desc">VorteX &amp; Fortune — BridgeMarkets 24/7</div>
     </div>
     <div class="carousel-card" style="background:linear-gradient(135deg,#312E81,#6366F1);" onclick="showSection('calc-mt5')">
-      <div class="cc-icon">🎯</div>
+      <div class="cc-icon"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.92)" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4"/><line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/></svg></div>
       <div class="cc-title">Calc. MT5 Personal</div>
       <div class="cc-desc">Pip values exactos desde tu cuenta real</div>
     </div>
     <div class="carousel-card" style="background:linear-gradient(135deg,#1C1917,#57534E);" onclick="showSection('logros')">
-      <div class="cc-icon">🌟</div>
+      <div class="cc-icon"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.92)" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/></svg></div>
       <div class="cc-title">Logros</div>
       <div class="cc-desc">Desbloquea insignias y sigue tu progreso</div>
     </div>
     <div class="carousel-card" style="background:linear-gradient(135deg,#1E3A5F,#2563EB);" onclick="showSection('dashboard')">
-      <div class="cc-icon">📊</div>
+      <div class="cc-icon"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.92)" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div>
       <div class="cc-title">Dashboard</div>
       <div class="cc-desc">Equity en tiempo real, KPIs y curva de rendimiento</div>
     </div>
     <div class="carousel-card" style="background:linear-gradient(135deg,#064E3B,#059669);" onclick="showSection('diario')">
-      <div class="cc-icon">📓</div>
+      <div class="cc-icon"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.92)" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><line x1="12" y1="7" x2="17" y2="7"/><line x1="12" y1="11" x2="17" y2="11"/><line x1="12" y1="15" x2="17" y2="15"/><line x1="8" y1="7" x2="9" y2="7" stroke-width="2.5"/><line x1="8" y1="11" x2="9" y2="11" stroke-width="2.5"/><line x1="8" y1="15" x2="9" y2="15" stroke-width="2.5"/></svg></div>
       <div class="cc-title">Diario de Trades</div>
       <div class="cc-desc">Registra, filtra y analiza cada operación</div>
     </div>
     <div class="carousel-card" style="background:linear-gradient(135deg,#3B0764,#7C3AED);" onclick="showSection('calculadora')">
-      <div class="cc-icon">🧮</div>
+      <div class="cc-icon"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.92)" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2"/><path d="M8 6h8"/><path d="M8 10h2m4 0h2M8 14h2m4 0h2M8 18h2m4 0h2"/></svg></div>
       <div class="cc-title">Calculadora</div>
       <div class="cc-desc">Tamaño de lote exacto con gestión de riesgo</div>
     </div>
     <div class="carousel-card" style="background:linear-gradient(135deg,#78350F,#D97706);" onclick="showSection('noticias')">
-      <div class="cc-icon">📰</div>
+      <div class="cc-icon"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.92)" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></div>
       <div class="cc-title">Noticias</div>
       <div class="cc-desc">Calendario macro, Forex, Cripto y Mercados</div>
     </div>
     <div class="carousel-card" style="background:linear-gradient(135deg,#1E1B4B,#4338CA);" onclick="showSection('ranking')">
-      <div class="cc-icon">🏆</div>
+      <div class="cc-icon"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.92)" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H2v11h4V9z"/><path d="M14 5h-4v15h4V5z"/><path d="M22 1h-4v19h4V1z"/></svg></div>
       <div class="cc-title">Ranking</div>
       <div class="cc-desc">Compite con los mejores traders de la plataforma</div>
     </div>
     <div class="carousel-card" style="background:linear-gradient(135deg,#164E63,#0891B2);" onclick="showSection('descargas')">
-      <div class="cc-icon">⚙️</div>
+      <div class="cc-icon"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.92)" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><polyline points="8 21 12 17 16 21"/><line x1="2" y1="17" x2="22" y2="17"/><line x1="7" y1="8" x2="7.01" y2="8" stroke-width="2.5"/><line x1="12" y1="8" x2="15" y2="8"/><line x1="7" y1="11" x2="7.01" y2="11" stroke-width="2.5"/><line x1="12" y1="11" x2="15" y2="11"/></svg></div>
       <div class="cc-title">EAs & Descargas</div>
       <div class="cc-desc">Expert Advisors exclusivos para MT5</div>
     </div>
     <div class="carousel-card" style="background:linear-gradient(135deg,#1A2E05,#65A30D);" onclick="showSection('conectarmt5')">
-      <div class="cc-icon">🔗</div>
+      <div class="cc-icon"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.92)" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="12" r="3"/><circle cx="18" cy="6" r="3"/><circle cx="18" cy="18" r="3"/><line x1="8.59" y1="10.51" x2="15.42" y2="7.49"/><line x1="8.59" y1="13.49" x2="15.42" y2="16.51"/></svg></div>
       <div class="cc-title">Conectar MT5</div>
       <div class="cc-desc">Sincroniza tu cuenta MetaTrader 5 en tiempo real</div>
     </div>
     <div class="carousel-card" style="background:linear-gradient(135deg,#4A0000,#DC2626);" onclick="showSection('noticias')">
-      <div class="cc-icon">💎</div>
+      <div class="cc-icon"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.92)" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 17 7 10 11 14 15 6 21 9"/><circle cx="21" cy="9" r="2" fill="rgba(255,255,255,0.3)"/></svg></div>
       <div class="cc-title">Índices Sintéticos</div>
-      <div class="cc-desc">Boom, Crash, Volatility — opera 24/7 sin noticias</div>
+      <div class="cc-desc">VorteX &amp; Fortune — BridgeMarkets 24/7</div>
     </div>
     <div class="carousel-card" style="background:linear-gradient(135deg,#312E81,#6366F1);" onclick="showSection('calc-mt5')">
-      <div class="cc-icon">🎯</div>
+      <div class="cc-icon"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.92)" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4"/><line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/></svg></div>
       <div class="cc-title">Calc. MT5 Personal</div>
       <div class="cc-desc">Pip values exactos desde tu cuenta real</div>
     </div>
     <div class="carousel-card" style="background:linear-gradient(135deg,#1C1917,#57534E);" onclick="showSection('logros')">
-      <div class="cc-icon">🌟</div>
+      <div class="cc-icon"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.92)" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/></svg></div>
       <div class="cc-title">Logros</div>
       <div class="cc-desc">Desbloquea insignias y sigue tu progreso</div>
     </div>
@@ -892,34 +893,34 @@ select.input-dark option{background:#131A26;color:#E2E8F0;}
                     <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 0 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
                   </a>
                   <button onclick="showSection('calculadora')" style="display:inline-flex;align-items:center;gap:8px;background:rgba(37,99,235,.1);color:#3B82F6;border:1px solid rgba(37,99,235,.3);font-weight:600;font-size:13px;padding:13px 22px;border-radius:12px;cursor:pointer;transition:all .2s;">
-                    🧮 Calculadora de Riesgo
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:6px;"><rect x="4" y="2" width="16" height="20" rx="2"/><path d="M8 6h8"/><path d="M8 10h2m4 0h2M8 14h2m4 0h2M8 18h2m4 0h2"/></svg>Calculadora de Riesgo
                   </button>
                 </div>
               </div>
               <div style="flex-shrink:0;display:flex;flex-direction:column;gap:10px;min-width:180px;">
                 
                 <div style="display:flex;align-items:center;gap:10px;background:rgba(30,41,59,.5);border:1px solid rgba(30,41,59,.8);border-radius:10px;padding:10px 14px;">
-                  <span style="font-size:15px;">✅</span>
+                  <span style="display:inline-flex;align-items:center;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
                   <span style="font-size:12px;font-weight:500;color:#CBD5E1;">Regulado y auditado</span>
                 </div>
                 <div style="display:flex;align-items:center;gap:10px;background:rgba(30,41,59,.5);border:1px solid rgba(30,41,59,.8);border-radius:10px;padding:10px 14px;">
-                  <span style="font-size:15px;">⚡</span>
+                  <span style="display:inline-flex;align-items:center;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#F59E0B" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></span>
                   <span style="font-size:12px;font-weight:500;color:#CBD5E1;">Ejecución instantánea</span>
                 </div>
                 <div style="display:flex;align-items:center;gap:10px;background:rgba(30,41,59,.5);border:1px solid rgba(30,41,59,.8);border-radius:10px;padding:10px 14px;">
-                  <span style="font-size:15px;">🕐</span>
+                  <span style="display:inline-flex;align-items:center;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span>
                   <span style="font-size:12px;font-weight:500;color:#CBD5E1;">Mercado 24/7</span>
                 </div>
                 <div style="display:flex;align-items:center;gap:10px;background:rgba(30,41,59,.5);border:1px solid rgba(30,41,59,.8);border-radius:10px;padding:10px 14px;">
-                  <span style="font-size:15px;">💰</span>
+                  <span style="display:inline-flex;align-items:center;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.5 8h5a2 2 0 1 1 0 4h-5.5M9.5 12H15a2 2 0 1 1 0 4H9.5M10 8v8"/></svg></span>
                   <span style="font-size:12px;font-weight:500;color:#CBD5E1;">Prop Firm disponible</span>
                 </div>
                 <div style="display:flex;align-items:center;gap:10px;background:rgba(30,41,59,.5);border:1px solid rgba(30,41,59,.8);border-radius:10px;padding:10px 14px;">
-                  <span style="font-size:15px;">📱</span>
+                  <span style="display:inline-flex;align-items:center;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#8B5CF6" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18" stroke-width="3"/></svg></span>
                   <span style="font-size:12px;font-weight:500;color:#CBD5E1;">MT5 + WebTrader</span>
                 </div>
                 <div style="display:flex;align-items:center;gap:10px;background:rgba(30,41,59,.5);border:1px solid rgba(30,41,59,.8);border-radius:10px;padding:10px 14px;">
-                  <span style="font-size:15px;">🎓</span>
+                  <span style="display:inline-flex;align-items:center;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#6366F1" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg></span>
                   <span style="font-size:12px;font-weight:500;color:#CBD5E1;">Soporte en español</span>
                 </div>
               </div>
@@ -955,28 +956,28 @@ select.input-dark option{background:#131A26;color:#E2E8F0;}
             
             <div class="benefit-card">
               <div class="bc-icon" style="background:rgba(37,99,235,.2);">
-                <span>🌐</span>
+                <span style="display:inline-flex;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></span>
               </div>
               <h4 style="font-size:13px;font-weight:700;color:#F1F5F9;margin:0 0 6px;">Sin Horarios</h4>
               <p style="font-size:12px;color:#94A3B8;line-height:1.6;margin:0;">Los índices sintéticos operan los 365 días del año, las 24 horas. Lunes o domingo, siempre hay mercado.</p>
             </div>
             <div class="benefit-card">
               <div class="bc-icon" style="background:rgba(139,92,246,.2);">
-                <span>🏦</span>
+                <span style="display:inline-flex;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="21" x2="21" y2="21"/><line x1="3" y1="10" x2="21" y2="10"/><polyline points="5 10 5 21"/><polyline points="10 10 10 21"/><polyline points="14 10 14 21"/><polyline points="19 10 19 21"/><polygon points="12 2 20 10 4 10"/></svg></span>
               </div>
               <h4 style="font-size:13px;font-weight:700;color:#F1F5F9;margin:0 0 6px;">Prop Firm</h4>
               <p style="font-size:12px;color:#94A3B8;line-height:1.6;margin:0;">Accede a capital institucional. Demuestra tu habilidad y opera con fondos de la firma sin arriesgar tu capital.</p>
             </div>
             <div class="benefit-card">
               <div class="bc-icon" style="background:rgba(16,185,129,.2);">
-                <span>📊</span>
+                <span style="display:inline-flex;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8B5CF6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></span>
               </div>
               <h4 style="font-size:13px;font-weight:700;color:#F1F5F9;margin:0 0 6px;">Sin Noticias</h4>
               <p style="font-size:12px;color:#94A3B8;line-height:1.6;margin:0;">Los índices sintéticos son inmunes a eventos macroeconómicos. Tu análisis técnico siempre manda.</p>
             </div>
             <div class="benefit-card">
               <div class="bc-icon" style="background:rgba(245,158,11,.2);">
-                <span>⚡</span>
+                <span style="display:inline-flex;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#F59E0B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></span>
               </div>
               <h4 style="font-size:13px;font-weight:700;color:#F1F5F9;margin:0 0 6px;">Baja Latencia</h4>
               <p style="font-size:12px;color:#94A3B8;line-height:1.6;margin:0;">Ejecución de órdenes en milisegundos. Sin requotes, sin slippage excesivo. Ideal para scalping y EA.</p>
@@ -992,7 +993,7 @@ select.input-dark option{background:#131A26;color:#E2E8F0;}
             
           <div class="synth-card" style="background:rgba(59,130,246,.08);border:1px solid rgba(59,130,246,.25);">
             <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
-              <span style="font-size:22px;">🌀</span>
+              <span class="synth-icon-svg"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12c2-4 4-4 6 0s4 4 6 0 4-4 6 0"/></svg></span>
               <span style="font-weight:700;font-size:13px;color:#3B82F6;">VorteX20 / VorteX40</span>
             </div>
             <p style="font-size:12px;color:#94A3B8;line-height:1.6;margin:0;">Volatilidad fija del 20% y 40%. 2–4 ticks por segundo. Ideal para iniciarse en sintéticos con movimientos controlados y predecibles.</p>
@@ -1000,7 +1001,7 @@ select.input-dark option{background:#131A26;color:#E2E8F0;}
           </div>
           <div class="synth-card" style="background:rgba(99,102,241,.08);border:1px solid rgba(99,102,241,.25);">
             <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
-              <span style="font-size:22px;">⚡</span>
+              <span class="synth-icon-svg"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#6366F1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></span>
               <span style="font-weight:700;font-size:13px;color:#6366F1;">VorteX60 / VorteX80</span>
             </div>
             <p style="font-size:12px;color:#94A3B8;line-height:1.6;margin:0;">Volatilidad fija del 60% y 80%. 4 ticks por segundo. Rango de movimiento medio-alto. Para traders con experiencia en gestión de riesgo.</p>
@@ -1008,7 +1009,7 @@ select.input-dark option{background:#131A26;color:#E2E8F0;}
           </div>
           <div class="synth-card" style="background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.25);">
             <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
-              <span style="font-size:22px;">🔥</span>
+              <span class="synth-icon-svg"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#EF4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg></span>
               <span style="font-weight:700;font-size:13px;color:#EF4444;">VorteX100</span>
             </div>
             <p style="font-size:12px;color:#94A3B8;line-height:1.6;margin:0;">Volatilidad fija del 100%. 4 ticks por segundo. El más agresivo de los VorteX. Máximo potencial de ganancia y riesgo. Requiere disciplina estricta.</p>
@@ -1016,7 +1017,7 @@ select.input-dark option{background:#131A26;color:#E2E8F0;}
           </div>
           <div class="synth-card" style="background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.25);">
             <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
-              <span style="font-size:22px;">📶</span>
+              <span class="synth-icon-svg"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 19 8 19 8 13 12 13 12 8 16 8 16 4 20 4"/><line x1="4" y1="4" x2="4" y2="19"/><line x1="4" y1="19" x2="20" y2="19"/></svg></span>
               <span style="font-weight:700;font-size:13px;color:#10B981;">Fortune 100/250/500/1000</span>
             </div>
             <p style="font-size:12px;color:#94A3B8;line-height:1.6;margin:0;">50% sube / 50% baja con step fijo (0.1, 0.25, 0.5 ó 1). Sin gaps ni noticias. El más predecible para sistemas de reversión y scalping mecánico.</p>
@@ -1024,7 +1025,7 @@ select.input-dark option{background:#131A26;color:#E2E8F0;}
           </div>
           <div class="synth-card" style="background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.25);">
             <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
-              <span style="font-size:22px;">🎲</span>
+              <span class="synth-icon-svg"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#F59E0B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="3"/><circle cx="8" cy="8" r="1.5" fill="#F59E0B"/><circle cx="16" cy="8" r="1.5" fill="#F59E0B"/><circle cx="12" cy="12" r="1.5" fill="#F59E0B"/><circle cx="8" cy="16" r="1.5" fill="#F59E0B"/><circle cx="16" cy="16" r="1.5" fill="#F59E0B"/></svg></span>
               <span style="font-weight:700;font-size:13px;color:#F59E0B;">FortuneX200 / X300 / X500</span>
             </div>
             <p style="font-size:12px;color:#94A3B8;line-height:1.6;margin:0;">50% sube / 50% baja con multiplicador de step aleatorio (hasta x2, x3 ó x5). Combina la estructura del Fortune con saltos impredecibles. Gestión de riesgo obligatoria.</p>
@@ -1041,32 +1042,32 @@ select.input-dark option{background:#131A26;color:#E2E8F0;}
             
             <div class="propfirm-step">
               <div class="step-num">1</div>
-              <div style="font-size:22px;margin-bottom:8px;">📋</div>
+              <div style="margin-bottom:8px;display:flex;justify-content:center;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.8)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="13" y2="16"/></svg></div>
               <h4 style="font-size:13px;font-weight:700;color:#F1F5F9;margin:0 0 6px;">Aplica</h4>
               <p style="font-size:11px;color:#94A3B8;line-height:1.5;margin:0;">Completa el formulario de evaluación y elige tu tamaño de cuenta</p>
             </div>
             <div class="propfirm-step">
               <div class="step-num">2</div>
-              <div style="font-size:22px;margin-bottom:8px;">🎯</div>
+              <div style="margin-bottom:8px;display:flex;justify-content:center;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.8)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg></div>
               <h4 style="font-size:13px;font-weight:700;color:#F1F5F9;margin:0 0 6px;">Evalúate</h4>
               <p style="font-size:11px;color:#94A3B8;line-height:1.5;margin:0;">Demuestra tu consistencia cumpliendo los objetivos de profit y drawdown</p>
             </div>
             <div class="propfirm-step">
               <div class="step-num">3</div>
-              <div style="font-size:22px;margin-bottom:8px;">✅</div>
+              <div style="margin-bottom:8px;display:flex;justify-content:center;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.8)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div>
               <h4 style="font-size:13px;font-weight:700;color:#F1F5F9;margin:0 0 6px;">Fondéate</h4>
               <p style="font-size:11px;color:#94A3B8;line-height:1.5;margin:0;">Aprueba la evaluación y recibe acceso a la cuenta fondeada</p>
             </div>
             <div class="propfirm-step">
               <div class="step-num">4</div>
-              <div style="font-size:22px;margin-bottom:8px;">💸</div>
+              <div style="margin-bottom:8px;display:flex;justify-content:center;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.8)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></div>
               <h4 style="font-size:13px;font-weight:700;color:#F1F5F9;margin:0 0 6px;">Retira</h4>
               <p style="font-size:11px;color:#94A3B8;line-height:1.5;margin:0;">Opera con el capital de la firma y retira hasta el 80% de tus ganancias</p>
             </div>
           </div>
           <div style="text-align:center;">
             <a href="https://trading.bridgemarkets.global//register?ref=6af2c3f6-2fdd-47&branchUuid=6bdab320-a2b8-43a5-a218-f" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:8px;background:linear-gradient(135deg,#7C3AED,#2563EB);color:#fff;font-weight:700;font-size:14px;padding:13px 32px;border-radius:12px;text-decoration:none;box-shadow:0 4px 24px rgba(124,58,237,.35);">
-              💎 Quiero el Prop Firm
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:6px;"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>Quiero el Prop Firm
               <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
             </a>
           </div>
@@ -1077,7 +1078,7 @@ select.input-dark option{background:#131A26;color:#E2E8F0;}
           <p style="font-size:22px;font-weight:800;color:#F1F5F9;margin:0 0 10px;">¿Listo para operar sin límites?</p>
           <p style="font-size:14px;color:#64748B;margin:0 0 24px;">Únete a BridgeMarkets hoy. Cuenta demo gratis, spreads desde 0 y mercado abierto las 24 horas.</p>
           <a href="https://trading.bridgemarkets.global//register?ref=6af2c3f6-2fdd-47&branchUuid=6bdab320-a2b8-43a5-a218-f" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:10px;background:linear-gradient(135deg,#2563EB,#1D4ED8);color:#fff;font-weight:700;font-size:15px;padding:15px 36px;border-radius:14px;text-decoration:none;box-shadow:0 6px 28px rgba(37,99,235,.45);transition:all .2s;">
-            🚀 Crear Cuenta en BridgeMarkets
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:6px;"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg>Crear Cuenta en BridgeMarkets
           </a>
           <p style="font-size:11px;color:#334155;margin:14px 0 0;">Al registrarte usas el enlace de referido de FlowTrade Suite</p>
         </div>
