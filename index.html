@@ -2890,6 +2890,7 @@ async function loadAppForUser(user) {
     const sidebarTok = document.getElementById('sidebarToken');
     if (sidebarTok && p && p.token_licencia) {
       sidebarTok.textContent = p.token_licencia.slice(0, 20) + '…';
+      sidebarTok.title = p.token_licencia; // full token on hover
     }
   } catch(e) { console.warn('loadAppForUser profile error:', e); }
 }
@@ -3355,6 +3356,123 @@ function copyDescargasToken() {
   const el=document.getElementById('descargasToken');
   if (!el) return;
   navigator.clipboard.writeText(el.textContent).then(()=>toast('Token copiado','success'));
+}
+
+// ═══════════════════════════════════════════════════════════════
+// PERFIL — LOAD, SAVE, PREFERENCES
+// ═══════════════════════════════════════════════════════════════
+async function loadProfile() {
+  if (!currentUser) return;
+  // Use cached perfil if available, otherwise fetch fresh
+  let p = currentPerfil;
+  if (!p || !p.token_licencia) {
+    const { data } = await sb.from('perfiles').select('*').eq('id', currentUser.id).single().catch(() => ({ data: null }));
+    p = data || currentPerfil;
+    if (data) { currentPerfil = data; window.currentPerfil = data; }
+  }
+  if (!p) return;
+
+  // Basic info
+  const el = (id) => document.getElementById(id);
+  if (el('profileNombre')) el('profileNombre').value = p.nombre || '';
+  if (el('profileEmail'))  el('profileEmail').value  = currentUser.email || '';
+  if (el('profileMt5'))    el('profileMt5').value    = p.mt5_cuenta || '';
+  if (el('profileServidor')) el('profileServidor').value = p.mt5_servidor || '';
+  if (el('profileActivos')) el('profileActivos').value = (p.activos_manuales || []).join(', ');
+
+  // Plan
+  const plan = p.plan || 'gratis';
+  const planLabels = { gratis: 'Gratis', premium: '⭐ Premium', elite: '💎 Elite' };
+  if (el('profilePlanBadge')) {
+    el('profilePlanBadge').textContent = planLabels[plan] || plan;
+    el('profilePlanBadge').className = 'text-2xl font-bold badge-' + plan;
+  }
+  if (el('profileFechaReg')) {
+    const reg = p.fecha_registro ? new Date(p.fecha_registro).toLocaleDateString('es-ES') : '—';
+    el('profileFechaReg').textContent = 'Miembro desde: ' + reg;
+  }
+  if (el('profilePlanExp')) {
+    if (plan === 'gratis') {
+      el('profilePlanExp').textContent = 'Plan gratuito — sin caducidad';
+      el('profilePlanExp').style.color = '#10B981';
+    } else if (p.fecha_expiracion_plan) {
+      const exp = new Date(p.fecha_expiracion_plan);
+      const daysLeft = Math.ceil((exp - Date.now()) / 86400000);
+      const color = daysLeft < 7 ? '#EF4444' : daysLeft < 30 ? '#FBBF24' : '#10B981';
+      el('profilePlanExp').textContent = 'Vence: ' + exp.toLocaleDateString('es-ES') + ' (' + daysLeft + ' días)';
+      el('profilePlanExp').style.color = color;
+    } else {
+      el('profilePlanExp').textContent = 'Plan ' + plan + ' — acceso permanente';
+      el('profilePlanExp').style.color = '#10B981';
+    }
+  }
+
+  // Token — FULL token (not truncated)
+  if (el('profileToken')) {
+    el('profileToken').textContent = p.token_licencia || '—';
+  }
+
+  // Preferences
+  if (el('prefNotifPush') && p.notificaciones_push !== undefined) {
+    el('prefNotifPush').checked = !!p.notificaciones_push;
+    const knob = document.getElementById('toggleKnob');
+    if (knob) {
+      knob.style.left = p.notificaciones_push ? '22px' : '2px';
+      knob.style.background = p.notificaciones_push ? '#2563EB' : '#475569';
+    }
+  }
+  if (el('prefCompartir') && p.compartir_estadisticas !== undefined) {
+    el('prefCompartir').checked = !!p.compartir_estadisticas;
+  }
+
+  // Apply notification pref toggles UI
+  try { applyNotifPrefsToUI(); } catch(_) {}
+}
+
+async function saveProfile() {
+  if (!currentUser) return toast('Sesión no activa', 'error');
+  const nombre  = document.getElementById('profileNombre')?.value.trim();
+  const activos = document.getElementById('profileActivos')?.value.trim();
+  if (!nombre) return toast('El nombre no puede estar vacío', 'error');
+  const activosArr = activos ? activos.split(',').map(s => s.trim()).filter(Boolean) : [];
+  const btn = event?.target;
+  if (btn) { btn.disabled = true; btn.textContent = 'Guardando...'; }
+  const { error } = await sb.from('perfiles').update({
+    nombre,
+    activos_manuales: activosArr,
+  }).eq('id', currentUser.id);
+  if (btn) { btn.disabled = false; btn.textContent = 'Guardar cambios'; }
+  if (error) return toast('Error: ' + error.message, 'error');
+  // Update cached perfil
+  if (currentPerfil) { currentPerfil.nombre = nombre; currentPerfil.activos_manuales = activosArr; }
+  // Update nav name
+  const navName = document.getElementById('navUserName');
+  if (navName) navName.textContent = nombre.split(' ')[0];
+  toast('✅ Perfil guardado', 'success');
+}
+
+async function togglePushPref(checked) {
+  if (!currentUser) return;
+  if (checked) {
+    const perm = await Notification.requestPermission().catch(() => 'denied');
+    if (perm !== 'granted') {
+      toast('⚠️ Permite las notificaciones en tu navegador', 'info', 4000);
+      document.getElementById('prefNotifPush').checked = false;
+      return;
+    }
+  }
+  const knob = document.getElementById('toggleKnob');
+  if (knob) { knob.style.left = checked ? '22px' : '2px'; knob.style.background = checked ? '#2563EB' : '#475569'; }
+  await sb.from('perfiles').update({ notificaciones_push: checked }).eq('id', currentUser.id).catch(() => {});
+  if (currentPerfil) currentPerfil.notificaciones_push = checked;
+  if (checked) { try { NM.init(); } catch(_) {} } else { try { NM.stop(); } catch(_) {} }
+}
+
+async function saveCompartirStats(checked) {
+  if (!currentUser) return;
+  await sb.from('perfiles').update({ compartir_estadisticas: checked }).eq('id', currentUser.id).catch(() => {});
+  if (currentPerfil) currentPerfil.compartir_estadisticas = checked;
+  toast(checked ? '📊 Apareces en el ranking' : '🙈 Oculto del ranking', 'info', 2000);
 }
 
 // ═══════════════════════════════════════════════════════════════
