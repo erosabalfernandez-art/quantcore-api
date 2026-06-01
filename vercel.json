@@ -1,29 +1,31 @@
 {
-  "version": 2,
-  "name": "samtrader-pro-suite-api",
-  "builds": [
-    {
-      "src": "api/*.js",
-      "use": "@vercel/node"
-    }
-  ],
-  "routes": [
-    { "src": "/api/validar-licencia",    "dest": "/api/validar-licencia.js"    },
-    { "src": "/api/heartbeat",           "dest": "/api/heartbeat.js"           },
-    { "src": "/api/desactivar-licencia", "dest": "/api/desactivar-licencia.js" },
-    { "src": "/api/recibir-trades",      "dest": "/api/recibir-trades.js"      },
-    { "src": "/api/recibir-simbolos",    "dest": "/api/recibir-simbolos.js"    },
-    { "src": "/api/health",              "dest": "/api/health.js"              },
-    { "src": "/api/ai-proxy",            "dest": "/api/ai-proxy.js"            }
-  ],
-  "headers": [
-    {
-      "source": "/api/(.*)",
-      "headers": [
-        { "key": "Access-Control-Allow-Origin",  "value": "*"                          },
-        { "key": "Access-Control-Allow-Methods", "value": "GET, POST, OPTIONS"         },
-        { "key": "Access-Control-Allow-Headers", "value": "Content-Type, Authorization" }
-      ]
-    }
-  ]
-}
+    "version": 2,
+    "name": "samtrader-pro-suite-api",
+    "builds": [
+      {
+        "src": "api/*.js",
+        "use": "@vercel/node"
+      }
+    ],
+    "routes": [
+      { "src": "/api/validar-licencia",    "dest": "/api/validar-licencia.js"    },
+      { "src": "/api/heartbeat",           "dest": "/api/heartbeat.js"           },
+      { "src": "/api/desactivar-licencia", "dest": "/api/desactivar-licencia.js" },
+      { "src": "/api/recibir-trades",      "dest": "/api/recibir-trades.js"      },
+      { "src": "/api/recibir-simbolos",    "dest": "/api/recibir-simbolos.js"    },
+      { "src": "/api/health",              "dest": "/api/health.js"              },
+      { "src": "/api/ai-proxy",            "dest": "/api/ai-proxy.js"            },
+      { "src": "/api/admin-unlock-mt5",    "dest": "/api/admin-unlock-mt5.js"    }
+    ],
+    "headers": [
+      {
+        "source": "/api/(.*)",
+        "headers": [
+          { "key": "Access-Control-Allow-Origin",  "value": "*"                          },
+          { "key": "Access-Control-Allow-Methods", "value": "GET, POST, OPTIONS"         },
+          { "key": "Access-Control-Allow-Headers", "value": "Content-Type, Authorization" }
+        ]
+      }
+    ]
+  }
+  
