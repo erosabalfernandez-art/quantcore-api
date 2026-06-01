@@ -58,6 +58,42 @@ body{background:#0B0F17;color:#E2E8F0;margin:0;font-size:14px;line-height:1.6;-w
 @keyframes modalIn{from{transform:scale(.95);opacity:0;}to{transform:scale(1);opacity:1;}}
 .table-row{border-bottom:1px solid rgba(30,41,59,0.5);}
 .table-row:hover{background:rgba(30,41,59,0.3);}
+
+  /* ═══════ HERO BANNER ═══════ */
+  .hero-banner{position:relative;border-radius:20px;overflow:hidden;background:linear-gradient(135deg,#0B1628 0%,#0F1E35 40%,#0D1428 100%);border:1px solid rgba(59,130,246,0.15);box-shadow:0 8px 48px rgba(0,0,0,0.5),0 0 0 1px rgba(255,255,255,0.04);padding:28px 28px 20px;}
+  .hero-grid-overlay{position:absolute;inset:0;background-image:linear-gradient(rgba(59,130,246,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(59,130,246,0.04) 1px,transparent 1px);background-size:32px 32px;pointer-events:none;}
+  .hero-particles span{position:absolute;width:2px;height:2px;border-radius:50%;background:#3B82F6;opacity:0;animation:heroFloat 6s infinite;}
+  .hero-particles span:nth-child(1){top:20%;left:10%;animation-delay:0s;}
+  .hero-particles span:nth-child(2){top:60%;left:20%;animation-delay:1.2s;background:#6366F1;}
+  .hero-particles span:nth-child(3){top:30%;left:70%;animation-delay:2.4s;}
+  .hero-particles span:nth-child(4){top:70%;left:60%;animation-delay:3.6s;background:#8B5CF6;}
+  .hero-particles span:nth-child(5){top:15%;left:85%;animation-delay:4.8s;}
+  @keyframes heroFloat{0%,100%{opacity:0;transform:translateY(0);}50%{opacity:.6;transform:translateY(-20px);}}
+  .hero-content{position:relative;z-index:2;display:flex;gap:24px;align-items:center;}
+  .hero-left{flex:1;min-width:0;}
+  .hero-logo{display:flex;align-items:center;gap:12px;}
+  .hero-brand-name{font-size:16px;font-weight:700;color:#E2E8F0;letter-spacing:-.01em;}
+  .hero-brand-sub{font-size:10px;color:#3B82F6;font-weight:600;letter-spacing:.08em;text-transform:uppercase;margin-top:1px;}
+  .hero-title{font-size:22px;font-weight:800;color:#F1F5F9;line-height:1.2;margin:0 0 10px;letter-spacing:-.02em;}
+  .hero-title-accent{background:linear-gradient(135deg,#3B82F6,#8B5CF6);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+  .hero-subtitle{font-size:12.5px;color:#94A3B8;line-height:1.6;margin:0 0 14px;max-width:380px;}
+  .hero-badges{display:flex;flex-wrap:wrap;gap:6px;}
+  .hero-badge{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:500;color:#CBD5E1;background:rgba(30,41,59,0.8);border:1px solid rgba(59,130,246,0.2);border-radius:20px;padding:4px 10px;}
+  .hero-chart-wrap{flex-shrink:0;width:290px;background:rgba(11,15,23,0.6);border-radius:14px;border:1px solid rgba(255,255,255,0.07);padding:14px;overflow:hidden;}
+  .hero-chart-label{font-size:10px;font-weight:600;color:#475569;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;}
+  .hero-chart-svg{width:100%;height:auto;display:block;}
+  .hero-chart-fill{animation:chartFadeIn 1.2s ease forwards;}
+  .hero-chart-line{animation:chartDraw 1.4s ease forwards;}
+  .hero-chart-dot{animation:chartFadeIn 1.5s ease forwards;}
+  .hero-chart-pulse{animation:pulse 2s ease infinite 1.5s;}
+  @keyframes chartFadeIn{from{opacity:0;}to{opacity:1;}}
+  @keyframes pulse{0%,100%{opacity:.2;transform:scale(1);}50%{opacity:.5;transform:scale(1.6);}}
+  .hero-chart-stats{display:flex;gap:0;border-top:1px solid rgba(255,255,255,0.06);margin-top:10px;padding-top:10px;}
+  .hero-chart-stat{flex:1;text-align:center;}
+  .hero-stat-val{display:block;font-size:13px;font-weight:700;color:#E2E8F0;font-family:'JetBrains Mono',monospace;}
+  .hero-stat-val.positive{color:#10B981;}
+  .hero-stat-lbl{display:block;font-size:9.5px;color:#475569;margin-top:2px;text-transform:uppercase;letter-spacing:.05em;}
+  @media(max-width:768px){.hero-content{flex-direction:column;}.hero-chart-wrap{width:100%;}.hero-title{font-size:18px;}}
 ::-webkit-scrollbar{width:5px;height:5px;}
 ::-webkit-scrollbar-track{background:#0B0F17;}
 ::-webkit-scrollbar-thumb{background:#1E293B;border-radius:3px;}
@@ -760,6 +796,110 @@ select.input-dark option{background:#131A26;color:#E2E8F0;}
       <!-- ████ INICIO — BridgeMarkets ████ -->
       <div id="section-inicio" class="hidden">
 
+
+          <!-- ═══════ HERO BANNER ═══════ -->
+          <div class="hero-banner mb-6" id="heroBanner">
+            <!-- Animated background grid -->
+            <div class="hero-grid-overlay"></div>
+            <!-- Floating particles -->
+            <div class="hero-particles">
+              <span></span><span></span><span></span><span></span><span></span>
+            </div>
+            <!-- Content -->
+            <div class="hero-content">
+              <div class="hero-left">
+                <!-- BridgeMarkets Logo SVG -->
+                <div class="hero-logo mb-3">
+                  <svg width="44" height="44" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect width="44" height="44" rx="10" fill="url(#bm-grad)"/>
+                    <defs><linearGradient id="bm-grad" x1="0" y1="0" x2="44" y2="44"><stop offset="0%" stop-color="#1D4ED8"/><stop offset="100%" stop-color="#7C3AED"/></linearGradient></defs>
+                    <polyline points="8,32 14,20 20,26 28,12 36,18" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    <circle cx="36" cy="18" r="3" fill="white" opacity="0.9"/>
+                    <rect x="8" y="34" width="28" height="1.5" rx="0.75" fill="white" opacity="0.3"/>
+                  </svg>
+                  <div>
+                    <div class="hero-brand-name">FlowTrade Suite</div>
+                    <div class="hero-brand-sub">powered by BridgeMarkets</div>
+                  </div>
+                </div>
+                <h1 class="hero-title">Opera como un<br/><span class="hero-title-accent">trader profesional</span></h1>
+                <p class="hero-subtitle">Diario de trading, calculadora de riesgo, análisis de rendimiento y EAs exclusivos — todo en una sola plataforma.</p>
+                <div class="hero-badges">
+                  <span class="hero-badge"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Opera 24/7</span>
+                  <span class="hero-badge"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>VorteX &amp; Fortune</span>
+                  <span class="hero-badge"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Datos en tiempo real</span>
+                </div>
+              </div>
+              <!-- Animated chart -->
+              <div class="hero-chart-wrap">
+                <div class="hero-chart-label">Portfolio Performance</div>
+                <svg class="hero-chart-svg" viewBox="0 0 280 120" xmlns="http://www.w3.org/2000/svg">
+                  <defs>
+                    <linearGradient id="chartFill" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stop-color="#3B82F6" stop-opacity="0.35"/>
+                      <stop offset="100%" stop-color="#3B82F6" stop-opacity="0"/>
+                    </linearGradient>
+                    <linearGradient id="chartStroke" x1="0" y1="0" x2="1" y2="0">
+                      <stop offset="0%" stop-color="#6366F1"/>
+                      <stop offset="100%" stop-color="#3B82F6"/>
+                    </linearGradient>
+                    <filter id="glow">
+                      <feGaussianBlur stdDeviation="2" result="blur"/>
+                      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+                    </filter>
+                  </defs>
+                  <!-- Grid lines -->
+                  <line x1="0" y1="30" x2="280" y2="30" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
+                  <line x1="0" y1="60" x2="280" y2="60" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
+                  <line x1="0" y1="90" x2="280" y2="90" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
+                  <!-- Y axis labels -->
+                  <text x="4" y="28" font-size="8" fill="rgba(255,255,255,0.3)" font-family="JetBrains Mono,monospace">+18%</text>
+                  <text x="4" y="58" font-size="8" fill="rgba(255,255,255,0.3)" font-family="JetBrains Mono,monospace">+9%</text>
+                  <text x="4" y="88" font-size="8" fill="rgba(255,255,255,0.3)" font-family="JetBrains Mono,monospace">0%</text>
+                  <!-- Fill area -->
+                  <path d="M30,88 C50,80 65,72 85,60 C105,48 115,52 135,42 C155,32 165,38 185,28 C205,18 220,22 240,16 C255,12 265,10 270,8 L270,100 L30,100 Z" fill="url(#chartFill)" class="hero-chart-fill"/>
+                  <!-- Main line -->
+                  <path d="M30,88 C50,80 65,72 85,60 C105,48 115,52 135,42 C155,32 165,38 185,28 C205,18 220,22 240,16 C255,12 265,10 270,8" fill="none" stroke="url(#chartStroke)" stroke-width="2.5" stroke-linecap="round" filter="url(#glow)" class="hero-chart-line"/>
+                  <!-- Animated dot at end -->
+                  <circle cx="270" cy="8" r="4" fill="#3B82F6" class="hero-chart-dot"/>
+                  <circle cx="270" cy="8" r="8" fill="#3B82F6" opacity="0.2" class="hero-chart-pulse"/>
+                  <!-- Candlesticks (decorative, bottom right) -->
+                  <g opacity="0.4">
+                    <rect x="185" y="62" width="5" height="18" rx="1" fill="#10B981"/>
+                    <line x1="187.5" y1="58" x2="187.5" y2="62" stroke="#10B981" stroke-width="1.2"/>
+                    <line x1="187.5" y1="80" x2="187.5" y2="84" stroke="#10B981" stroke-width="1.2"/>
+                    <rect x="197" y="68" width="5" height="12" rx="1" fill="#EF4444"/>
+                    <line x1="199.5" y1="64" x2="199.5" y2="68" stroke="#EF4444" stroke-width="1.2"/>
+                    <line x1="199.5" y1="80" x2="199.5" y2="85" stroke="#EF4444" stroke-width="1.2"/>
+                    <rect x="209" y="60" width="5" height="20" rx="1" fill="#10B981"/>
+                    <line x1="211.5" y1="55" x2="211.5" y2="60" stroke="#10B981" stroke-width="1.2"/>
+                    <line x1="211.5" y1="80" x2="211.5" y2="86" stroke="#10B981" stroke-width="1.2"/>
+                    <rect x="221" y="64" width="5" height="8" rx="1" fill="#EF4444"/>
+                    <line x1="223.5" y1="60" x2="223.5" y2="64" stroke="#EF4444" stroke-width="1.2"/>
+                    <line x1="223.5" y1="72" x2="223.5" y2="76" stroke="#EF4444" stroke-width="1.2"/>
+                    <rect x="233" y="58" width="5" height="22" rx="1" fill="#10B981"/>
+                    <line x1="235.5" y1="53" x2="235.5" y2="58" stroke="#10B981" stroke-width="1.2"/>
+                    <line x1="235.5" y1="80" x2="235.5" y2="84" stroke="#10B981" stroke-width="1.2"/>
+                  </g>
+                </svg>
+                <!-- Mini stats row inside chart -->
+                <div class="hero-chart-stats">
+                  <div class="hero-chart-stat">
+                    <span class="hero-stat-val positive">+18.4%</span>
+                    <span class="hero-stat-lbl">Rendimiento</span>
+                  </div>
+                  <div class="hero-chart-stat">
+                    <span class="hero-stat-val">67.3%</span>
+                    <span class="hero-stat-lbl">Win Rate</span>
+                  </div>
+                  <div class="hero-chart-stat">
+                    <span class="hero-stat-val positive">2.41</span>
+                    <span class="hero-stat-lbl">Profit Factor</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         <!-- CAROUSEL -->
         <div class="mb-6">
           <p class="text-xs font-semibold uppercase tracking-wider mb-3" style="color:#475569;">Explora la plataforma</p>
