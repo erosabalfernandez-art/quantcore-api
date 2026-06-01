@@ -710,7 +710,7 @@ select.input-dark option{background:#131A26;color:#E2E8F0;}
           <div id="userAvatar" class="w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold" style="background:linear-gradient(135deg,#2563EB,#3B82F6);">J</div>
           <div class="hidden md:block text-left">
             <p id="navUserName" class="text-sm font-semibold leading-tight">Cargando...</p>
-            <p id="navUserPlan" class="text-xs" style="color:#2563EB;">Gratis</p>
+            <span id="navUserPlan" class="text-xs px-2 py-0.5 rounded-full font-bold badge-gratis">Gratis</span>
           </div>
           <svg width="12" height="12" fill="none" stroke="#94A3B8" stroke-width="2" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
         </button>
@@ -2673,14 +2673,39 @@ async function loadAppForUser(user) {
     const {data:p} = await sb.from('perfiles').select('*').eq('id', user.id).single();
     currentPerfil = p || null;
     isAdmin = (p && p.rol === 'admin') || false;
+
+    // ── Admin nav ──
     const adminNav = document.getElementById('nav-admin');
     if (adminNav) adminNav.classList.toggle('hidden', !isAdmin);
-    const userNameEl = document.getElementById('userName');
-    if (userNameEl && p) userNameEl.textContent = p.nombre || user.email || '';
-    const userEmailEl = document.getElementById('userEmail');
-    if (userEmailEl) userEmailEl.textContent = user.email || '';
-    const planBadge = document.getElementById('userPlanBadge');
-    if (planBadge && p) planBadge.textContent = (p.plan||'gratis').charAt(0).toUpperCase()+(p.plan||'gratis').slice(1);
+
+    // ── Avatar initial ──
+    const nombre = (p && p.nombre) ? p.nombre : (user.email || '?');
+    const initial = nombre.charAt(0).toUpperCase();
+    const avatar = document.getElementById('userAvatar');
+    if (avatar) avatar.textContent = initial;
+
+    // ── Name in nav button ──
+    const navName = document.getElementById('navUserName');
+    if (navName) navName.textContent = nombre.split(' ')[0]; // first name only
+
+    // ── Plan badge in nav button ──
+    const plan = (p && p.plan) ? p.plan : 'gratis';
+    const planLabel = plan.charAt(0).toUpperCase() + plan.slice(1);
+    const navPlan = document.getElementById('navUserPlan');
+    if (navPlan) {
+      navPlan.textContent = planLabel;
+      navPlan.className = 'text-xs px-2 py-0.5 rounded-full font-bold badge-' + plan;
+    }
+
+    // ── Email in dropdown ──
+    const menuEmail = document.getElementById('menuUserEmail');
+    if (menuEmail) menuEmail.textContent = user.email || '';
+
+    // ── Sidebar token ──
+    const sidebarTok = document.getElementById('sidebarToken');
+    if (sidebarTok && p && p.token_licencia) {
+      sidebarTok.textContent = p.token_licencia.slice(0, 20) + '…';
+    }
   } catch(e) { console.warn('loadAppForUser profile error:', e); }
 }
 function openPayModal(plan) {
