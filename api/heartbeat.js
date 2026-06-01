@@ -29,12 +29,24 @@
     try {
       const { data: perfil, error: errP } = await sb
         .from('perfiles')
-        .select('id, bloqueado, plan, mt5_cuenta, mt5_cuenta_bloqueada')
+        .select('id, bloqueado, plan, mt5_cuenta, mt5_cuenta_bloqueada, fecha_expiracion_plan')
         .eq('token_licencia', token)
         .single();
 
       if (errP || !perfil) return res.status(403).json({ ok: false, motivo: 'Token no válido' });
       if (perfil.bloqueado) return res.status(403).json({ ok: false, motivo: 'Cuenta bloqueada' });
+
+      // Membresía expirada
+      if (perfil.plan !== 'gratis' && perfil.fecha_expiracion_plan) {
+        const expDate = new Date(perfil.fecha_expiracion_plan);
+        if (expDate < new Date()) {
+          return res.status(403).json({
+            ok: false,
+            motivo: `Membresía ${perfil.plan} vencida el ${expDate.toLocaleDateString('es-ES')}. Renueva tu plan en FlowTrade Suite.`,
+            expirado: true,
+          });
+        }
+      }
 
       // Verificar cuenta MT5 bloqueada
       if (perfil.mt5_cuenta_bloqueada && perfil.mt5_cuenta &&
