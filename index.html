@@ -2873,15 +2873,17 @@ async function loadAppForUser(user) {
   if(_auth) _auth.classList.add('hidden');
   const _cb = document.getElementById('chatBubble');
   if(_cb) _cb.classList.remove('hidden');
+  // Muestra inicio inmediatamente — no espera queries de Supabase
+  try { showSection('inicio'); } catch(_){}
   try {
     const _t = ms => new Promise((_,rej)=>setTimeout(()=>rej(new Error('timeout')),ms));
     const [{data:p},{data:adminRow}] = await Promise.all([
-      Promise.race([sb.from('perfiles').select('*').eq('id', user.id).single(), _t(5000)]),
-      Promise.race([sb.from('admins').select('user_id').eq('user_id', user.id).maybeSingle(), _t(5000)]),
+      Promise.race([sb.from('perfiles').select('*').eq('id', user.id).single(), _t(3000)]),
+      Promise.race([sb.from('admins').select('user_id').eq('user_id', user.id).maybeSingle(), _t(3000)]),
     ]).catch(async ()=>{
       // Fallback: try individually with extended timeout
-      const {data:p2} = await Promise.race([sb.from('perfiles').select('*').eq('id', user.id).single(), _t(15000)]).catch(()=>({data:null}));
-      const {data:ar2} = await Promise.race([sb.from('admins').select('user_id').eq('user_id', user.id).maybeSingle(), _t(15000)]).catch(()=>({data:null}));
+      const {data:p2} = await Promise.race([sb.from('perfiles').select('*').eq('id', user.id).single(), _t(5000)]).catch(()=>({data:null}));
+      const {data:ar2} = await Promise.race([sb.from('admins').select('user_id').eq('user_id', user.id).maybeSingle(), _t(5000)]).catch(()=>({data:null}));
       return [{data:p2},{data:ar2}];
     });
     currentPerfil = p || null;
@@ -5794,10 +5796,10 @@ async function handleOverlayLogin() {
     btn.disabled = false; btn.textContent = 'Entrar a la plataforma';
     msg.textContent = '⏱ La conexión tardó demasiado. Comprueba tu internet y vuelve a intentarlo.';
     msg.classList.remove('hidden');
-  }, 20000);
+  }, 10000);
 
   try {
-    const timeout20s = new Promise((_, rej) => setTimeout(() => rej(new Error('timeout')), 19000));
+    const timeout20s = new Promise((_, rej) => setTimeout(() => rej(new Error('timeout')), 9000));
     const loginResult = await Promise.race([
       sb.auth.signInWithPassword({ email, password: pass }),
       timeout20s,
