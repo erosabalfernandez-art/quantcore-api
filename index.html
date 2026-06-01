@@ -240,7 +240,12 @@ html[data-theme="light"] .glass-nav {
 }
 #themeToggleBtn:hover { border-color: rgba(148,163,184,.6); color: #E2E8F0; }
 
-</style>
+@keyframes ft-spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+  #appLoader{position:fixed;inset:0;z-index:99999;background:#0B0F17;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:14px}
+  #appLoader.fade-out{opacity:0;pointer-events:none;transition:opacity .3s}
+  #appLoader .sp{width:42px;height:42px;border:3px solid rgba(37,99,235,.2);border-top-color:#2563EB;border-radius:50%;animation:ft-spin .9s linear infinite}
+  #appLoader .lt{color:#64748B;font-size:13px;letter-spacing:.02em}
+  </style>
 <!-- Google Translate -->
 <div id="google_translate_element" style="display:none;position:absolute;"></div>
 <script>
@@ -279,6 +284,7 @@ window.addEventListener('load', () => {
 <script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 </head>
 <body>
+  <div id="appLoader"><div class="sp"></div><span class="lt">Cargando FlowTrade Suite…</span></div>
 <!-- COOKIE BANNER -->
 <div id="cookieBanner" class="hidden">
   <div style="max-width:1152px;margin:0 auto;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:16px;">
@@ -1303,7 +1309,7 @@ window.addEventListener('load', () => {
       <!-- ████ END INICIO ████ -->
 
       <!-- DASHBOARD -->
-      <div id="section-dashboard">
+      <div id="section-dashboard" class="hidden">
         <div class="mb-5 flex items-center justify-between">
           <div><h1 class="text-xl font-bold">Dashboard</h1><p class="text-xs mt-0.5" style="color:#94A3B8;">Resumen de tu actividad de trading</p></div>
           <button onclick="toggleWidgetEditMode()" id="widgetEditBtn" class="btn-outline text-xs px-3 py-1.5 rounded-lg">Widgets</button>
@@ -5623,24 +5629,33 @@ async function mt5SimulateReceive() {
       session = result?.data?.session ?? null;
     } catch(e) {
       showLanding();
+      const ldrE = document.getElementById('appLoader');
+      if (ldrE) { ldrE.classList.add('fade-out'); setTimeout(()=>{ ldrE.style.display='none'; }, 350); }
       return;
     }
-    if (!session) {
-      showLanding();
-    } else if (!_appBootstrapping) {
-      _appBootstrapping = true;
-      try {
-        await loadAppForUser(session.user);
-        document.getElementById('landingPage').classList.add('hidden');
-        document.getElementById('authOverlay').classList.add('hidden');
-        const _savedSection = localStorage.getItem('flowtrade_last_section');
-        const _validSections = ['inicio','dashboard','diario','planes','perfil','admin',
-          'calculadora','calc-mt5','noticias','referidos','ranking','logros','descargas','conectarmt5'];
-        showSection((_savedSection && _validSections.includes(_savedSection)) ? _savedSection : 'inicio');
-      } catch(e) {
+    const _hideLoader = () => {
+        const ldr = document.getElementById('appLoader');
+        if (ldr) { ldr.classList.add('fade-out'); setTimeout(()=>{ ldr.style.display='none'; }, 350); }
+      };
+      if (!session) {
         showLanding();
+        _hideLoader();
+      } else if (!_appBootstrapping) {
+        _appBootstrapping = true;
+        try {
+          await loadAppForUser(session.user);
+          document.getElementById('landingPage').classList.add('hidden');
+          document.getElementById('authOverlay').classList.add('hidden');
+          const _savedSection = localStorage.getItem('flowtrade_last_section');
+          const _validSections = ['inicio','dashboard','diario','planes','perfil','admin',
+            'calculadora','calc-mt5','noticias','referidos','ranking','logros','descargas','conectarmt5'];
+          showSection((_savedSection && _validSections.includes(_savedSection)) ? _savedSection : 'inicio');
+        } catch(e) {
+          showLanding();
+        } finally {
+          _hideLoader();
+        }
       }
-    }
     try { updatePayInstructions(); } catch(e) {}
     // Check maintenance on load (public check)
     try {
