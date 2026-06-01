@@ -1578,7 +1578,7 @@ select.input-dark option{background:#131A26;color:#E2E8F0;}
           <button id="adminTab-usuarios" onclick="showAdminTab('usuarios')" class="px-4 py-2 rounded-xl text-xs font-semibold" style="background:rgba(37,99,235,.15);color:#2563EB;border:1px solid rgba(37,99,235,.3);">Usuarios</button>
           <button id="adminTab-membresia" onclick="showAdminTab('membresia')" class="px-4 py-2 rounded-xl text-xs font-semibold btn-outline">Membresía</button>
           <button id="adminTab-pagos" onclick="showAdminTab('pagos')" class="px-4 py-2 rounded-xl text-xs font-semibold btn-outline">💳 Pagos <span id="chatUnreadBadge" class="hidden ml-1 px-1.5 py-0.5 rounded-full text-xs" style="background:#EF4444;color:#fff;">0</span></button>
-          <button id="adminTab-chats" onclick="showAdminTab('chats')" class="px-4 py-2 rounded-xl text-xs font-semibold btn-outline">Chats</button>
+          <button id="adminTab-chats" onclick="showAdminTab('chats');clearAdminChatBadge();" class="px-4 py-2 rounded-xl text-xs font-semibold btn-outline" style="position:relative;">Chats<span id="adminChatBadge" class="hidden" style="position:absolute;top:-4px;right:-4px;background:#EF4444;color:#fff;border-radius:50%;font-size:9px;font-weight:700;min-width:16px;height:16px;display:none;align-items:center;justify-content:center;padding:0 3px;">0</span></button>
           <button id="adminTab-licencias" onclick="showAdminTab('licencias')" class="px-4 py-2 rounded-xl text-xs font-semibold btn-outline">Licencias EA</button>
           <button id="adminTab-logslic" onclick="showAdminTab('logslic')" class="px-4 py-2 rounded-xl text-xs font-semibold btn-outline">Logs</button>
           <button id="adminTab-estadisticas" onclick="showAdminTab('estadisticas')" class="px-4 py-2 rounded-xl text-xs font-semibold btn-outline">Estadísticas de la Plataforma</button>
@@ -2853,6 +2853,8 @@ async function loadAppForUser(user) {
     });
     currentPerfil = p || null;
     isAdmin = !!adminRow;
+      // ── Start admin realtime chat notifications ──
+      if (isAdmin) { setTimeout(startAdminRealtimeChat, 1000); }
 
     // ── Admin nav ──
     const adminNav = document.getElementById('nav-admin');
@@ -3097,7 +3099,7 @@ function showAdminTab(tab) {
     if (t!==tab) btn.className='px-4 py-2 rounded-xl text-xs font-semibold btn-outline';
   });
   if (tab==='pagos') loadPagos();
-  if (tab==='chats') loadAdminConversations();
+  if (tab==='chats') { loadAdminConversations(); clearAdminChatBadge(); }
   if (tab==='membresia') loadMembresiaUserSelect();
   if (tab==='licencias') loadLicencias();
   if (tab==='logslic') loadLogsLic();
@@ -6002,9 +6004,109 @@ function forceClearSession() {
     } else {
       clearTimeout(inactivityTimer);
       clearTimeout(warningTimer);
-      currentUser = null; currentPerfil = null; isAdmin = false;
+      currentUser = null; currentPerfil = null; isAdmin = false; stopAdminRealtimeChat();
     }
   });
+
+  // ═══════════════════════════════════════════════════════════════
+  // ADMIN: REALTIME CHAT NOTIFICATIONS
+  // ═══════════════════════════════════════════════════════════════
+  let _adminRealtimeChannel = null;
+  let _adminChatBadgeCount = 0;
+
+  function playAdminNotifSound() {
+    try {
+      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain); gain.connect(ctx.destination);
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(880, ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(660, ctx.currentTime + 0.12);
+      gain.gain.setValueAtTime(0.18, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.35);
+      osc.start(ctx.currentTime);
+      osc.stop(ctx.currentTime + 0.35);
+      osc.onended = () => ctx.close();
+    } catch(e) { /* AudioContext not available */ }
+  }
+
+  function updateAdminChatBadge(delta) {
+    _adminChatBadgeCount = Math.max(0, _adminChatBadgeCount + delta);
+    const badge = document.getElementById('adminChatBadge');
+    if (!badge) return;
+    if (_adminChatBadgeCount > 0) {
+      badge.textContent = _adminChatBadgeCount > 9 ? '9+' : _adminChatBadgeCount;
+      badge.style.display = 'flex';
+      badge.classList.remove('hidden');
+    } else {
+      badge.style.display = 'none';
+      badge.classList.add('hidden');
+    }
+  }
+
+  function clearAdminChatBadge() {
+    _adminChatBadgeCount = 0;
+    const badge = document.getElementById('adminChatBadge');
+    if (badge) { badge.style.display = 'none'; badge.classList.add('hidden'); }
+  }
+
+  function startAdminRealtimeChat() {
+    if (_adminRealtimeChannel) return; // already subscribed
+    if (!isAdmin) return;
+
+    _adminRealtimeChannel = sb.channel('admin-mensajes-realtime')
+      .on('postgres_changes', {
+        event: 'INSERT',
+        schema: 'public',
+        table: 'mensajes',
+        filter: "remitente_tipo=eq.user"
+      }, async (payload) => {
+        const msg = payload.new;
+        if (!msg) return;
+
+        // Check if admin chats tab is currently open and visible
+        const chatsContent = document.getElementById('adminContent-chats');
+        const adminSection = document.getElementById('section-admin');
+        const chatsVisible = adminSection && !adminSection.classList.contains('hidden')
+                          && chatsContent && !chatsContent.classList.contains('hidden');
+
+        if (chatsVisible) {
+          // If the active conversation matches incoming message → auto-render
+          if (msg.conversacion_id === adminSelectedConvId) {
+            try {
+              const msgs = await loadChatMessages(adminSelectedConvId);
+              renderChatMessages(msgs, 'adminChatMessages');
+            } catch(_) {}
+          } else {
+            // Different conversation → reload the conversation list + show notification
+            try { loadAdminConversations(); } catch(_) {}
+            playAdminNotifSound();
+            toast('💬 Nuevo mensaje de usuario', 'info', 3500);
+          }
+          // Always reload conversation list to update unread counts
+          try { setTimeout(loadAdminConversations, 500); } catch(_) {}
+        } else {
+          // Admin panel not visible → show badge + sound
+          playAdminNotifSound();
+          updateAdminChatBadge(1);
+          // Also show a toast if app is open
+          if (currentUser) toast('💬 Nuevo mensaje en soporte', 'info', 4000);
+        }
+      })
+      .subscribe((status) => {
+        if (status === 'SUBSCRIBED') console.log('[Realtime] Admin chat subscribed ✅');
+        if (status === 'CHANNEL_ERROR') console.warn('[Realtime] Admin chat channel error');
+      });
+  }
+
+  function stopAdminRealtimeChat() {
+    if (_adminRealtimeChannel) {
+      try { sb.removeChannel(_adminRealtimeChannel); } catch(_) {}
+      _adminRealtimeChannel = null;
+      _adminChatBadgeCount = 0;
+    }
+  }
 })();
 </script>
 
