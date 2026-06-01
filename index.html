@@ -4667,9 +4667,13 @@ function startAdminPolling() {
 function stopAdminPolling() { if(adminPollInterval){clearInterval(adminPollInterval);adminPollInterval=null;} }
 async function loadAdminConversations() {
   if (!isAdmin) return;
-  const {data}=await sb.from('conversaciones').select('*,perfiles!conversaciones_usuario_id_fkey(nombre)').order('ultimo_mensaje_en',{ascending:false,nullsFirst:false});
+  const {data,error}=await sb.from('conversaciones').select('*').order('ultimo_mensaje_en',{ascending:false,nullsFirst:false});
   const c=document.getElementById('adminConvList');
-  if (!data?.length) { c.innerHTML='<p style="padding:12px;color:#475569;">Sin conversaciones</p>'; return; }
+  if (error||!data?.length) { c.innerHTML='<p style="padding:12px;color:#475569;">Sin conversaciones</p>'; return; }
+  // Fetch user names separately (avoid FK join cache issues)
+  const convUids=[...new Set(data.filter(cv=>cv.usuario_id).map(cv=>cv.usuario_id))];
+  const convNames={};
+  if(convUids.length){const{data:_cp}=await sb.from('perfiles').select('id,nombre').in('id',convUids);(_cp||[]).forEach(p=>convNames[p.id]=p.nombre);}
   const {data:unread}=await sb.from('mensajes').select('conversacion_id').eq('leido',false).eq('remitente_tipo','user');
   const unreadMap={};
   (unread||[]).forEach(m=>{ unreadMap[m.conversacion_id]=(unreadMap[m.conversacion_id]||0)+1; });
@@ -4678,8 +4682,9 @@ async function loadAdminConversations() {
   document.getElementById('chatUnreadBadge').classList.toggle('hidden',total<=0);
   c.innerHTML=data.map(conv=>{
     const un=unreadMap[conv.id]||0;
-    return `<div onclick="openAdminConv('${conv.id}','${escA(conv.perfiles?.nombre||'Usuario')}')" class="p-3 rounded-xl cursor-pointer hover:bg-white/5 transition-all" style="border-bottom:1px solid rgba(30,41,59,.4);">
-      <div class="flex items-center justify-between"><span class="font-semibold" style="font-size:12px;">${esc(conv.perfiles?.nombre||'—')}</span>${un?`<span class="px-1.5 py-0.5 rounded-full text-xs font-bold" style="background:#EF4444;color:#fff;">${un}</span>`:''}</div>
+    const userName=convNames[conv.usuario_id]||'Usuario';
+    return `<div onclick="openAdminConv('${conv.id}','${escA(userName)}')" class="p-3 rounded-xl cursor-pointer hover:bg-white/5 transition-all" style="border-bottom:1px solid rgba(30,41,59,.4);">
+      <div class="flex items-center justify-between"><span class="font-semibold" style="font-size:12px;">${esc(userName)}</span>${un?`<span class="px-1.5 py-0.5 rounded-full text-xs font-bold" style="background:#EF4444;color:#fff;">${un}</span>`:''}</div>
       <p style="font-size:11px;color:#475569;">${conv.ultimo_mensaje_en?new Date(conv.ultimo_mensaje_en).toLocaleString('es-ES'):'Sin mensajes'}</p>
     </div>`;
   }).join('');
