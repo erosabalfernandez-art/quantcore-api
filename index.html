@@ -3009,7 +3009,8 @@ async function grantMembership() {
   if (!userId) return toast('Selecciona un usuario','error');
   let fecha_exp=null;
   if (dur>0) { const d=new Date(); d.setMonth(d.getMonth()+dur); fecha_exp=d.toISOString(); }
-  const {error}=await sb.from('perfiles').update({plan,fecha_expiracion_plan:fecha_exp}).eq('id',userId);
+  const newToken2 = crypto.randomUUID();
+  const {error}=await sb.from('perfiles').update({plan,fecha_expiracion_plan:fecha_exp, token_licencia: newToken2}).eq('id',userId);
   if (error) return toast('Error: '+error.message,'error');
   toast(`Plan ${cap(plan)} otorgado`,'success');
   loadAllUsers();
@@ -3045,7 +3046,8 @@ async function verifyPago(id, userId, plan) {
   if (errPago) return toast('Error: '+errPago.message,'error');
   let fecha_exp=null;
   if (dur>0) { const d=new Date(); d.setMonth(d.getMonth()+dur); fecha_exp=d.toISOString(); }
-  const {error:errPerfil}=await sb.from('perfiles').update({plan:plan||'premium',fecha_expiracion_plan:fecha_exp}).eq('id',userId);
+  const newToken = crypto.randomUUID();
+  const {error:errPerfil}=await sb.from('perfiles').update({plan:plan||'premium',fecha_expiracion_plan:fecha_exp, token_licencia: newToken}).eq('id',userId);
   if (errPerfil) return toast('Pago aprobado, error al actualizar plan: '+errPerfil.message,'error');
 
   // Generate referral commission
