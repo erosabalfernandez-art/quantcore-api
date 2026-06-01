@@ -2548,14 +2548,22 @@ select.input-dark option{background:#131A26;color:#E2E8F0;}
     </div>
     <div id="chatMessages" class="p-3 flex flex-col gap-2 overflow-y-auto" style="height:280px;"></div>
     <div class="p-3 border-t" style="border-color:rgba(30,41,59,.5);">
-      <div class="flex gap-2">
-        <label class="btn-ghost cursor-pointer p-2" title="Adjuntar imagen">
-          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-          <input type="file" accept="image/*" class="hidden" onchange="attachChatImage(event)"/>
-        </label>
-        <input id="chatInput" class="input-dark flex-1 px-3 py-2 rounded-xl text-sm" placeholder="Escribe un mensaje..." onkeydown="if(event.key==='Enter')sendUserMessage()"/>
-        <button onclick="sendUserMessage()" class="btn-green px-3 py-2 rounded-xl text-sm">→</button>
-      </div>
+      <!-- Preview de imagen pendiente -->
+        <div id="chatImgPreviewRow" class="hidden mb-2 flex items-center gap-2 px-1">
+          <div class="relative inline-block">
+            <img id="chatImgPreview" src="" class="rounded-lg object-cover" style="max-height:64px;max-width:120px;border:1px solid rgba(37,99,235,.3);"/>
+            <button onclick="cancelChatImage()" class="absolute -top-1 -right-1 rounded-full flex items-center justify-center" style="background:#EF4444;width:16px;height:16px;border:none;cursor:pointer;color:white;font-size:10px;line-height:1;">✕</button>
+          </div>
+          <span class="text-xs" style="color:#94A3B8;">Imagen lista — escribe un mensaje o envía directo</span>
+        </div>
+        <div class="flex gap-2">
+          <label class="btn-ghost cursor-pointer p-2" title="Adjuntar imagen">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+            <input type="file" accept="image/*" class="hidden" onchange="attachChatImage(event)"/>
+          </label>
+          <input id="chatInput" class="input-dark flex-1 px-3 py-2 rounded-xl text-sm" placeholder="Escribe un mensaje..." onkeydown="if(event.key==='Enter')sendUserMessage()"/>
+          <button onclick="sendUserMessage()" class="btn-green px-3 py-2 rounded-xl text-sm">→</button>
+        </div>
     </div>
   </div>
 </div>
@@ -5123,22 +5131,46 @@ async function toggleChatModal() {
   } else { modal.classList.add('hidden'); }
 }
 let pendingChatImage=null;
-function attachChatImage(event) { pendingChatImage=event.target.files[0]; if(pendingChatImage) toast('Imagen lista, envía el mensaje','info'); }
+function attachChatImage(event) {
+  pendingChatImage = event.target.files[0];
+  if (!pendingChatImage) return;
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    var preview = document.getElementById('chatImgPreview');
+    var row = document.getElementById('chatImgPreviewRow');
+    if (preview) preview.src = e.target.result;
+    if (row) row.classList.remove('hidden');
+  };
+  reader.readAsDataURL(pendingChatImage);
+}
+function cancelChatImage() {
+  pendingChatImage = null;
+  var row = document.getElementById('chatImgPreviewRow');
+  var img = document.getElementById('chatImgPreview');
+  if (row) row.classList.add('hidden');
+  if (img) img.src = '';
+}; }
 async function sendUserMessage() {
   const input=document.getElementById('chatInput');
   const text=input.value.trim();
   if (!text&&!pendingChatImage) return;
   if (!currentUser) return toast('Inicia sesión para enviar mensajes','error');
-  // Optimistic UI: show message immediately
-  const chatC=document.getElementById('chatMessages');
-  if (chatC&&text) {
-    const d=document.createElement('div');
-    d.className='flex justify-end';
-    d.innerHTML=`<div class="chat-msg-user p-3" style="max-width:75%;"><p style="font-size:13px;">${esc(text)}</p><p style="font-size:10px;color:#475569;margin-top:4px;text-align:right;">${new Date().toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'})}</p></div>`;
-    chatC.appendChild(d);
-    chatC.scrollTop=chatC.scrollHeight;
-  }
-  input.value='';
+  // Optimistic UI: show message + image immediately
+    const chatC=document.getElementById('chatMessages');
+    if (chatC && (text || pendingChatImage)) {
+      const d=document.createElement('div');
+      d.className='flex justify-end';
+      var imgTag = pendingChatImage ? '<img src="'+URL.createObjectURL(pendingChatImage)+'" class="rounded-lg mb-1 object-cover" style="max-height:120px;max-width:200px;"/>' : '';
+      d.innerHTML='<div class="chat-msg-user p-3" style="max-width:75%;">'+imgTag+(text?'<p style="font-size:13px;">'+esc(text)+'</p>':'')+'<p style="font-size:10px;color:#475569;margin-top:4px;text-align:right;">'+new Date().toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'})+'</p></div>';
+      chatC.appendChild(d);
+      chatC.scrollTop=chatC.scrollHeight;
+    }
+    // Hide preview strip
+    var previewRow = document.getElementById('chatImgPreviewRow');
+    if (previewRow) previewRow.classList.add('hidden');
+    var previewImg = document.getElementById('chatImgPreview');
+    if (previewImg) previewImg.src='';
+    input.value='';
   try {
     const convId=await createOrGetConversation();
     if (!convId) {
