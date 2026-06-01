@@ -2803,7 +2803,7 @@ async function idbGetAllTrades() { return idbGetAll(); }
 // ═══════════════════════════════════════════════════════════════
 // JOURNAL + DASHBOARD
 // ═══════════════════════════════════════════════════════════════
-async function loadJournal() {
+async async function loadJournal() {
   journalTrades = await idbGetAll();
   journalTrades.sort((a,b)=>new Date(b.fecha)-new Date(a.fecha));
   updateDashboardMetrics();
@@ -2930,7 +2930,7 @@ function showSection(id) {
 // ═══════════════════════════════════════════════════════════════
 // LOAD APP FOR AUTHENTICATED USER
 // ═══════════════════════════════════════════════════════════════
-async function loadAppForUser(user) {
+async async function loadAppForUser(user) {
   currentUser = user;
   window.currentUser = user;
   // Mostrar app inmediatamente con datos básicos del session
@@ -5628,11 +5628,158 @@ async function mt5SimulateReceive() {
   await updateDashboardMetrics();
 }
 
-// ═══════════════════════════════════════════════════════════════
-// INIT
-// ═══════════════════════════════════════════════════════════════
-(async()=>{
-    function showLanding() {
+
+  // ═══════════════════════════════════════════════════════════════
+  // MISSING FUNCTIONS — FIXED (audit)
+  // ═══════════════════════════════════════════════════════════════
+
+  // ── Auth: non-overlay login form ──
+  async function handleLogin() {
+    const email = (document.getElementById('loginEmail')?.value || '').trim();
+    const pass  = document.getElementById('loginPassword')?.value || '';
+    const msg   = document.getElementById('authMsg');
+    const btn   = document.getElementById('btnLogin');
+    if (!email || !pass) { if(msg){msg.textContent='Rellena el email y la contraseña.';msg.classList.remove('hidden');} return; }
+    if(btn){btn.disabled=true;btn.textContent='Verificando...';}
+    if(msg) msg.classList.add('hidden');
+    const _t = setTimeout(()=>{ if(btn){btn.disabled=false;btn.textContent='Entrar a la plataforma';} if(msg){msg.textContent='⏱ La conexión tardó demasiado. Inténtalo de nuevo.';msg.classList.remove('hidden');} }, 20000);
+    try {
+      const { data, error } = await Promise.race([
+        sb.auth.signInWithPassword({ email, password: pass }),
+        new Promise((_,rej)=>setTimeout(()=>rej(new Error('timeout')),19000))
+      ]);
+      if (error) {
+        clearTimeout(_t);
+        if(msg){msg.textContent=error.message;msg.classList.remove('hidden');}
+        if(btn){btn.disabled=false;btn.textContent='Entrar a la plataforma';}
+        return;
+      }
+      clearTimeout(_t);
+      // Auth state listener (onAuthStateChange) handles redirect
+    } catch(e) {
+      clearTimeout(_t);
+      if(msg){msg.textContent='Error de conexión. Comprueba tu internet.';msg.classList.remove('hidden');}
+      if(btn){btn.disabled=false;btn.textContent='Entrar a la plataforma';}
+    }
+  }
+
+  async function handleRegister() {
+    const nombre  = (document.getElementById('regNombre')?.value || '').trim();
+    const email   = (document.getElementById('regEmail')?.value || '').trim();
+    const pass    = document.getElementById('regPassword')?.value || '';
+    const refCode = (document.getElementById('regRefCode')?.value || '').trim();
+    const msg     = document.getElementById('regMsg');
+    const btn     = document.getElementById('btnRegister');
+    if (!nombre || !email || !pass) { if(msg){msg.style.cssText='background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.3);color:#FCA5A5;';msg.textContent='Rellena todos los campos.';msg.classList.remove('hidden');} return; }
+    if(!email.includes('@')){ if(msg){msg.textContent='Escribe un email válido.';msg.classList.remove('hidden');} return; }
+    if(pass.length<8){ if(msg){msg.textContent='La contraseña debe tener mínimo 8 caracteres.';msg.classList.remove('hidden');} return; }
+    if(btn){btn.disabled=true;btn.textContent='Creando cuenta...';}
+    try {
+      let referenteId = null;
+      if (refCode) {
+        const { data: rp } = await sb.from('perfiles').select('id').eq('token_licencia', refCode).single().catch(()=>({data:null}));
+        if (rp) referenteId = rp.id;
+      }
+      const { data, error } = await sb.auth.signUp({ email, password: pass, options:{ data:{ nombre } } });
+      if (error) { if(msg){msg.style.cssText='background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.3);color:#FCA5A5;';msg.textContent=error.message;msg.classList.remove('hidden');} if(btn){btn.disabled=false;btn.textContent='Crear cuenta';} return; }
+      if (referenteId && data?.user) { await sb.from('referidos').insert({ referente_id: referenteId, referido_id: data.user.id }).catch(()=>{}); }
+      if(msg){msg.style.cssText='background:rgba(37,99,235,.12);border:1px solid rgba(37,99,235,.3);color:#93C5FD;';msg.innerHTML='📧 Confirma tu email en <strong>'+email+'</strong>. Revisa la carpeta de spam.';msg.classList.remove('hidden');}
+      if(btn){btn.disabled=false;btn.textContent='Crear cuenta';}
+    } catch(e) {
+      if(msg){msg.textContent='Error inesperado. Inténtalo de nuevo.';msg.classList.remove('hidden');}
+      if(btn){btn.disabled=false;btn.textContent='Crear cuenta';}
+    }
+  }
+
+  async function handleForgotPassword() {
+    const email = (document.getElementById('loginEmail')?.value || '').trim();
+    const msg   = document.getElementById('authMsg');
+    if (!email) { if(msg){msg.textContent='Escribe tu email primero.';msg.classList.remove('hidden');} return; }
+    const { error } = await sb.auth.resetPasswordForEmail(email).catch(e=>({error:e}));
+    if (error) { if(msg){msg.textContent='No se pudo enviar: '+error.message;msg.classList.remove('hidden');} return; }
+    if(msg){msg.style.cssText='background:rgba(37,99,235,.12);border:1px solid rgba(37,99,235,.3);color:#93C5FD;';msg.innerHTML='📧 Email de recuperación enviado a <strong>'+email+'</strong>. Revisa spam.';msg.classList.remove('hidden');}
+  }
+
+  async function handleResendConfirmation() {
+    const email = (document.getElementById('loginEmail')?.value || '').trim();
+    const msg   = document.getElementById('authMsg');
+    const btn   = document.getElementById('btnResend');
+    if (!email) { if(msg){msg.textContent='Escribe tu email primero.';msg.classList.remove('hidden');} return; }
+    if(btn){btn.disabled=true;btn.textContent='Enviando...';}
+    const { error } = await sb.auth.resend({ type:'signup', email }).catch(e=>({error:e}));
+    if (error) { if(msg){msg.textContent='Error: '+error.message;msg.classList.remove('hidden');} }
+    else { if(msg){msg.style.cssText='background:rgba(37,99,235,.12);border:1px solid rgba(37,99,235,.3);color:#93C5FD;';msg.textContent='📧 Email de confirmación reenviado a '+email;msg.classList.remove('hidden');} }
+    if(btn){btn.disabled=false;btn.textContent='📧 Reenviar email de confirmación';}
+  }
+
+  // ── Logout confirm ──
+  async function confirmLogout() {
+    closeModal('modalLogout');
+    try { await sb.auth.signOut(); } catch(_) {}
+    currentUser = null; window.currentUser = null; currentPerfil = null; window.currentPerfil = null;
+    const mainApp=document.getElementById('mainApp'), landing=document.getElementById('landingPage');
+    const cb=document.getElementById('chatBubble'), hb=document.getElementById('helpBubble');
+    if(mainApp) mainApp.classList.add('hidden');
+    if(landing) landing.classList.remove('hidden');
+    if(cb) cb.classList.add('hidden');
+    if(hb) hb.classList.add('hidden');
+    toast('Sesión cerrada', 'info', 2500);
+  }
+
+  // ── Journal render + pagination + filters ──
+  let _jPage = 0;
+  const _jPageSize = 20;
+
+  function renderJournal() {
+    const trades = journalTrades || [];
+    const fActivo  = (document.getElementById('filterActivo')?.value || '').toLowerCase().trim();
+    const fResult  = document.getElementById('filterResult')?.value || 'all';
+    const fFrom    = document.getElementById('filterFrom')?.value || '';
+    const fTo      = document.getElementById('filterTo')?.value || '';
+    let filtered = trades.filter(t => {
+      if (fActivo && !(t.activo||'').toLowerCase().includes(fActivo)) return false;
+      if (fResult === 'win'  && !(parseFloat(t.resultadoUSD||0) > 0)) return false;
+      if (fResult === 'loss' && !(parseFloat(t.resultadoUSD||0) < 0)) return false;
+      if (fFrom) { const d=(t.fecha||'').slice(0,10); if(d<fFrom) return false; }
+      if (fTo)   { const d=(t.fecha||'').slice(0,10); if(d>fTo)   return false; }
+      return true;
+    });
+    const total = filtered.length;
+    const pages = Math.max(1, Math.ceil(total / _jPageSize));
+    if (_jPage >= pages) _jPage = pages - 1;
+    const slice = filtered.slice(_jPage * _jPageSize, (_jPage + 1) * _jPageSize);
+    const tbody = document.getElementById('journalTableBody');
+    if (!tbody) return;
+    if (!slice.length) {
+      const empty = (total===0 && !fActivo && fResult==='all' && !fFrom && !fTo)
+        ? 'Sin trades aún. Importa un CSV/HTML o añade uno manualmente.'
+        : 'Sin resultados con estos filtros.';
+      tbody.innerHTML = '<tr><td colspan="10" class="text-center py-12" style="color:#475569;">'+empty+'</td></tr>';
+      const info = document.getElementById('journalPageInfo');
+      if(info) info.textContent = total ? (filtered.length+' trades filtrados') : 'Sin trades';
+      return;
+    }
+    tbody.innerHTML = slice.map(t => {
+      const pnl = parseFloat(t.resultadoUSD||0);
+      const color = pnl>0?'#2563EB':pnl<0?'#EF4444':'#94A3B8';
+      let fechaStr = '—';
+      try { fechaStr = new Date(t.fecha).toLocaleString('es-ES',{day:'2-digit',month:'2-digit',year:'2-digit',hour:'2-digit',minute:'2-digit'}); } catch(_){}
+      return '<tr style="border-bottom:1px solid rgba(30,41,59,.4);">'
+        +'<td class="px-4 py-3 mono" style="color:#94A3B8;white-space:nowrap;">'+esc(fechaStr)+'</td>'
+        +'<td class="px-4 py-3 font-semibold mono">'+esc(t.activo||'—')+'</td>'
+        +'<td class="px-4 py-3"><span style="color:'+(t.tipo==='Compra'?'#2563EB':'#EF4444')+'">'+esc(t.tipo||'—')+'</span></td>'
+        +'<td class="px-4 py-3 text-right mono">'+(t.lotes||'—')+'</td>'
+        +'<td class="px-4 py-3 text-right mono">'+(t.entrada||'—')+'</td>'
+        +'<td class="px-4 py-3 text-right mono">'+(t.salida||'—')+'</td>'
+        +'<td class="px-4 py-3 text-right mono" style="color:'+color+';">'+(pnl>=0?'+':'')+parseFloat(t.pips||0).toFixed(1)+'</td>'
+        +'<td class="px-4 py-3 text-right mono font-bold" style="color:'+color+';">'+(pnl>=0?'+':'')+'
+      const _loaderFailsafe = setTimeout(() => {
+        const ldr = document.getElementById('appLoader');
+        if (ldr) { ldr.classList.add('fade-out'); setTimeout(()=>{ ldr.style.display='none'; }, 350); }
+        const landing = document.getElementById('landingPage');
+        if (landing) landing.classList.remove('hidden');
+      }, 12000);
+      function showLanding() {
       document.getElementById('landingPage').classList.remove('hidden');
       document.getElementById('authScreen').classList.add('hidden');
       document.getElementById('mainApp').classList.add('hidden');
@@ -5651,9 +5798,764 @@ async function mt5SimulateReceive() {
       return;
     }
     const _hideLoader = () => {
+          clearTimeout(_loaderFailsafe);
+          const ldr = document.getElementById('appLoader');
+          if (ldr) { ldr.classList.add('fade-out'); setTimeout(()=>{ ldr.style.display='none'; }, 350); }
+        };
+      if (!session) {
+        showLanding();
+        _hideLoader();
+      } else if (!_appBootstrapping) {
+        _appBootstrapping = true;
+        try {
+          await loadAppForUser(session.user);
+          document.getElementById('landingPage').classList.add('hidden');
+          document.getElementById('authOverlay').classList.add('hidden');
+          const _savedSection = localStorage.getItem('flowtrade_last_section');
+          const _validSections = ['inicio','dashboard','diario','planes','perfil','admin',
+            'calculadora','calc-mt5','noticias','referidos','ranking','logros','descargas','conectarmt5'];
+          showSection((_savedSection && _validSections.includes(_savedSection)) ? _savedSection : 'inicio');
+        } catch(e) {
+          showLanding();
+        } finally {
+          _hideLoader();
+        }
+      }
+    try { updatePayInstructions(); } catch(e) {}
+    // Check maintenance on load (public check)
+    try {
+      const {data}=await sb.from('configuracion_plataforma').select('valor').eq('clave','modo_mantenimiento').single();
+      if (data?.valor==='true' && !session) {
+        document.getElementById('modalMaintenance').classList.remove('hidden');
+      }
+    } catch(e){}
+    // Cookie banner
+    if (!localStorage.getItem('cookiesAccepted')) {
+      setTimeout(function(){ document.getElementById('cookieBanner').classList.remove('hidden'); }, 1500);
+    }
+  })();
+
+function acceptCookies() {
+  localStorage.setItem('cookiesAccepted', 'true');
+  document.getElementById('cookieBanner').classList.add('hidden');
+}
+
+
+function toggleTheme() {
+  const html = document.documentElement;
+  const isLight = html.getAttribute('data-theme') === 'light';
+  html.setAttribute('data-theme', isLight ? 'dark' : 'light');
+  localStorage.setItem('ft_theme', isLight ? 'dark' : 'light');
+  const btn = document.getElementById('themeToggleBtn');
+  if (btn) btn.innerHTML = isLight
+    ? '<svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>Claro'
+    : '<svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>Oscuro';
+}
+// Apply saved theme on load
+(function(){
+  const saved = localStorage.getItem('ft_theme') || 'dark';
+  document.documentElement.setAttribute('data-theme', saved);
+  window.addEventListener('DOMContentLoaded', () => {
+    const btn = document.getElementById('themeToggleBtn');
+    if (!btn) return;
+    if (saved === 'light') btn.innerHTML = '<svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>Claro';
+  });
+})();
+
+// ═══════════════════════════════════════════════════════════════
+// WEB PUSH NOTIFICATIONS
+// ═══════════════════════════════════════════════════════════════
+const VAPID_PUBLIC_KEY = 'BDjdlulAsa13yWbgL1lxorpk9ZEHCjFe2r3_fPoDzw6h3tzyXLPu984jFLms6zFuUGwuYKfSxGf4g-fV2DorLyo';
+
+function urlBase64ToUint8Array(base64String) {
+  const padding = '='.repeat((4 - base64String.length % 4) % 4);
+  const base64  = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+  const raw     = window.atob(base64);
+  return new Uint8Array([...raw].map(c => c.charCodeAt(0)));
+}
+
+let _swRegistration = null;
+
+async function initServiceWorker() {
+  if (!('serviceWorker' in navigator) || !('PushManager' in window)) return;
+  try {
+    _swRegistration = await navigator.serviceWorker.register('/sw.js', { scope: '/' });
+    // Show "Activate alerts" button if permission not yet granted
+    const perm = Notification.permission;
+    if (perm === 'default') {
+      const btn = document.getElementById('notifPermBtn');
+      if (btn) btn.classList.remove('hidden');
+    }
+    // Auto-subscribe if already granted
+    if (perm === 'granted') {
+      await ensurePushSubscription();
+    }
+  } catch(e) { console.warn('SW register failed:', e); }
+}
+
+async function ensurePushSubscription() {
+  if (!_swRegistration || !currentUser) return;
+  try {
+    const existing = await _swRegistration.pushManager.getSubscription();
+    if (existing) { await savePushSubscription(existing); return; }
+    const sub = await _swRegistration.pushManager.subscribe({
+      userVisibleOnly: true,
+      applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY)
+    });
+    await savePushSubscription(sub);
+  } catch(e) { console.warn('Push subscribe error:', e); }
+}
+
+async function savePushSubscription(sub) {
+  if (!currentUser || !sub) return;
+  const subJson = sub.toJSON();
+  await sb.from('push_subscriptions').upsert({
+    user_id: currentUser.id,
+    endpoint: subJson.endpoint,
+    p256dh:  subJson.keys?.p256dh,
+    auth:    subJson.keys?.auth,
+    updated_at: new Date().toISOString()
+  }, { onConflict: 'user_id' }).catch(() => {});
+}
+
+async function requestPushPermission() {
+  if (!('Notification' in window)) { toast('Tu navegador no soporta notificaciones', 'info'); return; }
+  const perm = await Notification.requestPermission().catch(() => 'denied');
+  const btn  = document.getElementById('notifPermBtn');
+  if (perm === 'granted') {
+    if (btn) btn.classList.add('hidden');
+    await ensurePushSubscription();
+    toast('🔔 Notificaciones push activadas', 'success', 3000);
+  } else {
+    toast('⚠️ Permite las notificaciones en tu navegador', 'info', 4000);
+  }
+}
+
+async function unsubscribePush() {
+  if (!_swRegistration) return;
+  const sub = await _swRegistration.pushManager.getSubscription().catch(() => null);
+  if (sub) await sub.unsubscribe().catch(() => {});
+  if (currentUser) {
+    await sb.from('push_subscriptions').delete().eq('user_id', currentUser.id).catch(() => {});
+  }
+}
+
+// Init SW on DOMContentLoaded
+document.addEventListener('DOMContentLoaded', () => {
+  setTimeout(initServiceWorker, 1000);
+});
+
+function toggleLandingFAQ(btn) {
+  const item = btn.closest('.faq-item');
+  const isOpen = item.classList.contains('open');
+  document.querySelectorAll('.faq-item.open').forEach(el => el.classList.remove('open'));
+  if (!isOpen) item.classList.add('open');
+}
+
+function showAuthFromLanding(tab) {
+  document.getElementById('landingPage').classList.add('hidden');
+  document.getElementById('authOverlay').classList.remove('hidden');
+  switchOverlayTab(tab || 'login');
+}
+
+function switchOverlayTab(tab) {
+  const loginTab = document.getElementById('overlayTabLogin');
+  const registerTab = document.getElementById('overlayTabRegister');
+  const loginForm = document.getElementById('overlayFormLogin');
+  const registerForm = document.getElementById('overlayFormRegister');
+  if (tab === 'login') {
+    loginTab.style.background = '#131A26'; loginTab.style.color = '#E2E8F0';
+    registerTab.style.background = 'transparent'; registerTab.style.color = '#94A3B8';
+    loginForm.classList.remove('hidden');
+    registerForm.classList.add('hidden');
+  } else {
+    registerTab.style.background = '#131A26'; registerTab.style.color = '#E2E8F0';
+    loginTab.style.background = 'transparent'; loginTab.style.color = '#94A3B8';
+    registerForm.classList.remove('hidden');
+    loginForm.classList.add('hidden');
+  }
+}
+
+function closeAuthOverlay() {
+  document.getElementById('authOverlay').classList.add('hidden');
+  document.getElementById('landingPage').classList.remove('hidden');
+}
+
+async function handleOverlayLogin() {
+  const email = document.getElementById('overlayLoginEmail').value.trim();
+  const pass  = document.getElementById('overlayLoginPassword').value;
+  const msg   = document.getElementById('overlayAuthMsg');
+  if (!email || !pass) { msg.textContent = 'Rellena el email y la contraseña.'; msg.classList.remove('hidden'); return; }
+  const btn = document.getElementById('btnOverlayLogin');
+  btn.disabled = true; btn.textContent = 'Verificando...';
+  msg.classList.add('hidden');
+
+  // Safety timeout: always reset button after 20 seconds
+  const _loginTimeout = setTimeout(() => {
+    btn.disabled = false; btn.textContent = 'Entrar a la plataforma';
+    msg.textContent = '⏱ La conexión tardó demasiado. Comprueba tu internet y vuelve a intentarlo.';
+    msg.classList.remove('hidden');
+  }, 20000);
+
+  try {
+    const timeout20s = new Promise((_, rej) => setTimeout(() => rej(new Error('timeout')), 19000));
+    const loginResult = await Promise.race([
+      sb.auth.signInWithPassword({ email, password: pass }),
+      timeout20s,
+    ]);
+    const { data, error } = loginResult;
+    if (error) {
+      clearTimeout(_loginTimeout);
+      msg.textContent = error.message;
+      msg.classList.remove('hidden');
+      btn.disabled = false; btn.textContent = 'Entrar a la plataforma';
+      return;
+    }
+    // Quick blocked-check (with timeout)
+    let bloqueado = false;
+    try {
+      const bResult = await Promise.race([
+        sb.from('perfiles').select('bloqueado').eq('id', data.user.id).single(),
+        new Promise((_, rej) => setTimeout(() => rej(new Error('timeout')), 8000)),
+      ]);
+      bloqueado = bResult?.data?.bloqueado || false;
+    } catch(_) { /* ignore timeout on blocked check — let user in */ }
+
+    if (bloqueado) {
+      clearTimeout(_loginTimeout);
+      await sb.auth.signOut();
+      msg.textContent = '⛔ Cuenta suspendida. Contacta con nuestro equipo.';
+      msg.classList.remove('hidden');
+      btn.disabled = false; btn.textContent = 'Entrar a la plataforma';
+      return;
+    }
+    clearTimeout(_loginTimeout);
+    await loadAppForUser(data.user);
+    showSection('inicio');
+  } catch(e) {
+    clearTimeout(_loginTimeout);
+    if (e.message === 'timeout') {
+      msg.textContent = '⏱ La conexión tardó demasiado. Comprueba tu internet y vuelve a intentarlo.';
+    } else {
+      msg.textContent = '🌐 Error de red. Comprueba tu conexión.';
+    }
+    msg.classList.remove('hidden');
+  } finally {
+    clearTimeout(_loginTimeout);
+    btn.disabled = false; btn.textContent = 'Entrar a la plataforma';
+  }
+}
+
+async function handleOverlayRegister() {
+  const nombre  = document.getElementById('overlayRegNombre').value.trim();
+  const email   = document.getElementById('overlayRegEmail').value.trim();
+  const pass    = document.getElementById('overlayRegPassword').value;
+  const refCode = document.getElementById('overlayRegRefCode').value.trim();
+  const msg     = document.getElementById('overlayRegMsg');
+  if (!nombre || !email || !pass) {
+    msg.style.cssText = 'background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.3);color:#FCA5A5;';
+    msg.textContent = 'Rellena todos los campos.'; msg.classList.remove('hidden'); return;
+  }
+  if (!email.includes('@')) { msg.textContent = 'Escribe un email válido.'; msg.classList.remove('hidden'); return; }
+  if (pass.length < 8) { msg.textContent = '🔒 La contraseña debe tener mínimo 8 caracteres.'; msg.classList.remove('hidden'); return; }
+  const btn = document.getElementById('btnOverlayRegister');
+  btn.disabled = true; btn.textContent = 'Creando cuenta...';
+  try {
+    let referenteId = null;
+    if (refCode) {
+      const { data: refPerfil } = await sb.from('perfiles').select('id').eq('token_licencia', refCode).single();
+      if (refPerfil) referenteId = refPerfil.id;
+    }
+    const { data, error } = await sb.auth.signUp({ email, password: pass, options: { data: { nombre } } });
+    if (error) { msg.textContent = error.message; msg.classList.remove('hidden'); btn.disabled = false; btn.textContent = 'Crear cuenta'; return; }
+    if (referenteId && data.user) {
+      await sb.from('perfiles').update({ referido_por: referenteId }).eq('id', data.user.id);
+    }
+    if (!data.session) {
+      msg.style.cssText = 'background:rgba(37,99,235,.12);border:1px solid rgba(37,99,235,.3);color:#93C5FD;';
+      msg.innerHTML = '✅ ¡Cuenta creada! Revisa tu bandeja en <strong>' + email + '</strong> y confirma el enlace.';
+      msg.classList.remove('hidden');
+    } else {
+      toast('¡Bienvenido a FlowTrade Pro!', 'success');
+    }
+  } catch(e) { msg.textContent = '🌐 Error de red.'; msg.classList.remove('hidden'); }
+  finally { btn.disabled = false; btn.textContent = 'Crear cuenta'; }
+}
+
+async function handleOverlayForgotPassword() {
+  const email = document.getElementById('overlayLoginEmail').value.trim();
+  const msg   = document.getElementById('overlayAuthMsg');
+  if (!email) { msg.textContent = 'Escribe tu email primero.'; msg.classList.remove('hidden'); return; }
+  const { error } = await sb.auth.resetPasswordForEmail(email);
+  if (error) { msg.textContent = 'No se pudo enviar: ' + error.message; msg.classList.remove('hidden'); return; }
+  msg.style.cssText = 'background:rgba(37,99,235,.12);border:1px solid rgba(37,99,235,.3);color:#93C5FD;';
+  msg.innerHTML = '📧 Email de recuperación enviado a <strong>' + email + '</strong>. Revisa spam.';
+  msg.classList.remove('hidden');
+}
+
+// ═══════════════════════════════════════════════════════════════
+// BOTONES FLOTANTES ARRASTRABLES
+// ═══════════════════════════════════════════════════════════════
+(function() {
+  function makeDraggable(el, storageKey, defaultBottom, defaultRight) {
+    let dragging = false, moved = false;
+    let startX, startY, startLeft, startTop;
+
+    function getInitialPos() {
+      const saved = localStorage.getItem(storageKey);
+      if (saved) {
+        try { return JSON.parse(saved); } catch(_) {}
+      }
+      return {
+        left: window.innerWidth  - defaultRight - el.offsetWidth,
+        top:  window.innerHeight - defaultBottom - el.offsetHeight
+      };
+    }
+
+    function applyPos(left, top) {
+      const maxL = window.innerWidth  - el.offsetWidth  - 4;
+      const maxT = window.innerHeight - el.offsetHeight - 4;
+      left = Math.max(4, Math.min(left, maxL));
+      top  = Math.max(4, Math.min(top,  maxT));
+      el.style.left   = left + 'px';
+      el.style.top    = top  + 'px';
+      el.style.right  = 'auto';
+      el.style.bottom = 'auto';
+    }
+
+    function onStart(e) {
+      dragging = true; moved = false;
+      const touch = e.touches ? e.touches[0] : e;
+      startX = touch.clientX; startY = touch.clientY;
+      const r = el.getBoundingClientRect();
+      startLeft = r.left; startTop = r.top;
+      el.style.transition = 'none';
+      e.preventDefault();
+    }
+
+    function onMove(e) {
+      if (!dragging) return;
+      const touch = e.touches ? e.touches[0] : e;
+      const dx = touch.clientX - startX;
+      const dy = touch.clientY - startY;
+      if (Math.abs(dx) > 4 || Math.abs(dy) > 4) moved = true;
+      if (moved) applyPos(startLeft + dx, startTop + dy);
+    }
+
+    function onEnd(e) {
+      if (!dragging) return;
+      dragging = false;
+      el.style.transition = '';
+      if (moved) {
+        const r = el.getBoundingClientRect();
+        localStorage.setItem(storageKey, JSON.stringify({ left: r.left, top: r.top }));
+        e.stopImmediatePropagation();
+        e.preventDefault();
+      }
+    }
+
+    el.addEventListener('mousedown',  onStart, { passive: false });
+    el.addEventListener('touchstart', onStart, { passive: false });
+    document.addEventListener('mousemove',  onMove);
+    document.addEventListener('touchmove',  onMove, { passive: false });
+    document.addEventListener('mouseup',    onEnd,  true);
+    document.addEventListener('touchend',   onEnd,  true);
+
+    // Aplicar posición guardada cuando el elemento sea visible
+    const obs = new MutationObserver(() => {
+      if (!el.classList.contains('hidden')) {
+        const pos = getInitialPos();
+        applyPos(pos.left, pos.top);
+      }
+    });
+    obs.observe(el, { attributeFilter: ['class'] });
+  }
+
+  makeDraggable(document.getElementById('chatBubble'), 'floatPos_chat', 24, 24);
+  makeDraggable(document.getElementById('helpBubble'), 'floatPos_help', 86, 24);
+})();
+
+// ═══════════════════════════════════════════════════════════════
+// AUTH ACTIONS
+// ═══════════════════════════════════════════════════════════════
+async function handleLogout() {
+  try { await sb.auth.signOut({ scope: 'local' }); } catch(_) {}
+  Object.keys(localStorage).forEach(k => { if (k.startsWith('sb-')) localStorage.removeItem(k); });
+  localStorage.removeItem('flowtrade_last_section');
+  currentUser   = null;
+  currentPerfil = null;
+  isAdmin       = false;
+  window.location.reload();
+}
+
+function resumeSession() {
+  const banner = document.getElementById('sessionResumeBanner');
+  if (banner) banner.classList.add('hidden');
+  // Session is already in localStorage — just reload to re-initialize
+  window.location.reload();
+}
+
+function forceClearSession() {
+  Object.keys(localStorage).forEach(k => { if (k.startsWith('sb-')) localStorage.removeItem(k); });
+  const banner = document.getElementById('sessionResumeBanner');
+  if (banner) banner.classList.add('hidden');
+  window.location.reload();
+}
+
+// ═══════════════════════════════════════════════════════════════
+// AUTO-LOGOUT POR INACTIVIDAD
+// ═══════════════════════════════════════════════════════════════
+(function() {
+  const INACTIVITY_LIMIT = 30 * 60 * 1000;
+  const WARNING_BEFORE   = 5  * 60 * 1000;
+  let inactivityTimer, warningTimer, warningToastId;
+
+  function resetTimers() {
+    if (!currentUser) return;
+    clearTimeout(inactivityTimer);
+    clearTimeout(warningTimer);
+    warningTimer = setTimeout(() => {
+      toast('⚠️ Cerrarás sesión en 5 minutos por inactividad.', 'info', 5 * 60 * 1000);
+    }, INACTIVITY_LIMIT - WARNING_BEFORE);
+    inactivityTimer = setTimeout(async () => {
+      toast('🔒 Sesión cerrada por inactividad.', 'info', 4000);
+      await new Promise(r => setTimeout(r, 1000));
+      try { await sb.auth.signOut({ scope: 'local' }); } catch(_) {}
+      Object.keys(localStorage).forEach(k => { if (k.startsWith('sb-')) localStorage.removeItem(k); });
+      window.location.href = '/';
+    }, INACTIVITY_LIMIT);
+  }
+
+  ['mousemove','mousedown','keydown','touchstart','scroll','click'].forEach(ev =>
+    document.addEventListener(ev, resetTimers, { passive: true })
+  );
+
+  sb.auth.onAuthStateChange(async (event, session) => {
+    if (session?.user) {
+      resetTimers();
+      if ((event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED' || event === 'INITIAL_SESSION') && !currentUser && !_appBootstrapping) {
+        _appBootstrapping = true;
+        await loadAppForUser(session.user);
+        if (event !== 'TOKEN_REFRESHED') showSection('inicio');
+      }
+    } else {
+      clearTimeout(inactivityTimer);
+      clearTimeout(warningTimer);
+      currentUser = null; currentPerfil = null; isAdmin = false;
+    }
+  });
+})();
+</script>
+
+<!-- Modal: Politica de Privacidad -->
+<div id="modalPrivacy" class="modal-bg hidden">
+  <div class="modal-box modal-box-lg" style="max-width:680px;">
+    <div class="flex items-center justify-between mb-5">
+      <h3 class="text-base font-bold">&#128274; Politica de Privacidad</h3>
+      <button onclick="closeModal('modalPrivacy')" class="btn-ghost"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <div class="space-y-4 text-sm overflow-y-auto" style="color:#94A3B8;line-height:1.7;max-height:65vh;">
+      <div><h4 class="font-semibold mb-2" style="color:#E2E8F0;">1. Responsable del tratamiento</h4><p>FlowTrade Suite, proyecto independiente. Contacto: erosabalfernandez@gmail.com</p></div>
+      <div><h4 class="font-semibold mb-2" style="color:#E2E8F0;">2. Datos que recopilamos</h4>
+        <ul style="list-style:disc;margin-left:16px;line-height:2;">
+          <li><b style="color:#E2E8F0;">Datos de registro:</b> nombre, email y contrasena (encriptada por Supabase Auth).</li>
+          <li><b style="color:#E2E8F0;">Datos de perfil:</b> numero de cuenta MT5, servidor, preferencias de notificaciones y plan contratado.</li>
+          <li><b style="color:#E2E8F0;">Datos de licencias:</b> tipo de EA, cuenta MT5 asociada y timestamps de heartbeat.</li>
+          <li><b style="color:#E2E8F0;">Datos de pagos:</b> metodo, monto e ID de transaccion (solo para verificacion manual).</li>
+          <li><b style="color:#E2E8F0;">Trades del diario:</b> almacenados <b style="color:#2563EB;">exclusivamente en tu navegador</b> (IndexedDB). No se transmiten a nuestros servidores.</li>
+        </ul>
+      </div>
+      <div><h4 class="font-semibold mb-2" style="color:#E2E8F0;">3. Finalidad del tratamiento</h4><p>Gestionar tu cuenta, verificar licencias de EAs, procesar pagos manuales, enviarte notificaciones del servicio y mantener el sistema de referidos. No usamos tus datos para marketing de terceros ni los vendemos.</p></div>
+      <div><h4 class="font-semibold mb-2" style="color:#E2E8F0;">4. Base legal</h4><p>La ejecucion del contrato de servicio (Art. 6.1.b RGPD) y el consentimiento explicito al registrarte.</p></div>
+      <div><h4 class="font-semibold mb-2" style="color:#E2E8F0;">5. Almacenamiento y seguridad</h4><p>Los datos de perfil y licencias se almacenan en Supabase (PostgreSQL), con cifrado en transito (TLS 1.3) y en reposo. Las contrasenas son gestionadas por Supabase Auth (bcrypt). Los trades solo existen en tu dispositivo (IndexedDB).</p></div>
+      <div><h4 class="font-semibold mb-2" style="color:#E2E8F0;">6. Tus derechos</h4><p>Puedes solicitar acceso, rectificacion, supresion o portabilidad de tus datos escribiendo a erosabalfernandez@gmail.com. Atendemos solicitudes en maximo 30 dias.</p></div>
+      <div><h4 class="font-semibold mb-2" style="color:#E2E8F0;">7. Transferencias internacionales</h4><p>Supabase puede almacenar datos en servidores de la UE o EE.UU. bajo mecanismos legales adecuados (SCCs). Finnhub recibe solo peticiones de datos de mercado publicos, sin datos personales.</p></div>
+      <div><h4 class="font-semibold mb-2" style="color:#E2E8F0;">8. Conservacion de datos</h4><p>Conservamos tus datos mientras tu cuenta este activa. Al eliminarla, tus datos se borran de nuestros servidores en un plazo de 30 dias.</p></div>
+      <p class="text-xs" style="color:#475569;">Ultima actualizacion: Mayo 2026</p>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Politica de Cookies -->
+<div id="modalCookies" class="modal-bg hidden">
+  <div class="modal-box" style="max-width:580px;">
+    <div class="flex items-center justify-between mb-5">
+      <h3 class="text-base font-bold">&#127850; Politica de Cookies</h3>
+      <button onclick="closeModal('modalCookies')" class="btn-ghost"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <div class="space-y-4 text-sm" style="color:#94A3B8;line-height:1.7;">
+      <div><h4 class="font-semibold mb-2" style="color:#E2E8F0;">Que almacenamos?</h4>
+        <p>FlowTrade Suite usa <b style="color:#E2E8F0;">exclusivamente almacenamiento tecnico imprescindible</b>. No usamos cookies de rastreo, publicidad ni analisis de terceros.</p>
+      </div>
+      <div class="space-y-3">
+        <div class="p-3 rounded-xl" style="background:rgba(30,41,59,.5);"><p class="font-semibold text-xs mb-1" style="color:#E2E8F0;">IndexedDB &mdash; Diario de trading</p><p class="text-xs">Almacena tus trades, historial de calculos y configuracion de widgets. Solo existe en tu dispositivo. No se transmite a servidores externos.</p></div>
+        <div class="p-3 rounded-xl" style="background:rgba(30,41,59,.5);"><p class="font-semibold text-xs mb-1" style="color:#E2E8F0;">localStorage &mdash; Preferencias de la app</p><p class="text-xs">Guarda preferencias de notificaciones, widgets ocultos, cache de noticias (Finnhub) y estado de aceptacion de cookies.</p></div>
+        <div class="p-3 rounded-xl" style="background:rgba(30,41,59,.5);"><p class="font-semibold text-xs mb-1" style="color:#E2E8F0;">Cookies de sesion &mdash; Supabase Auth</p><p class="text-xs">Supabase establece cookies de sesion seguras (HttpOnly) para mantener tu inicio de sesion. Expiran al cerrar sesion o tras 7 dias de inactividad.</p></div>
+      </div>
+      <div><h4 class="font-semibold mb-2" style="color:#E2E8F0;">Cookies de terceros</h4><p>No usamos Google Analytics, Facebook Pixel ni ninguna herramienta de rastreo o publicidad. Las unicas conexiones externas son Supabase (base de datos) y Finnhub (noticias economicas).</p></div>
+      <div><h4 class="font-semibold mb-2" style="color:#E2E8F0;">Control de cookies</h4><p>Puedes borrar el almacenamiento local desde la configuracion de tu navegador. Esto cerrara tu sesion y eliminara tu diario local. Exporta antes de hacerlo.</p></div>
+      <div class="flex gap-3 pt-2">
+        <button onclick="acceptCookies();closeModal('modalCookies')" class="btn-green flex-1 py-2.5 rounded-xl text-sm font-semibold">Aceptar</button>
+        <button onclick="closeModal('modalCookies')" class="btn-outline flex-1 py-2.5 rounded-xl text-sm">Cerrar</button>
+      </div>
+      <p class="text-xs" style="color:#475569;">Ultima actualizacion: Mayo 2026</p>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
++Math.abs(pnl).toFixed(2)+'</td>'
+        +'<td class="px-4 py-3 text-center">'+(t.screenshot?'📷':'')+'</td>'
+        +'<td class="px-4 py-3 text-right"><button onclick="deleteTrade('+JSON.stringify(t.id)+')" style="background:rgba(239,68,68,.1);border:none;cursor:pointer;color:#EF4444;padding:3px 8px;border-radius:6px;font-size:11px;">✕</button></td>'
+        +'</tr>';
+    }).join('');
+    const info = document.getElementById('journalPageInfo');
+    if(info) info.textContent = 'Mostrando '+(_jPage*_jPageSize+1)+'–'+Math.min((_jPage+1)*_jPageSize,total)+' de '+total+' trades';
+  }
+
+  function journalPage(dir) {
+    const total = (journalTrades||[]).length;
+    const pages = Math.max(1, Math.ceil(total / _jPageSize));
+    _jPage = Math.max(0, Math.min(pages-1, _jPage+dir));
+    renderJournal();
+  }
+
+  function clearFilters() {
+    ['filterActivo'].forEach(id=>{ const e=document.getElementById(id); if(e) e.value=''; });
+    const fRes=document.getElementById('filterResult'); if(fRes) fRes.value='all';
+    ['filterFrom','filterTo'].forEach(id=>{ const e=document.getElementById(id); if(e) e.value=''; });
+    _jPage=0;
+    renderJournal();
+  }
+
+  async function deleteTrade(id) {
+    if(!confirm('¿Eliminar este trade del diario local?')) return;
+    await idbDelete(id);
+    journalTrades = await idbGetAll();
+    journalTrades.sort((a,b)=>new Date(b.fecha)-new Date(a.fecha));
+    renderJournal();
+    updateDashboardMetrics();
+    toast('Trade eliminado','info',2000);
+  }
+
+  // ── Add / Save trade ──
+  function openAddTradeModal() {
+    const now=new Date(), pad=n=>String(n).padStart(2,'0');
+    const local=now.getFullYear()+'-'+pad(now.getMonth()+1)+'-'+pad(now.getDate())+'T'+pad(now.getHours())+':'+pad(now.getMinutes());
+    const el=document.getElementById('trFecha'); if(el&&!el.value) el.value=local;
+    openModal('modalAddTrade');
+  }
+
+  async function saveManualTrade() {
+    const fecha  = document.getElementById('trFecha')?.value;
+    const activo = (document.getElementById('trActivo')?.value||'').trim().toUpperCase();
+    const tipo   = document.getElementById('trTipo')?.value||'Compra';
+    const lotes  = parseFloat(document.getElementById('trLotes')?.value||'0');
+    const entrada= parseFloat(document.getElementById('trEntrada')?.value||'0');
+    const salida = parseFloat(document.getElementById('trSalida')?.value||'0');
+    const usd    = parseFloat(document.getElementById('trUSD')?.value||'0');
+    const pips   = parseFloat(document.getElementById('trPips')?.value||'0');
+    const notas  = (document.getElementById('trNotas')?.value||'').trim();
+    if(!fecha||!activo){ toast('Rellena al menos fecha y activo','error'); return; }
+    const trade={ id:Date.now(), fecha:new Date(fecha).toISOString(), activo, tipo, lotes, entrada, salida, resultadoUSD:usd, pips, notas, source:'manual' };
+    await idbPut(trade);
+    ['trFecha','trActivo','trLotes','trEntrada','trSalida','trUSD','trPips','trNotas'].forEach(id=>{ const e=document.getElementById(id); if(e) e.value=''; });
+    closeModal('modalAddTrade');
+    journalTrades = await idbGetAll();
+    journalTrades.sort((a,b)=>new Date(b.fecha)-new Date(a.fecha));
+    renderJournal();
+    updateDashboardMetrics();
+    toast('✅ Trade guardado correctamente','success');
+  }
+
+  // ── Export ──
+  function _dlBlob(data, mime, name) {
+    const b=new Blob([data],{type:mime}), u=URL.createObjectURL(b), a=document.createElement('a');
+    a.href=u; a.download=name; a.click(); setTimeout(()=>URL.revokeObjectURL(u),3000);
+  }
+  function _dtag(){ const d=new Date(); return d.getFullYear()+String(d.getMonth()+1).padStart(2,'0')+String(d.getDate()).padStart(2,'0'); }
+
+  function exportCSV() {
+    const trades=journalTrades||[];
+    if(!trades.length){ toast('No hay trades para exportar','info'); return; }
+    const hdr='Fecha,Activo,Tipo,Lotes,Entrada,Salida,Pips,ResultadoUSD,Notas';
+    const rows=trades.map(t=>[t.fecha||'',t.activo||'',t.tipo||'',t.lotes||'',t.entrada||'',t.salida||'',t.pips||'',t.resultadoUSD||'',(t.notas||'').replace(/"/g,'""')].map(v=>'"'+v+'"').join(','));
+    _dlBlob([hdr,...rows].join('\r\n'),'text/csv','flowtrade-journal-'+_dtag()+'.csv');
+    toast('✅ CSV exportado','success');
+  }
+
+  function exportJSON() {
+    const trades=journalTrades||[];
+    if(!trades.length){ toast('No hay trades para exportar','info'); return; }
+    _dlBlob(JSON.stringify(trades,null,2),'application/json','flowtrade-backup-'+_dtag()+'.json');
+    toast('✅ Respaldo JSON exportado','success');
+  }
+
+  function exportPDF() {
+    const plan=window.currentPerfil?.plan||'gratis';
+    if(plan!=='elite'){ toast('⭐ El export PDF es exclusivo del plan Elite','info',4000); return; }
+    toast('Generando PDF... (próximamente)','info',3000);
+  }
+
+  // ── Import ──
+  async function importFile(event) {
+    const file=event.target.files?.[0]; if(!file) return;
+    event.target.value='';
+    const text=await file.text();
+    const isHTML=file.name.toLowerCase().match(/\.html?$/);
+    let added=0;
+    if(isHTML) {
+      const parser=new DOMParser(), doc=parser.parseFromString(text,'text/html');
+      const rows=[...doc.querySelectorAll('tr')];
+      for(const row of rows) {
+        const cells=[...row.querySelectorAll('td')].map(td=>td.textContent.trim());
+        if(cells.length<4) continue;
+        const pnl=parseFloat((cells[cells.length-1]||'').replace(/[, ]/g,''));
+        if(isNaN(pnl)) continue;
+        await idbPut({ id:Date.now()+Math.random(), fecha:cells[0]?new Date(cells[0]).toISOString():new Date().toISOString(), activo:cells[2]||'DESCONOCIDO', tipo:(cells[3]||'').toLowerCase().includes('buy')?'Compra':'Venta', lotes:parseFloat(cells[4]||'0')||0, entrada:parseFloat((cells[5]||'0').replace(',','.'))||0, salida:parseFloat((cells[6]||'0').replace(',','.'))||0, resultadoUSD:pnl, pips:0, notas:'[Importado HTML]', source:'import_html' });
+        added++;
+      }
+    } else {
+      const lines=text.split('\n').filter(l=>l.trim());
+      for(const line of lines.slice(1)) {
+        const cols=line.split(',').map(c=>c.trim().replace(/^"|"$/g,''));
+        if(cols.length<4) continue;
+        const pnl=parseFloat(cols[7]||cols[6]||'0');
+        if(isNaN(pnl)&&!cols[1]) continue;
+        await idbPut({ id:Date.now()+Math.random(), fecha:cols[0]?new Date(cols[0]).toISOString():new Date().toISOString(), activo:cols[1]||'DESCONOCIDO', tipo:(cols[2]||'').toLowerCase().match(/buy|compra/)?'Compra':'Venta', lotes:parseFloat(cols[3]||'0')||0, entrada:parseFloat(cols[4]||'0')||0, salida:parseFloat(cols[5]||'0')||0, resultadoUSD:isNaN(pnl)?0:pnl, pips:parseFloat(cols[6]||'0')||0, notas:cols[8]||'', source:'import_csv' });
+        added++;
+      }
+    }
+    journalTrades=await idbGetAll(); journalTrades.sort((a,b)=>new Date(b.fecha)-new Date(a.fecha));
+    renderJournal(); updateDashboardMetrics();
+    toast('✅ '+added+' trades importados','success',4000);
+  }
+
+  async function importJSON(event) {
+    const file=event.target.files?.[0]; if(!file) return;
+    event.target.value='';
+    try {
+      const data=JSON.parse(await file.text());
+      const arr=Array.isArray(data)?data:(data.trades||[]);
+      if(!arr.length){ toast('El JSON no contiene trades','error'); return; }
+      for(const t of arr) { if(t.activo||t.resultadoUSD!==undefined) await idbPut({...t,id:t.id||Date.now()+Math.random()}); }
+      journalTrades=await idbGetAll(); journalTrades.sort((a,b)=>new Date(b.fecha)-new Date(a.fecha));
+      renderJournal(); updateDashboardMetrics();
+      toast('✅ '+arr.length+' trades importados desde JSON','success',4000);
+    } catch(e){ toast('❌ Error al leer el JSON: '+e.message,'error',4000); }
+  }
+
+  // ── MT5 License Test ──
+  async function testLicenseConnection() {
+    const el=document.getElementById('licenseTestResult'); if(!el) return;
+    const token=window.currentPerfil?.token_licencia;
+    if(!token){ el.style.cssText='background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.3);color:#FCA5A5;'; el.textContent='No tienes un token de licencia. Actualiza tu perfil.'; el.classList.remove('hidden'); return; }
+    el.style.cssText='background:rgba(37,99,235,.12);border:1px solid rgba(37,99,235,.3);color:#93C5FD;';
+    el.textContent='🔄 Probando conexión...'; el.classList.remove('hidden');
+    try {
+      const res=await fetch('/api/validar-licencia',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({token,cuenta_mt5:window.currentPerfil?.mt5_cuenta||'TEST'})});
+      const data=await res.json();
+      if(data.valid||data.success){
+        el.style.cssText='background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.3);color:#86EFAC;';
+        el.innerHTML='✅ <strong>Conexión exitosa.</strong> El EA puede comunicarse con la plataforma.<br><small>Token activo · Plan: '+(data.plan||window.currentPerfil?.plan||'—')+'</small>';
+      } else {
+        el.style.cssText='background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.3);color:#FCA5A5;';
+        el.textContent='❌ '+(data.message||data.error||'Token no reconocido');
+      }
+    } catch(e){ el.style.cssText='background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.3);color:#FCA5A5;'; el.textContent='❌ Error de red: '+e.message; }
+  }
+
+  // ── Widgets ──
+  const _WPREFS='ft_widget_prefs';
+  function _getWPrefs(){ try{ return JSON.parse(localStorage.getItem(_WPREFS)||'{}'); }catch(_){ return {}; } }
+  function _saveWPrefs(p){ localStorage.setItem(_WPREFS,JSON.stringify(p)); }
+
+  function toggleWidget(id) {
+    const card=document.getElementById('widget-'+id); if(!card) return;
+    const p=_getWPrefs(), hidden=!p[id]; p[id]=hidden; _saveWPrefs(p);
+    card.style.display=hidden?'none':'';
+    const btn=card.querySelector('.widget-toggle-btn'); if(btn) btn.textContent=hidden?'✓':'✕';
+  }
+
+  function toggleWidgetEditMode() {
+    const btn=document.getElementById('widgetEditBtn');
+    const inEdit=btn?.dataset.editing==='1';
+    const toggleBtns=document.querySelectorAll('.widget-toggle-btn');
+    if(inEdit) {
+      if(btn){ btn.dataset.editing='0'; btn.textContent='Widgets'; }
+      toggleBtns.forEach(b=>b.style.display='none');
+      const p=_getWPrefs();
+      document.querySelectorAll('.widget-card').forEach(card=>{
+        const id=card.id?.replace('widget-','');
+        if(id) card.style.display=p[id]?'none':'';
+      });
+    } else {
+      if(btn){ btn.dataset.editing='1'; btn.textContent='✓ Listo'; }
+      toggleBtns.forEach(b=>b.style.display='flex');
+      document.querySelectorAll('.widget-card').forEach(c=>c.style.display='');
+      const p=_getWPrefs();
+      toggleBtns.forEach(b=>{
+        const card=b.closest('.widget-card');
+        if(card){ const id=card.id?.replace('widget-',''); b.textContent=p[id]?'✓ Restaurar':'✕'; }
+      });
+    }
+  }
+
+  // ── Browser Cleanup Tools ──
+  async function clearAppCache() {
+    try {
+      if('serviceWorker' in navigator){ const regs=await navigator.serviceWorker.getRegistrations(); for(const r of regs) await r.unregister(); }
+      if('caches' in window){ const keys=await caches.keys(); for(const k of keys) await caches.delete(k); }
+      toast('✅ Caché limpiado. Recargando...','success',2000);
+      setTimeout(()=>window.location.reload(true),2100);
+    } catch(e){ toast('Error: '+e.message,'error'); }
+  }
+
+  async function hardResetApp() {
+    if(!confirm('⚠️ RESET COMPLETO: Se borrarán todos tus datos locales (trades del diario, caché, sesiones). Los datos guardados en la nube no se afectan.\n\n¿Continuar?')) return;
+    try {
+      localStorage.clear(); sessionStorage.clear();
+      if('serviceWorker' in navigator){ const regs=await navigator.serviceWorker.getRegistrations(); for(const r of regs) await r.unregister(); }
+      if('caches' in window){ const keys=await caches.keys(); for(const k of keys) await caches.delete(k); }
+      await new Promise((res,rej)=>{ const r=indexedDB.deleteDatabase('FlowTradeDB'); r.onsuccess=res; r.onerror=rej; r.onblocked=res; }).catch(()=>{});
+      window.location.reload(true);
+    } catch(e){ alert('Error en limpieza: '+e.message+'\nRecarga manualmente.'); }
+  }
+
+  // ═══════════════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════════════
+(async()=>{
+      const _loaderFailsafe = setTimeout(() => {
         const ldr = document.getElementById('appLoader');
         if (ldr) { ldr.classList.add('fade-out'); setTimeout(()=>{ ldr.style.display='none'; }, 350); }
-      };
+        const landing = document.getElementById('landingPage');
+        if (landing) landing.classList.remove('hidden');
+      }, 12000);
+      function showLanding() {
+      document.getElementById('landingPage').classList.remove('hidden');
+      document.getElementById('authScreen').classList.add('hidden');
+      document.getElementById('mainApp').classList.add('hidden');
+      document.getElementById('chatBubble').classList.add('hidden');
+      document.getElementById('helpBubble').classList.add('hidden');
+    }
+    try { await openIDB(); } catch(e) {}
+    let session = null;
+    try {
+      const result = await sb.auth.getSession();
+      session = result?.data?.session ?? null;
+    } catch(e) {
+      showLanding();
+      const ldrE = document.getElementById('appLoader');
+      if (ldrE) { ldrE.classList.add('fade-out'); setTimeout(()=>{ ldrE.style.display='none'; }, 350); }
+      return;
+    }
+    const _hideLoader = () => {
+          clearTimeout(_loaderFailsafe);
+          const ldr = document.getElementById('appLoader');
+          if (ldr) { ldr.classList.add('fade-out'); setTimeout(()=>{ ldr.style.display='none'; }, 350); }
+        };
       if (!session) {
         showLanding();
         _hideLoader();
