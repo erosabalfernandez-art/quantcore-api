@@ -1398,7 +1398,7 @@ select.input-dark option{background:#131A26;color:#E2E8F0;}
         <!-- Métodos de pago -->
         <div class="glass-card rounded-xl p-6">
           <h3 class="font-semibold text-sm mb-5">Métodos de pago disponibles</h3>
-          <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+          <div class="grid grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
             <div class="p-4 rounded-xl text-center" style="background:rgba(30,41,59,.5);">
               <div class="text-2xl mb-2">💚</div><div class="font-semibold text-xs mb-1">PIX</div>
             </div>
@@ -1410,6 +1410,14 @@ select.input-dark option{background:#131A26;color:#E2E8F0;}
             </div>
             <div class="p-4 rounded-xl text-center" style="background:rgba(30,41,59,.5);">
               <div class="text-2xl mb-2">💵</div><div class="font-semibold text-xs mb-1">USDC TRC20</div>
+            </div>
+            <div class="p-4 rounded-xl text-center" style="background:rgba(30,41,59,.5);">
+              <div class="text-2xl mb-2">🟡</div><div class="font-semibold text-xs mb-1">USDT BEP20</div>
+              <div class="text-xs" style="color:#94A3B8;">Red BSC</div>
+            </div>
+            <div class="p-4 rounded-xl text-center" style="background:rgba(30,41,59,.5);">
+              <div class="text-2xl mb-2">🔵</div><div class="font-semibold text-xs mb-1">USDC BEP20</div>
+              <div class="text-xs" style="color:#94A3B8;">Red BSC</div>
             </div>
           </div>
           <div class="flex gap-3 flex-wrap">
@@ -2506,6 +2514,8 @@ select.input-dark option{background:#131A26;color:#E2E8F0;}
           <option value="paypal">PayPal</option>
           <option value="usdt">USDT TRC20</option>
           <option value="usdc">USDC TRC20</option>
+          <option value="usdt_bep20">USDT BEP20 (BSC)</option>
+          <option value="usdc_bep20">USDC BEP20 (BSC)</option>
         </select>
       </div>
       <div id="pagoInstrucciones" class="px-4 py-3 rounded-xl text-sm" style="background:rgba(30,41,59,.5);color:#94A3B8;line-height:1.7;"></div>
@@ -2608,7 +2618,7 @@ const SUPABASE_KEY  = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFz
 const FINNHUB_KEY   = 'd8dq7fpr01qhm4agkptgd8dq7fpr01qhm4agkpu0';
 const FINNHUB_CACHE_KEY = 'finnhub_calendar_v2';
 const FINNHUB_CACHE_TTL = 3600000;
-const PAYMENT_INFO  = { pix:'erosabalfernandez@gmail.com', paypal:'erosabalfernandez@gmail.com', usdt:'TYourUSDTAddressHere', usdc:'TYourUSDCAddressHere' };
+const PAYMENT_INFO  = { pix:'erosabalfernandez@gmail.com', paypal:'cuentasbrasil033@gmail.com', usdt:'TYourUSDTAddressHere', usdc:'TYourUSDCAddressHere', usdt_bep20:'0x24252ef84f8b4665170c199595ce326bb4709a0f', usdc_bep20:'0x24252ef84f8b4665170c199595ce326bb4709a0f' };
 const journalPageSize = 10;
 
 // ═══════════════════════════════════════════════════════════════
@@ -3530,6 +3540,8 @@ function updatePayInstructions() {
     paypal:`PayPal: <strong>${PAYMENT_INFO.paypal}</strong><br>Envía ${precio}€ como "Friends &amp; Family"`,
     usdt:`USDT TRC20: <strong>${PAYMENT_INFO.usdt}</strong><br>Envía exactamente ${precio} USDT`,
     usdc:`USDC TRC20: <strong>${PAYMENT_INFO.usdc}</strong><br>Envía exactamente ${precio} USDC`,
+    usdt_bep20:`USDT BEP20 (BSC): <strong>${PAYMENT_INFO.usdt_bep20}</strong><br>Envía exactamente ${precio} USDT — Red BEP20/BSC`,
+    usdc_bep20:`USDC BEP20 (BSC): <strong>${PAYMENT_INFO.usdc_bep20}</strong><br>Envía exactamente ${precio} USDC — Red BEP20/BSC`,
   };
   if (instrEl) instrEl.innerHTML = info[metodo]||'';
 }
