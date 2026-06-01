@@ -447,3 +447,62 @@ where table_schema = 'public'
   )
 order by table_name;
 -- Resultado esperado: 12 filas con nombres y número de columnas de cada tabla.
+
+
+  -- ================================================================
+  -- SECURITY UPDATE v3 — MT5 account locking, HWID, fraud alerts
+  -- Ejecutar una sola vez en el SQL Editor de Supabase
+  -- ================================================================
+
+  -- ──────────────────────────────────────────────────────────────────
+  -- Add HWID and IP columns to licencias_ea
+  -- ──────────────────────────────────────────────────────────────────
+  alter table public.licencias_ea
+    add column if not exists hwid         text,
+    add column if not exists ip_registro  text;
+
+  -- ──────────────────────────────────────────────────────────────────
+  -- Add MT5 lock fields to perfiles
+  -- ──────────────────────────────────────────────────────────────────
+  alter table public.perfiles
+    add column if not exists mt5_cuenta_bloqueada  boolean not null default false,
+    add column if not exists fecha_registro_mt5    timestamptz;
+
+  -- ──────────────────────────────────────────────────────────────────
+  -- New table: admin_mt5_unlocks
+  -- Historial de acciones admin sobre cuentas MT5
+  -- ──────────────────────────────────────────────────────────────────
+  create table if not exists public.admin_mt5_unlocks (
+    id                  bigserial primary key,
+    admin_id            uuid references auth.users(id),
+    usuario_id          uuid references auth.users(id),
+    accion              text not null,        -- 'desbloquear_mt5' | 'cambiar_mt5' | 'revocar_licencia_ea' | 'activar_licencia_ea'
+    motivo              text,
+    mt5_cuenta_anterior text,
+    mt5_cuenta_nueva    text,
+    fecha               timestamptz not null default now()
+  );
+  comment on table public.admin_mt5_unlocks is 'Registro de acciones administrativas sobre cuentas MT5';
+
+  create index if not exists idx_admin_mt5_unlocks_usuario on public.admin_mt5_unlocks(usuario_id);
+  create index if not exists idx_admin_mt5_unlocks_fecha   on public.admin_mt5_unlocks(fecha desc);
+
+  -- ──────────────────────────────────────────────────────────────────
+  -- New table: alertas_fraude
+  -- Alertas de seguridad: HWIDs distintos, cuentas MT5 diferentes, etc.
+  -- ──────────────────────────────────────────────────────────────────
+  create table if not exists public.alertas_fraude (
+    id          bigserial primary key,
+    usuario_id  uuid references auth.users(id),
+    tipo        text not null,   -- 'cuenta_diferente' | 'hwid_diferente' | 'heartbeat_cuenta_diferente' | etc.
+    detalle     text,
+    ip          text,
+    fecha       timestamptz not null default now(),
+    revisado    boolean not null default false
+  );
+  comment on table public.alertas_fraude is 'Alertas de seguridad y posible fraude en uso de EAs';
+
+  create index if not exists idx_alertas_fraude_usuario on public.alertas_fraude(usuario_id);
+  create index if not exists idx_alertas_fraude_fecha   on public.alertas_fraude(fecha desc);
+  create index if not exists idx_alertas_fraude_revisado on public.alertas_fraude(revisado) where revisado = false;
+  
