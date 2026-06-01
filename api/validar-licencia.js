@@ -3,6 +3,7 @@
   // Registra y vincula la cuenta MT5 de forma permanente (solo admin puede desbloquear).
 
   const { createClient } = require('@supabase/supabase-js');
+const { checkRateLimit, checkAutoBlock, checkOrigin, genericError } = require('./_lib/security');
 
   const CORS_HEADERS = {
     'Access-Control-Allow-Origin': '*',
@@ -30,6 +31,27 @@
   const mt5_account = (_mt5||''). trim();
     const ip = req.headers['x-forwarded-for']?.split(',')[0]?.trim() || req.socket?.remoteAddress || 'unknown';
 
+    const sb = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY);
+
+    // Validación de origen (bloquea navegadores de orígenes desconocidos)
+    if (!checkOrigin(req)) {
+      return res.status(403).json({ valido: false, motivo: 'Origen no permitido', codigo: 403 });
+    }
+
+    // Rate limiting por IP
+    const rateLimited = await checkRateLimit(sb, ip);
+    if (rateLimited) {
+      return res.status(429).json({ valido: false, motivo: 'Demasiadas solicitudes. Espera 1 minuto.', codigo: 429 });
+    }
+
+    // Auto-bloqueo por fallos consecutivos del mismo token
+    if (token) {
+      const autoBlocked = await checkAutoBlock(sb, token);
+      if (autoBlocked) {
+        return res.status(429).json({ valido: false, motivo: 'Token temporalmente bloqueado por múltiples fallos. Espera 5 minutos.', codigo: 429 });
+      }
+    }
+
     if (!token || !ea_tipo || !mt5_account) {
       return res.status(400).json({ valido: false, motivo: 'Campos requeridos: token, ea_tipo, mt5_account', codigo: 400 });
     }
@@ -37,7 +59,6 @@
       return res.status(400).json({ valido: false, motivo: `EA tipo desconocido: ${ea_tipo}`, codigo: 400 });
     }
 
-    const sb = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY);
     let motivo = null, usuarioId = null, plan = null;
 
     try {
@@ -86,8 +107,8 @@
         if (perfil.mt5_cuenta && perfil.mt5_cuenta_bloqueada) {
           // Cuenta ya vinculada y bloqueada — verificar que coincide
           if (String(perfil.mt5_cuenta).trim() !== String(mt5_account).trim()) {
-            motivo = `Cuenta MT5 bloqueada: ${perfil.mt5_cuenta}. Para cambiarla contacta al administrador.`;
-            await logAlertaFraude(sb, { usuarioId, tipo: 'cuenta_diferente', detalle: `Intentó usar cuenta ${mt5_account} pero tiene vinculada ${perfil.mt5_cuenta}`, ip });
+            motivo = genericError('cuenta_bloqueada');
+            await logAlertaFraude(sb, { usuarioId, tipo: 'cuenta_diferente', detalle: `Cuenta diferente detectada — ip: ${ip}`, ip });
             await logIntento(sb, { usuarioId, token, ea_tipo, mt5_account, exito: false, motivo, ip, version_ea, hwid });
             return res.status(403).json({ valido: false, motivo, bloqueo_cuenta: true, codigo: 403 });
           }
@@ -102,7 +123,7 @@
       } else {
         // Para otros EAs: verificar que la cuenta coincide si ya está asignada
         if (perfil.mt5_cuenta && String(perfil.mt5_cuenta).trim() !== String(mt5_account).trim()) {
-          motivo = `Cuenta MT5 no coincide. Registrada: ${perfil.mt5_cuenta}. Contacta al administrador.`;
+          motivo = genericError('mt5_no_coincide');
           await logIntento(sb, { usuarioId, token, ea_tipo, mt5_account, exito: false, motivo, ip, version_ea, hwid });
           return res.status(403).json({ valido: false, motivo, codigo: 403 });
         }
