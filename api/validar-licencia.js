@@ -119,10 +119,18 @@
           await logIntento(sb, { usuarioId, token, ea_tipo, mt5_account, exito: false, motivo, ip, version_ea, hwid });
           return res.status(403).json({ valido: false, motivo, codigo: 403 });
         }
-        // HWID check: si hay HWID registrado y difiere → alerta de fraude
+        // HWID check: si el HWID difiere → BLOQUEO AUTOMÁTICO + alerta de fraude
         if (hwid && licExistente.hwid && licExistente.hwid !== hwid) {
-          await logAlertaFraude(sb, { usuarioId, tipo: 'hwid_diferente', detalle: `HWID registrado: ${licExistente.hwid} | Nuevo HWID: ${hwid} | Cuenta: ${mt5_account}`, ip });
-          // No bloqueamos automáticamente, solo alertamos al admin
+          await logAlertaFraude(sb, {
+            usuarioId, tipo: 'hwid_diferente',
+            detalle: `HWID registrado: ${licExistente.hwid} | Nuevo HWID: ${hwid} | Cuenta: ${mt5_account} — LICENCIA DESACTIVADA AUTOMÁTICAMENTE`,
+            ip,
+          });
+          // BLOQUEO AUTOMÁTICO: segundo dispositivo detectado → desactivar licencia inmediatamente
+          await sb.from('licencias_ea').update({ activo: false }).eq('id', licExistente.id);
+          motivo = 'Este EA está registrado en otro dispositivo. La licencia ha sido desactivada automáticamente por seguridad. Contacta al administrador para reactivarla.';
+          await logIntento(sb, { usuarioId, token, ea_tipo, mt5_account, exito: false, motivo, ip, version_ea, hwid });
+          return res.status(403).json({ valido: false, motivo, hwid_bloqueado: true, codigo: 403 });
         }
         // Actualizar heartbeat y HWID si es nuevo
         await sb.from('licencias_ea').update({
