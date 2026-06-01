@@ -41,7 +41,7 @@
       // 1. Buscar usuario por token
       const { data: perfil, error: errP } = await sb
         .from('perfiles')
-        .select('id, nombre, plan, mt5_cuenta, mt5_cuenta_bloqueada, bloqueado, token_licencia')
+        .select('id, nombre, plan, mt5_cuenta, mt5_cuenta_bloqueada, bloqueado, token_licencia, fecha_expiracion_plan')
         .eq('token_licencia', token)
         .single();
 
@@ -66,6 +66,16 @@
         motivo = `Plan "${plan}" no incluye el EA "${ea_tipo}". Requerido: ${PLAN_EA[ea_tipo].join(' o ')}`;
         await logIntento(sb, { usuarioId, token, ea_tipo, mt5_account, exito: false, motivo, ip, version_ea, hwid });
         return res.status(403).json({ valido: false, motivo, codigo: 403 });
+      }
+
+      // 3b. Membresía expirada (excepto plan gratis que no expira)
+      if (plan !== 'gratis' && perfil.fecha_expiracion_plan) {
+        const expDate = new Date(perfil.fecha_expiracion_plan);
+        if (expDate < new Date()) {
+          motivo = `Membresía ${plan} vencida el ${expDate.toLocaleDateString('es-ES')}. Renueva tu plan en FlowTrade Suite.`;
+          await logIntento(sb, { usuarioId, token, ea_tipo, mt5_account, exito: false, motivo, ip, version_ea, hwid });
+          return res.status(403).json({ valido: false, motivo, expirado: true, codigo: 403 });
+        }
       }
 
       // 4. Verificar o vincular cuenta MT5 (SOLO para data_bridge)
@@ -137,13 +147,20 @@
 
       await logIntento(sb, { usuarioId, token, ea_tipo, mt5_account, exito: true, motivo: 'OK', ip, version_ea, hwid });
 
+      // Calcular días restantes
+      let diasRestantes = null;
+      if (plan !== 'gratis' && perfil.fecha_expiracion_plan) {
+        diasRestantes = Math.ceil((new Date(perfil.fecha_expiracion_plan) - new Date()) / 86400000);
+      }
+
       return res.status(200).json({
         valido: true,
         plan,
-        mensaje: `Licencia activa para ${ea_tipo} — Plan ${plan}`,
+        mensaje: `Licencia activa para ${ea_tipo} — Plan ${plan}${diasRestantes !== null ? ' — vence en ' + diasRestantes + ' días' : ''}`,
         heartbeat_interval: 3600,
         usuario: perfil.nombre,
         cuenta_vinculada: String(mt5_account),
+        dias_restantes: diasRestantes,
       });
 
     } catch (err) {
