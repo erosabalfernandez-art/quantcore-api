@@ -3947,9 +3947,9 @@ function updateDescargasVisibility() {
   const rm=document.getElementById('dl-btn-riskmanager');
   const aj=document.getElementById('dl-btn-autojournaling');
   const bs=document.getElementById('dl-btn-backtest');
-  if(rm) rm.innerHTML=isPremOrElite?dlBtn(BASE+'RiskManager.mq5','RiskManager.mq5','btn-green',''):locked('premium');
-  if(aj) aj.innerHTML=isPremOrElite?dlBtn(BASE+'AutoJournaling.mq5','AutoJournaling.mq5','btn-blue',''):locked('premium');
-  if(bs) bs.innerHTML=isElite?dlBtn(BASE+'BacktestSimulator.mq5','BacktestSimulator.mq5','btn-green',''):locked('elite');
+  if(rm) rm.innerHTML=isPremOrElite?dlBtn(BASE+'RiskManager_QuantCore.mq5','RiskManager_QuantCore.mq5','btn-green',''):locked('premium');
+  if(aj) aj.innerHTML=isPremOrElite?dlBtn(BASE+'AutoJournaling_QuantCore.mq5','AutoJournaling_QuantCore.mq5','btn-blue',''):locked('premium');
+  if(bs) bs.innerHTML=isElite?dlBtn(BASE+'BacktestSimulator_QuantCore.mq5','BacktestSimulator_QuantCore.mq5','btn-green',''):locked('elite');
 }
 async function logEaDownload(eaTipo) {
   if (!currentUser) return;
