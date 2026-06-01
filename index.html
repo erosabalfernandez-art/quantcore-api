@@ -5615,31 +5615,33 @@ async function mt5SimulateReceive() {
       document.getElementById('helpBubble').classList.add('hidden');
     }
     try { await openIDB(); } catch(e) {}
-    let session = null;
-    try {
-      const result = await sb.auth.getSession();
-      session = result?.data?.session ?? null;
-    } catch(e) {
-      showLanding();
-      return;
-    }
-    if (!session) {
-      showLanding();
-    } else if (!_appBootstrapping) {
-      _appBootstrapping = true;
+      localStorage.removeItem('flowtrade_last_section');
+      let session = null;
       try {
-        await loadAppForUser(session.user);
-        document.getElementById('landingPage').classList.add('hidden');
-        document.getElementById('authOverlay').classList.add('hidden');
-        const _savedSection = localStorage.getItem('flowtrade_last_section');
-        const _validSections = ['inicio','dashboard','diario','planes','perfil','admin',
-          'calculadora','calc-mt5','noticias','referidos','ranking','logros','descargas','conectarmt5'];
-        showSection((_savedSection && _validSections.includes(_savedSection)) ? _savedSection : 'inicio');
+        const _authTimeout = new Promise((_, rej) =>
+          setTimeout(() => rej(new Error('auth_timeout')), 7000)
+        );
+        const result = await Promise.race([sb.auth.getSession(), _authTimeout]);
+        session = result?.data?.session ?? null;
       } catch(e) {
         showLanding();
+        return;
       }
-    }
-    try { updatePayInstructions(); } catch(e) {}
+      if (!session) {
+        showLanding();
+      } else if (!_appBootstrapping) {
+        _appBootstrapping = true;
+        try {
+          await loadAppForUser(session.user);
+          document.getElementById('landingPage').classList.add('hidden');
+          document.getElementById('authOverlay').classList.add('hidden');
+          showSection('inicio');
+        } catch(e) {
+          _appBootstrapping = false;
+          showLanding();
+        }
+      }
+      try { updatePayInstructions(); } catch(e) {}
     // Check maintenance on load (public check)
     try {
       const {data}=await sb.from('configuracion_plataforma').select('valor').eq('clave','modo_mantenimiento').single();
@@ -6028,19 +6030,28 @@ function forceClearSession() {
   );
 
   sb.auth.onAuthStateChange(async (event, session) => {
-    if (session?.user) {
-      resetTimers();
-      if ((event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED' || event === 'INITIAL_SESSION') && !currentUser && !_appBootstrapping) {
-        _appBootstrapping = true;
-        await loadAppForUser(session.user);
-        if (event !== 'TOKEN_REFRESHED') showSection('inicio');
+      if (session?.user) {
+        resetTimers();
+        if ((event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED' || event === 'INITIAL_SESSION') && !currentUser && !_appBootstrapping) {
+          _appBootstrapping = true;
+          try {
+            await loadAppForUser(session.user);
+            if (event !== 'TOKEN_REFRESHED') showSection('inicio');
+          } catch(e) {
+            _appBootstrapping = false;
+            document.getElementById('landingPage').classList.remove('hidden');
+            document.getElementById('mainApp').classList.add('hidden');
+          }
+        }
+      } else {
+        clearTimeout(inactivityTimer);
+        clearTimeout(warningTimer);
+        currentUser = null; currentPerfil = null; isAdmin = false; stopAdminRealtimeChat();
+        document.getElementById('landingPage').classList.remove('hidden');
+        document.getElementById('mainApp').classList.add('hidden');
+        document.getElementById('authOverlay').classList.add('hidden');
       }
-    } else {
-      clearTimeout(inactivityTimer);
-      clearTimeout(warningTimer);
-      currentUser = null; currentPerfil = null; isAdmin = false; stopAdminRealtimeChat();
-    }
-  });
+    });
 
   // ═══════════════════════════════════════════════════════════════
   // ADMIN: REALTIME CHAT NOTIFICATIONS
