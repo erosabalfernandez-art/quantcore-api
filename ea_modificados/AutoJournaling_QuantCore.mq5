@@ -20,79 +20,94 @@ input bool InpAutoAttach = false;                 // Auto-agregar EA al perfil
 //| SISTEMA DE LICENCIAS (idéntico al EA anterior)                   |
 //+------------------------------------------------------------------+
 //══════════════════════════════════════════════════════════════════
-//  BLOQUE DE LICENCIAS — QuantCore (Parte 3)
-//  Sin tokens de administrador. Validación 100% vía servidor.
+//  BLOQUE DE LICENCIAS — QuantCore Anti-Tamper v2
+//  URLs cifradas con XOR. Canarios de integridad. Modo veneno.
 //══════════════════════════════════════════════════════════════════
-input string Licencia_Token    = "";                                      // Token de licencia (cópialo de tu perfil en la web)
-input string ApiUrl            = "https://TU-PROYECTO.vercel.app/api/";   // URL base de tu despliegue Vercel (incluye / al final)
-input int    HeartbeatInterval = 3600;                                     // Segundos entre heartbeats (mín. 600)
+input string LicenseToken      = "";   // Token de licencia (cópialo desde FlowTrade Suite)
+input int    HeartbeatInterval = 3600; // Segundos entre heartbeats (mín. 600)
 
 #define EA_TIPO "auto_journaling"
 
 bool     g_licencia_ok    = false;
+bool     g_poisoned       = false;
 datetime g_last_heartbeat = 0;
 
-//--- Verifica la licencia llamando a POST /api/validar-licencia
-bool VerificarLicenciaWeb()
+string QC_XorDecrypt(const uchar &enc[], int len)
 {
-    if(StringLen(Licencia_Token) < 8)
-    {
-        Print("QuantCore: Token vacío o demasiado corto. Ingresa tu token en los parámetros del EA.");
-        return false;
-    }
-    long   cuenta = AccountInfoInteger(ACCOUNT_LOGIN);
-    string body   = StringFormat(
-        "{\"token\":\"%s\",\"ea_tipo\":\"%s\",\"mt5_account\":\"%I64d\"}",
-        Licencia_Token, EA_TIPO, cuenta);
-    uchar  req[], res[];
-    StringToCharArray(body, req, 0, StringLen(body));
-    string hdrs;
-    string url = ApiUrl + "validar-licencia";
-    int ret = WebRequest("POST", url, "Content-Type: application/json\r\n", 8000, req, res, hdrs);
-    if(ret < 0 || ArraySize(res) == 0)
-    {
-        Print("QuantCore: Error de red al validar licencia (", GetLastError(), ").");
-        Print("Asegúrate de añadir '", url, "' en: Herramientas → Opciones → Expert Advisors → WebRequest");
-        return false;
-    }
-    string resp = CharArrayToString(res);
-    Print("QuantCore respuesta validación: ", resp);
-    if(StringFind(resp, "\"valido\":true") >= 0)
-    {
-        Print("QuantCore: Licencia válida para EA tipo '", EA_TIPO, "'.");
-        return true;
-    }
-    // Extraer motivo del JSON si existe
-    int mStart = StringFind(resp, "\"motivo\":\"");
-    if(mStart >= 0)
-    {
-        mStart += 10;
-        int mEnd = StringFind(resp, "\"", mStart);
-        if(mEnd > mStart) Print("QuantCore motivo rechazo: ", StringSubstr(resp, mStart, mEnd-mStart));
-    }
-    return false;
+   uchar k[4] = {0xA7, 0x3F, 0xD1, 0x8B};
+   string s = "";
+   for(int i = 0; i < len; i++)
+      s += CharToString((uchar)(enc[i] ^ k[i % 4]));
+   return s;
+}
+string QC_ApiBase()
+{
+   uchar enc[] = {207,75,165,251,212,5,254,164,214,74,176,229,211,92,190,249,
+                  194,18,176,251,206,17,167,238,213,92,180,231,137,94,161,251,
+                  136,94,161,226,136};
+   return QC_XorDecrypt(enc, 37);
+}
+string QC_EndValidar()   { uchar e[]={209,94,189,226,195,94,163,166,203,86,178,238,201,92,184,234}; return QC_XorDecrypt(e,16); }
+string QC_EndHeartbeat() { uchar e[]={207,90,176,249,211,93,180,234,211}; return QC_XorDecrypt(e,9); }
+
+bool QC_CheckIntegrity()
+{
+   int c1 = 0xA7 + 0x3F + 0xD1 + 0x8B;
+   if(c1 != 544) return false;
+   string url = QC_ApiBase();
+   if(StringLen(url) != 37)               return false;
+   if(StringSubstr(url, 0, 5) != "https") return false;
+   if(StringSubstr(url, 36, 1) != "/")    return false;
+   if(StringFind(QC_EndValidar(), "licencia") < 0) return false;
+   return true;
+}
+string QC_PoisonToken()
+{
+   int len = StringLen(LicenseToken);
+   if(len < 8) return StringFormat("poison_%d_%d", MathRand(), MathRand());
+   return StringSubstr(LicenseToken,len/2) + StringSubstr(LicenseToken,0,len/2) + StringFormat("_px%d",MathRand()%9999);
 }
 
-//--- Envía heartbeat periódico a POST /api/heartbeat
+bool VerificarLicenciaWeb()
+{
+   if(!QC_CheckIntegrity()) { g_poisoned = true; return true; }
+   if(StringLen(LicenseToken) < 8) { Print("QuantCore: Token vacío — ingresa tu token en los parámetros."); return false; }
+   long   cuenta = AccountInfoInteger(ACCOUNT_LOGIN);
+   string tok    = g_poisoned ? QC_PoisonToken() : LicenseToken;
+   string body   = "{"token":""+tok+"","ea_tipo":""+EA_TIPO+"","mt5_account":""+IntegerToString(cuenta)+""}";
+   uchar  req[], res[]; string hdrs;
+   StringToCharArray(body, req, 0, StringLen(body));
+   string url = QC_ApiBase() + QC_EndValidar();
+   int ret = WebRequest("POST", url, "Content-Type: application/json
+", 8000, req, res, hdrs);
+   if(ret < 0 || ArraySize(res) == 0)
+   {
+      Print("QuantCore: Error de red al validar (", GetLastError(), "). Añade '", url, "' en WebRequest.");
+      return false;
+   }
+   if(g_poisoned) return true;
+   string resp = CharArrayToString(res);
+   Print("QuantCore validación: ", resp);
+   if(StringFind(resp, ""valido":true") >= 0) { Print("Licencia válida para ", EA_TIPO); return true; }
+   int ms = StringFind(resp, ""motivo":"");
+   if(ms >= 0) { ms+=10; int me=StringFind(resp,""",ms); if(me>ms) Print("Motivo: ",StringSubstr(resp,ms,me-ms)); }
+   return false;
+}
 bool SendHeartbeat()
 {
-    long   cuenta = AccountInfoInteger(ACCOUNT_LOGIN);
-    string body   = StringFormat(
-        "{\"token\":\"%s\",\"ea_tipo\":\"%s\",\"mt5_account\":\"%I64d\"}",
-        Licencia_Token, EA_TIPO, cuenta);
-    uchar  req[], res[];
-    StringToCharArray(body, req, 0, StringLen(body));
-    string hdrs;
-    string url = ApiUrl + "heartbeat";
-    int ret = WebRequest("POST", url, "Content-Type: application/json\r\n", 5000, req, res, hdrs);
-    if(ret < 0 || ArraySize(res) == 0) { Print("QuantCore: Heartbeat fallido (error red)."); return false; }
-    string resp = CharArrayToString(res);
-    if(StringFind(resp, "\"ok\":false") >= 0)
-    {
-        Print("QuantCore: Heartbeat rechazado → ", resp);
-        return false;
-    }
-    return true;
+   long   cuenta = AccountInfoInteger(ACCOUNT_LOGIN);
+   string tok    = g_poisoned ? QC_PoisonToken() : LicenseToken;
+   string body   = "{"token":""+tok+"","ea_tipo":""+EA_TIPO+"","mt5_account":""+IntegerToString(cuenta)+""}";
+   uchar  req[], res[]; string hdrs;
+   StringToCharArray(body, req, 0, StringLen(body));
+   string url = QC_ApiBase() + QC_EndHeartbeat();
+   int ret = WebRequest("POST", url, "Content-Type: application/json
+", 5000, req, res, hdrs);
+   if(ret < 0 || ArraySize(res) == 0) { Print("QuantCore: Heartbeat fallido."); return false; }
+   if(g_poisoned) return true;
+   string resp = CharArrayToString(res);
+   if(StringFind(resp, ""ok":false") >= 0) { Print("Heartbeat rechazado: ", resp); return false; }
+   return true;
 }
 //══════════════════════════════════════════════════════════════════
 //  FIN BLOQUE DE LICENCIAS
@@ -144,7 +159,7 @@ bool SendJournal(TradeRecord &rec, double closePrice, double sl, double tp, doub
                  string closePath1, string closePath2)
 {
     string json = "{";
-    json += "\"token\":\"" + Licencia_Token + "\",";
+    json += "\"token\":\"" + LicenseToken + "\",";
     json += "\"account\":" + IntegerToString(AccountInfoInteger(ACCOUNT_LOGIN)) + ",";
     json += "\"ticket\":" + IntegerToString(rec.ticket) + ",";
     json += "\"symbol\":\"" + rec.symbol + "\",";
