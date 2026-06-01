@@ -3,9 +3,6 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate"/>
-<meta http-equiv="Pragma" content="no-cache"/>
-<meta http-equiv="Expires" content="0"/>
 <title>FlowTrade Suite</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -206,102 +203,9 @@ select.input-dark option{background:#131A26;color:#E2E8F0;}
 .propfirm-step{background:rgba(19,26,38,.8);border:1px solid rgba(30,41,59,.6);border-radius:14px;padding:20px;text-align:center;position:relative;}
 .propfirm-step .step-num{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#2563EB,#1D4ED8);color:#fff;font-size:14px;font-weight:700;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;}
 .inicio-section-divider{text-align:center;padding:12px 0 6px;font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#475569;}
-
-/* ── LIGHT MODE ── */
-html[data-theme="light"] body {
-  filter: invert(1) hue-rotate(180deg);
-}
-html[data-theme="light"] body img,
-html[data-theme="light"] body canvas,
-html[data-theme="light"] body video,
-html[data-theme="light"] body .hero-chart-svg,
-html[data-theme="light"] body [style*="background:url"],
-html[data-theme="light"] body [style*="background-image"],
-html[data-theme="light"] body .goog-te-banner-frame {
-  filter: invert(1) hue-rotate(180deg);
-}
-/* Fix: backdrop-filter breaks under filter:invert on parent */
-html[data-theme="light"] body .glass-card,
-html[data-theme="light"] body .glass-nav {
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
-}
-#themeToggleBtn {
-  background: none;
-  border: 1px solid rgba(148,163,184,.3);
-  border-radius: 8px;
-  padding: 6px 10px;
-  cursor: pointer;
-  font-size: 14px;
-  color: #94A3B8;
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  transition: all .15s;
-}
-#themeToggleBtn:hover { border-color: rgba(148,163,184,.6); color: #E2E8F0; }
-/* ── GOOGLE TRANSLATE FIXES ── */
-.goog-te-banner-frame.skiptranslate { display: none !important; }
-body { top: 0 !important; }
-.goog-te-gadget-icon { display: none; }
-#goog-gt-tt, .goog-te-balloon-frame { display: none !important; }
-.goog-text-highlight { background: none !important; box-shadow: none !important; }
-
-@keyframes ft-spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
-  #appLoader{position:fixed;inset:0;z-index:99999;background:#0B0F17;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:14px}
-  #appLoader.fade-out{opacity:0;pointer-events:none;transition:opacity .3s}
-  #appLoader .sp{width:42px;height:42px;border:3px solid rgba(37,99,235,.2);border-top-color:#2563EB;border-radius:50%;animation:ft-spin .9s linear infinite}
-  #appLoader .lt{color:#64748B;font-size:13px;letter-spacing:.02em}
-  </style>
-<!-- Google Translate -->
-<div id="google_translate_element" style="display:none;position:absolute;"></div>
-<script>
-function googleTranslateElementInit() {
-  new google.translate.TranslateElement({
-    pageLanguage: 'es',
-    includedLanguages: 'en,es',
-    layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
-    autoDisplay: false
-  }, 'google_translate_element');
-}
-function translatePage(lang, _retries) {
-  localStorage.setItem('ft_lang', lang);
-  const label = lang === 'en' ? 'ES' : 'EN';
-  const b1 = document.getElementById('langToggleBtn');
-  const b2 = document.getElementById('langToggleBtnLanding');
-  if (b1) b1.textContent = label;
-  if (b2) b2.textContent = label;
-  if (lang === 'es') {
-    document.cookie = 'googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/';
-    document.cookie = 'googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=' + window.location.hostname;
-    window.location.reload();
-    return;
-  }
-  const sel = document.querySelector('.goog-te-combo');
-  if (sel) {
-    sel.value = lang;
-    sel.dispatchEvent(new Event('change'));
-  } else if ((_retries||0) < 30) {
-    setTimeout(() => translatePage(lang, (_retries||0)+1), 400);
-  } else {
-    document.cookie = 'googtrans=/es/' + lang + '; path=/';
-    document.cookie = 'googtrans=/es/' + lang + '; path=/; domain=' + window.location.hostname;
-    window.location.reload();
-  }
-}
-window.addEventListener('load', () => {
-  const saved = localStorage.getItem('ft_lang');
-  if (saved && saved !== 'es') {
-    const b2 = document.getElementById('langToggleBtnLanding');
-    if (b2) b2.textContent = 'ES';
-    setTimeout(() => translatePage(saved), 1500);
-  }
-});
-</script>
-<script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+</style>
 </head>
 <body>
-  <div id="appLoader"><div class="sp"></div><span class="lt">Cargando FlowTrade Suite…</span></div>
 <!-- COOKIE BANNER -->
 <div id="cookieBanner" class="hidden">
   <div style="max-width:1152px;margin:0 auto;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:16px;">
@@ -329,10 +233,9 @@ window.addEventListener('load', () => {
         <span style="font-size:11px;padding:2px 10px;border-radius:20px;font-weight:700;background:rgba(37,99,235,.15);color:#2563EB;">SUITE</span>
       </div>
       <div style="display:flex;align-items:center;gap:12px;">
-          <button id="langToggleBtnLanding" onclick="translatePage(this.textContent==='EN'?'en':'es')" title="Traducir / Translate" style="background:none;border:1px solid rgba(148,163,184,.3);border-radius:8px;padding:6px 12px;cursor:pointer;font-size:12px;color:#94A3B8;font-weight:600;transition:all .15s;">EN</button>
-          <button onclick="showAuthFromLanding('login')" class="btn-land-s" style="padding:8px 18px;border-radius:12px;font-size:13px;">Iniciar sesion</button>
-          <button onclick="showAuthFromLanding('register')" class="btn-land-p" style="padding:8px 18px;border-radius:12px;font-size:13px;">Registrarse gratis</button>
-        </div>
+        <button onclick="showAuthFromLanding('login')" class="btn-land-s" style="padding:8px 18px;border-radius:12px;font-size:13px;">Iniciar sesion</button>
+        <button onclick="showAuthFromLanding('register')" class="btn-land-p" style="padding:8px 18px;border-radius:12px;font-size:13px;">Registrarse gratis</button>
+      </div>
     </div>
   </nav>
 
@@ -796,10 +699,6 @@ window.addEventListener('load', () => {
       <span class="text-xs px-2 py-0.5 rounded-full font-bold" style="background:rgba(37,99,235,.15);color:#2563EB;">SUITE</span>
     </div>
     <div class="flex items-center gap-3">
-      <button id="langToggleBtn" onclick="translatePage(this.textContent==='EN'?'en':'es')" title="Translate to English / Español" style="background:none;border:1px solid rgba(148,163,184,.3);border-radius:8px;padding:6px 10px;cursor:pointer;font-size:13px;font-weight:600;color:#94A3B8;">EN</button>
-      <button id="themeToggleBtn" onclick="toggleTheme()" title="Cambiar modo claro/oscuro">
-        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>Oscuro
-      </button>
       <button id="notifPermBtn" onclick="requestPushPermission()" class="hidden text-xs px-3 py-1.5 rounded-lg" style="background:rgba(251,191,36,.1);border:1px solid rgba(251,191,36,.3);color:#FBBF24;">Activar alertas</button>
       <!-- Notification Bell -->
       <div class="relative" id="notifBellWrapper">
@@ -906,7 +805,7 @@ window.addEventListener('load', () => {
     <main class="flex-1 overflow-y-auto p-5">
 
 
-      <!-- INICIO -->
+      <!-- ████ INICIO — BridgeMarkets ████ -->
       <div id="section-inicio" class="hidden">
 
 
@@ -921,7 +820,7 @@ window.addEventListener('load', () => {
             <!-- Content -->
             <div class="hero-content">
               <div class="hero-left">
-                <!-- Logo -->
+                <!-- BridgeMarkets Logo SVG -->
                 <div class="hero-logo mb-3">
                   <svg width="44" height="44" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <rect width="44" height="44" rx="10" fill="url(#bm-grad)"/>
@@ -932,7 +831,7 @@ window.addEventListener('load', () => {
                   </svg>
                   <div>
                     <div class="hero-brand-name">FlowTrade Suite</div>
-                    
+                    <div class="hero-brand-sub">powered by BridgeMarkets</div>
                   </div>
                 </div>
                 <h1 class="hero-title">Opera como un<br/><span class="hero-title-accent">trader profesional</span></h1>
@@ -1056,7 +955,7 @@ window.addEventListener('load', () => {
     <div class="carousel-card" style="background:linear-gradient(135deg,#4A0000,#DC2626);" onclick="showSection('noticias')">
       <div class="cc-icon"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.92)" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 17 7 10 11 14 15 6 21 9"/><circle cx="21" cy="9" r="2" fill="rgba(255,255,255,0.3)"/></svg></div>
       <div class="cc-title">Índices Sintéticos</div>
-      <div class="cc-desc">VorteX &amp; Fortune — opera sin horarios</div>
+      <div class="cc-desc">VorteX &amp; Fortune — BridgeMarkets 24/7</div>
     </div>
     <div class="carousel-card" style="background:linear-gradient(135deg,#312E81,#6366F1);" onclick="showSection('calc-mt5')">
       <div class="cc-icon"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.92)" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4"/><line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/></svg></div>
@@ -1106,7 +1005,7 @@ window.addEventListener('load', () => {
     <div class="carousel-card" style="background:linear-gradient(135deg,#4A0000,#DC2626);" onclick="showSection('noticias')">
       <div class="cc-icon"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.92)" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 17 7 10 11 14 15 6 21 9"/><circle cx="21" cy="9" r="2" fill="rgba(255,255,255,0.3)"/></svg></div>
       <div class="cc-title">Índices Sintéticos</div>
-      <div class="cc-desc">Índices Sintéticos 24/7</div>
+      <div class="cc-desc">VorteX &amp; Fortune — BridgeMarkets 24/7</div>
     </div>
     <div class="carousel-card" style="background:linear-gradient(135deg,#312E81,#6366F1);" onclick="showSection('calc-mt5')">
       <div class="cc-icon"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.92)" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4"/><line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/></svg></div>
@@ -1122,76 +1021,58 @@ window.addEventListener('load', () => {
           </div>
         </div>
 
-
-        <!-- ═══════ BRIDGEMARKETS PARTNER SECTION ═══════ -->
+        <!-- HERO BRIDGEMARKETS -->
         <div class="bm-hero mb-6">
           <div style="position:relative;z-index:1;">
             <div class="bm-badge">
-              <svg width="10" height="10" viewBox="0 0 24 24" fill="#10B981"><circle cx="12" cy="12" r="10"/></svg>
-              Broker Partner Recomendado
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="#3B82F6"><circle cx="12" cy="12" r="10"/></svg>
+              Broker Recomendado
             </div>
             <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:24px;">
               <div style="flex:1;min-width:260px;">
-                <!-- Logo: FlowTrade × BridgeMarkets partnership badge (no trademark) -->
-                <div class="hero-logo mb-4" style="align-items:flex-start;">
-                  <div style="background:linear-gradient(135deg,#2563EB,#7C3AED);border-radius:12px;padding:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-                    <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <polyline points="4,26 10,16 16,20 23,8 29,13" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-                      <circle cx="29" cy="13" r="2.5" fill="white" opacity="0.9"/>
-                      <rect x="4" y="28" width="24" height="1.5" rx="0.75" fill="white" opacity="0.3"/>
-                    </svg>
-                  </div>
-                  <div>
-                    <div class="hero-brand-name" style="font-size:18px;">BridgeMarkets</div>
-                    <div style="font-size:11px;color:#64748B;font-weight:500;letter-spacing:.5px;">BROKER PARTNER OFICIAL</div>
-                  </div>
+                <div style="background:#fff;display:inline-block;padding:10px 18px;border-radius:12px;margin-bottom:20px;">
+                  <img src="data:image/png;base64,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" alt="BridgeMarkets" style="height:44px;display:block;object-fit:contain;"/>
                 </div>
-                <h2 style="font-size:24px;font-weight:800;color:#F1F5F9;line-height:1.25;margin:0 0 12px;">
-                  El broker ideal para<br/><span style="color:#3B82F6;">Índices Sintéticos</span> &amp; Prop Firm
+                <h2 style="font-size:26px;font-weight:800;color:#F1F5F9;line-height:1.25;margin:0 0 12px;">
+                  El broker ideal para<br/><span style="color:#3B82F6;">Índices Sintéticos</span> & Prop Firm
                 </h2>
-                <p style="color:#94A3B8;font-size:14px;line-height:1.7;margin:0 0 22px;max-width:480px;">
-                  Accede a los mercados sintéticos las 24 horas del día, los 365 días del año. Sin noticias macroeconómicas que arruinen tus trades. Sin cierres de mercado. Spreads desde 0 pip y plataforma MT5 profesional.
+                <p style="color:#94A3B8;font-size:14px;line-height:1.7;margin:0 0 24px;max-width:480px;">
+                  BridgeMarkets es la plataforma de trading que combina acceso a mercados sintéticos 24/7, condiciones de spreads competitivos y un programa de fondeo prop firm — todo en un solo lugar. Sin noticias que arruinen tus trades. Sin cierres de mercado.
                 </p>
-                <!-- Urgency badge -->
-                <div style="display:inline-flex;align-items:center;gap:6px;background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.25);border-radius:8px;padding:6px 12px;margin-bottom:18px;">
-                  <span style="width:6px;height:6px;background:#10B981;border-radius:50%;animation:pulse 1.5s infinite;display:inline-block;"></span>
-                  <span style="font-size:11px;font-weight:600;color:#10B981;">Cuenta demo gratuita disponible ahora</span>
-                </div>
                 <div style="display:flex;gap:12px;flex-wrap:wrap;">
-                  <a href="https://trading.bridgemarkets.global//register?ref=6af2c3f6-2fdd-47&branchUuid=6bdab320-a2b8-43a5-a218-f" target="_blank" rel="noopener sponsored" style="display:inline-flex;align-items:center;gap:8px;background:linear-gradient(135deg,#2563EB,#1D4ED8);color:#fff;font-weight:700;font-size:14px;padding:13px 26px;border-radius:12px;text-decoration:none;box-shadow:0 4px 20px rgba(37,99,235,.4);transition:all .2s;">
-                    <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 0 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                  <a href="https://trading.bridgemarkets.global//register?ref=6af2c3f6-2fdd-47&branchUuid=6bdab320-a2b8-43a5-a218-f" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:8px;background:linear-gradient(135deg,#2563EB,#1D4ED8);color:#fff;font-weight:700;font-size:14px;padding:13px 26px;border-radius:12px;text-decoration:none;transition:all .2s;box-shadow:0 4px 20px rgba(37,99,235,.4);">
                     Abrir Cuenta Gratis
+                    <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 0 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
                   </a>
                   <button onclick="showSection('calculadora')" style="display:inline-flex;align-items:center;gap:8px;background:rgba(37,99,235,.1);color:#3B82F6;border:1px solid rgba(37,99,235,.3);font-weight:600;font-size:13px;padding:13px 22px;border-radius:12px;cursor:pointer;transition:all .2s;">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2"/><path d="M8 6h8"/><path d="M8 10h2m4 0h2M8 14h2m4 0h2M8 18h2m4 0h2"/></svg>
-                    Calcular Riesgo
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:6px;"><rect x="4" y="2" width="16" height="20" rx="2"/><path d="M8 6h8"/><path d="M8 10h2m4 0h2M8 14h2m4 0h2M8 18h2m4 0h2"/></svg>Calculadora de Riesgo
                   </button>
                 </div>
               </div>
-              <!-- Feature chips -->
-              <div style="flex-shrink:0;display:flex;flex-direction:column;gap:8px;min-width:180px;">
+              <div style="flex-shrink:0;display:flex;flex-direction:column;gap:10px;min-width:180px;">
+                
                 <div style="display:flex;align-items:center;gap:10px;background:rgba(30,41,59,.5);border:1px solid rgba(30,41,59,.8);border-radius:10px;padding:10px 14px;">
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-                  <span style="font-size:12px;font-weight:500;color:#CBD5E1;">Mercado 24/7 sin interrupciones</span>
+                  <span style="display:inline-flex;align-items:center;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+                  <span style="font-size:12px;font-weight:500;color:#CBD5E1;">Regulado y auditado</span>
                 </div>
                 <div style="display:flex;align-items:center;gap:10px;background:rgba(30,41,59,.5);border:1px solid rgba(30,41,59,.8);border-radius:10px;padding:10px 14px;">
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#F59E0B" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-                  <span style="font-size:12px;font-weight:500;color:#CBD5E1;">Ejecución en milisegundos</span>
+                  <span style="display:inline-flex;align-items:center;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#F59E0B" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></span>
+                  <span style="font-size:12px;font-weight:500;color:#CBD5E1;">Ejecución instantánea</span>
                 </div>
                 <div style="display:flex;align-items:center;gap:10px;background:rgba(30,41,59,.5);border:1px solid rgba(30,41,59,.8);border-radius:10px;padding:10px 14px;">
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                  <span style="font-size:12px;font-weight:500;color:#CBD5E1;">Spread desde 0 pip</span>
+                  <span style="display:inline-flex;align-items:center;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span>
+                  <span style="font-size:12px;font-weight:500;color:#CBD5E1;">Mercado 24/7</span>
                 </div>
                 <div style="display:flex;align-items:center;gap:10px;background:rgba(30,41,59,.5);border:1px solid rgba(30,41,59,.8);border-radius:10px;padding:10px 14px;">
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.5 8h5a2 2 0 1 1 0 4h-5.5M9.5 12H15a2 2 0 1 1 0 4H9.5M10 8v8"/></svg>
+                  <span style="display:inline-flex;align-items:center;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.5 8h5a2 2 0 1 1 0 4h-5.5M9.5 12H15a2 2 0 1 1 0 4H9.5M10 8v8"/></svg></span>
                   <span style="font-size:12px;font-weight:500;color:#CBD5E1;">Prop Firm disponible</span>
                 </div>
                 <div style="display:flex;align-items:center;gap:10px;background:rgba(30,41,59,.5);border:1px solid rgba(30,41,59,.8);border-radius:10px;padding:10px 14px;">
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#8B5CF6" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18" stroke-width="3"/></svg>
-                  <span style="font-size:12px;font-weight:500;color:#CBD5E1;">MT5 + WebTrader profesional</span>
+                  <span style="display:inline-flex;align-items:center;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#8B5CF6" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18" stroke-width="3"/></svg></span>
+                  <span style="font-size:12px;font-weight:500;color:#CBD5E1;">MT5 + WebTrader</span>
                 </div>
                 <div style="display:flex;align-items:center;gap:10px;background:rgba(30,41,59,.5);border:1px solid rgba(30,41,59,.8);border-radius:10px;padding:10px 14px;">
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#6366F1" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
+                  <span style="display:inline-flex;align-items:center;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#6366F1" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg></span>
                   <span style="font-size:12px;font-weight:500;color:#CBD5E1;">Soporte en español</span>
                 </div>
               </div>
@@ -1201,44 +1082,57 @@ window.addEventListener('load', () => {
 
         <!-- STATS BAR -->
         <div class="bm-stat-bar mb-6">
-          <div class="bm-stat-item"><div class="val">24/7</div><div class="lbl">Siempre abierto</div></div>
-          <div class="bm-stat-item"><div class="val">0 pip</div><div class="lbl">Spread mínimo</div></div>
-          <div class="bm-stat-item"><div class="val">500+</div><div class="lbl">Instrumentos</div></div>
-          <div class="bm-stat-item"><div class="val">5 min</div><div class="lbl">Abrir cuenta</div></div>
-          <div class="bm-stat-item"><div class="val">80%</div><div class="lbl">Split Prop Firm</div></div>
+          
+          <div class="bm-stat-item">
+            <div class="val">24/7</div>
+            <div class="lbl">Mercado abierto</div>
+          </div>
+          <div class="bm-stat-item">
+            <div class="val">0 pip</div>
+            <div class="lbl">Spread mínimo</div>
+          </div>
+          <div class="bm-stat-item">
+            <div class="val">500+</div>
+            <div class="lbl">Instrumentos</div>
+          </div>
+          <div class="bm-stat-item">
+            <div class="val">5 min</div>
+            <div class="lbl">Apertura de cuenta</div>
+          </div>
         </div>
 
-        <!-- ¿POR QUÉ BRIDGEMARKETS? -->
+        <!-- POR QUÉ BRIDGEMARKETS -->
         <div class="mb-6">
-          <div class="inicio-section-divider">¿Por qué operar con BridgeMarkets?</div>
+          <div class="inicio-section-divider">¿Por qué BridgeMarkets?</div>
           <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mt-3">
+            
             <div class="benefit-card">
               <div class="bc-icon" style="background:rgba(37,99,235,.2);">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+                <span style="display:inline-flex;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></span>
               </div>
               <h4 style="font-size:13px;font-weight:700;color:#F1F5F9;margin:0 0 6px;">Sin Horarios</h4>
-              <p style="font-size:12px;color:#94A3B8;line-height:1.6;margin:0;">Los índices sintéticos operan los 365 días del año, 24 horas. Lunes o domingo, siempre hay mercado.</p>
+              <p style="font-size:12px;color:#94A3B8;line-height:1.6;margin:0;">Los índices sintéticos operan los 365 días del año, las 24 horas. Lunes o domingo, siempre hay mercado.</p>
             </div>
             <div class="benefit-card">
               <div class="bc-icon" style="background:rgba(139,92,246,.2);">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8B5CF6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="21" x2="21" y2="21"/><line x1="3" y1="10" x2="21" y2="10"/><polyline points="5 10 5 21"/><polyline points="10 10 10 21"/><polyline points="14 10 14 21"/><polyline points="19 10 19 21"/><polygon points="12 2 20 10 4 10"/></svg>
+                <span style="display:inline-flex;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="21" x2="21" y2="21"/><line x1="3" y1="10" x2="21" y2="10"/><polyline points="5 10 5 21"/><polyline points="10 10 10 21"/><polyline points="14 10 14 21"/><polyline points="19 10 19 21"/><polygon points="12 2 20 10 4 10"/></svg></span>
               </div>
               <h4 style="font-size:13px;font-weight:700;color:#F1F5F9;margin:0 0 6px;">Prop Firm</h4>
-              <p style="font-size:12px;color:#94A3B8;line-height:1.6;margin:0;">Accede a capital de la firma. Demuestra tu habilidad y opera sin arriesgar tu propio dinero.</p>
+              <p style="font-size:12px;color:#94A3B8;line-height:1.6;margin:0;">Accede a capital institucional. Demuestra tu habilidad y opera con fondos de la firma sin arriesgar tu capital.</p>
             </div>
             <div class="benefit-card">
               <div class="bc-icon" style="background:rgba(16,185,129,.2);">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+                <span style="display:inline-flex;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8B5CF6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></span>
               </div>
               <h4 style="font-size:13px;font-weight:700;color:#F1F5F9;margin:0 0 6px;">Sin Noticias</h4>
-              <p style="font-size:12px;color:#94A3B8;line-height:1.6;margin:0;">Los índices sintéticos son inmunes a eventos macro. Tu análisis técnico siempre manda.</p>
+              <p style="font-size:12px;color:#94A3B8;line-height:1.6;margin:0;">Los índices sintéticos son inmunes a eventos macroeconómicos. Tu análisis técnico siempre manda.</p>
             </div>
             <div class="benefit-card">
               <div class="bc-icon" style="background:rgba(245,158,11,.2);">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#F59E0B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                <span style="display:inline-flex;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#F59E0B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></span>
               </div>
-              <h4 style="font-size:13px;font-weight:700;color:#F1F5F9;margin:0 0 6px;">Alta Velocidad</h4>
-              <p style="font-size:12px;color:#94A3B8;line-height:1.6;margin:0;">Ejecución en milisegundos. Sin requotes, sin slippage excesivo. Ideal para scalping y EAs.</p>
+              <h4 style="font-size:13px;font-weight:700;color:#F1F5F9;margin:0 0 6px;">Baja Latencia</h4>
+              <p style="font-size:12px;color:#94A3B8;line-height:1.6;margin:0;">Ejecución de órdenes en milisegundos. Sin requotes, sin slippage excesivo. Ideal para scalping y EA.</p>
             </div>
           </div>
         </div>
@@ -1246,67 +1140,86 @@ window.addEventListener('load', () => {
         <!-- ÍNDICES SINTÉTICOS -->
         <div class="mb-6">
           <div class="inicio-section-divider">Índices Sintéticos BridgeMarkets — Opera 24/7</div>
-          <p style="text-align:center;font-size:13px;color:#64748B;margin:6px 0 16px;">Instrumentos algorítmicos exclusivos. Sin correlación con el mercado real. Volatilidad predecible, spreads bajos, análisis técnico puro.</p>
+          <p style="text-align:center;font-size:13px;color:#64748B;margin:6px 0 16px;">Instrumentos algorítmicos exclusivos de BridgeMarkets. Sin correlación con el mercado real. Volatilidad predecible, spreads bajos, análisis técnico puro.</p>
           <div class="grid grid-cols-2 lg:grid-cols-3 gap-3">
-            <div class="synth-card" style="background:rgba(59,130,246,.08);border:1px solid rgba(59,130,246,.25);">
-              <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
-                <span class="synth-icon-svg"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12c2-4 4-4 6 0s4 4 6 0 4-4 6 0"/></svg></span>
-                <span style="font-weight:700;font-size:13px;color:#3B82F6;">VorteX 20 / 40</span>
-              </div>
-              <p style="font-size:12px;color:#94A3B8;line-height:1.6;margin:0;">Volatilidad fija 20%–40%. 2–4 ticks/s. Perfecto para iniciarse con movimientos controlados y predecibles.</p>
+            
+          <div class="synth-card" style="background:rgba(59,130,246,.08);border:1px solid rgba(59,130,246,.25);">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+              <span class="synth-icon-svg"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12c2-4 4-4 6 0s4 4 6 0 4-4 6 0"/></svg></span>
+              <span style="font-weight:700;font-size:13px;color:#3B82F6;">VorteX20 / VorteX40</span>
             </div>
-            <div class="synth-card" style="background:rgba(99,102,241,.08);border:1px solid rgba(99,102,241,.25);">
-              <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
-                <span class="synth-icon-svg"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#6366F1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></span>
-                <span style="font-weight:700;font-size:13px;color:#6366F1;">VorteX 60 / 80</span>
-              </div>
-              <p style="font-size:12px;color:#94A3B8;line-height:1.6;margin:0;">Volatilidad 60%–80%. 4 ticks/s. Rango medio-alto. Para traders con experiencia en gestión de riesgo.</p>
+            <p style="font-size:12px;color:#94A3B8;line-height:1.6;margin:0;">Volatilidad fija del 20% y 40%. 2–4 ticks por segundo. Ideal para iniciarse en sintéticos con movimientos controlados y predecibles.</p>
+            <div class="synth-card::after" style="position:absolute;bottom:0;left:0;right:0;height:2px;background:#3B82F6;opacity:.4;border-radius:0 0 14px 14px;"></div>
+          </div>
+          <div class="synth-card" style="background:rgba(99,102,241,.08);border:1px solid rgba(99,102,241,.25);">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+              <span class="synth-icon-svg"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#6366F1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></span>
+              <span style="font-weight:700;font-size:13px;color:#6366F1;">VorteX60 / VorteX80</span>
             </div>
-            <div class="synth-card" style="background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.25);">
-              <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
-                <span class="synth-icon-svg"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#EF4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg></span>
-                <span style="font-weight:700;font-size:13px;color:#EF4444;">VorteX 100</span>
-              </div>
-              <p style="font-size:12px;color:#94A3B8;line-height:1.6;margin:0;">Volatilidad 100%. El más agresivo. Máximo potencial de ganancia y riesgo. Requiere disciplina estricta.</p>
+            <p style="font-size:12px;color:#94A3B8;line-height:1.6;margin:0;">Volatilidad fija del 60% y 80%. 4 ticks por segundo. Rango de movimiento medio-alto. Para traders con experiencia en gestión de riesgo.</p>
+            <div class="synth-card::after" style="position:absolute;bottom:0;left:0;right:0;height:2px;background:#6366F1;opacity:.4;border-radius:0 0 14px 14px;"></div>
+          </div>
+          <div class="synth-card" style="background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.25);">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+              <span class="synth-icon-svg"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#EF4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg></span>
+              <span style="font-weight:700;font-size:13px;color:#EF4444;">VorteX100</span>
             </div>
-            <div class="synth-card" style="background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.25);">
-              <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
-                <span class="synth-icon-svg"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 19 8 19 8 13 12 13 12 8 16 8 16 4 20 4"/><line x1="4" y1="4" x2="4" y2="19"/><line x1="4" y1="19" x2="20" y2="19"/></svg></span>
-                <span style="font-weight:700;font-size:13px;color:#10B981;">Fortune 100 / 250 / 500</span>
-              </div>
-              <p style="font-size:12px;color:#94A3B8;line-height:1.6;margin:0;">50% sube / 50% baja con step fijo. Sin gaps ni noticias. Ideal para reversión y scalping mecánico.</p>
+            <p style="font-size:12px;color:#94A3B8;line-height:1.6;margin:0;">Volatilidad fija del 100%. 4 ticks por segundo. El más agresivo de los VorteX. Máximo potencial de ganancia y riesgo. Requiere disciplina estricta.</p>
+            <div class="synth-card::after" style="position:absolute;bottom:0;left:0;right:0;height:2px;background:#EF4444;opacity:.4;border-radius:0 0 14px 14px;"></div>
+          </div>
+          <div class="synth-card" style="background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.25);">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+              <span class="synth-icon-svg"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 19 8 19 8 13 12 13 12 8 16 8 16 4 20 4"/><line x1="4" y1="4" x2="4" y2="19"/><line x1="4" y1="19" x2="20" y2="19"/></svg></span>
+              <span style="font-weight:700;font-size:13px;color:#10B981;">Fortune 100/250/500/1000</span>
             </div>
-            <div class="synth-card" style="background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.25);">
-              <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
-                <span class="synth-icon-svg"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#F59E0B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="3"/><circle cx="8" cy="8" r="1.5" fill="#F59E0B"/><circle cx="16" cy="8" r="1.5" fill="#F59E0B"/><circle cx="12" cy="12" r="1.5" fill="#F59E0B"/><circle cx="8" cy="16" r="1.5" fill="#F59E0B"/><circle cx="16" cy="16" r="1.5" fill="#F59E0B"/></svg></span>
-                <span style="font-weight:700;font-size:13px;color:#F59E0B;">FortuneX 200 / 300 / 500</span>
-              </div>
-              <p style="font-size:12px;color:#94A3B8;line-height:1.6;margin:0;">Step aleatorio multiplicador. Combina la estructura Fortune con saltos impredecibles. Gestión de riesgo obligatoria.</p>
+            <p style="font-size:12px;color:#94A3B8;line-height:1.6;margin:0;">50% sube / 50% baja con step fijo (0.1, 0.25, 0.5 ó 1). Sin gaps ni noticias. El más predecible para sistemas de reversión y scalping mecánico.</p>
+            <div class="synth-card::after" style="position:absolute;bottom:0;left:0;right:0;height:2px;background:#10B981;opacity:.4;border-radius:0 0 14px 14px;"></div>
+          </div>
+          <div class="synth-card" style="background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.25);">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+              <span class="synth-icon-svg"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#F59E0B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="3"/><circle cx="8" cy="8" r="1.5" fill="#F59E0B"/><circle cx="16" cy="8" r="1.5" fill="#F59E0B"/><circle cx="12" cy="12" r="1.5" fill="#F59E0B"/><circle cx="8" cy="16" r="1.5" fill="#F59E0B"/><circle cx="16" cy="16" r="1.5" fill="#F59E0B"/></svg></span>
+              <span style="font-weight:700;font-size:13px;color:#F59E0B;">FortuneX200 / X300 / X500</span>
             </div>
-            <div class="synth-card" style="background:rgba(124,58,237,.08);border:1px solid rgba(124,58,237,.25);">
-              <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
-                <span class="synth-icon-svg"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#7C3AED" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></span>
-                <span style="font-weight:700;font-size:13px;color:#7C3AED;">Boom &amp; Crash</span>
-              </div>
-              <p style="font-size:12px;color:#94A3B8;line-height:1.6;margin:0;">Picos alcistas o bajistas en ticks aleatorios. Alta recompensa con riesgo controlado por tamaño de lote.</p>
-            </div>
+            <p style="font-size:12px;color:#94A3B8;line-height:1.6;margin:0;">50% sube / 50% baja con multiplicador de step aleatorio (hasta x2, x3 ó x5). Combina la estructura del Fortune con saltos impredecibles. Gestión de riesgo obligatoria.</p>
+            <div class="synth-card::after" style="position:absolute;bottom:0;left:0;right:0;height:2px;background:#F59E0B;opacity:.4;border-radius:0 0 14px 14px;"></div>
+          </div>
           </div>
         </div>
 
         <!-- PROP FIRM -->
         <div class="mb-6" style="background:linear-gradient(135deg,rgba(37,99,235,.08),rgba(139,92,246,.06));border:1px solid rgba(37,99,235,.2);border-radius:16px;padding:28px;">
-          <div class="inicio-section-divider" style="padding-top:0;">Programa Prop Firm BridgeMarkets</div>
+          <div class="inicio-section-divider" style="padding-top:0;">Programa Prop Firm</div>
           <p style="text-align:center;font-size:13px;color:#64748B;margin:4px 0 20px;">Opera con capital de la firma. Sin riesgo propio. Gana hasta el 80% de las ganancias.</p>
           <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-5">
-            <div class="propfirm-step"><div class="step-num">1</div><div style="margin-bottom:8px;display:flex;justify-content:center;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.8)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/></svg></div><h4 style="font-size:13px;font-weight:700;color:#F1F5F9;margin:0 0 6px;">Aplica</h4><p style="font-size:11px;color:#94A3B8;line-height:1.5;margin:0;">Completa el formulario y elige tamaño de cuenta</p></div>
-            <div class="propfirm-step"><div class="step-num">2</div><div style="margin-bottom:8px;display:flex;justify-content:center;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.8)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg></div><h4 style="font-size:13px;font-weight:700;color:#F1F5F9;margin:0 0 6px;">Evalúate</h4><p style="font-size:11px;color:#94A3B8;line-height:1.5;margin:0;">Demuestra consistencia cumpliendo los objetivos</p></div>
-            <div class="propfirm-step"><div class="step-num">3</div><div style="margin-bottom:8px;display:flex;justify-content:center;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.8)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div><h4 style="font-size:13px;font-weight:700;color:#F1F5F9;margin:0 0 6px;">Fondéate</h4><p style="font-size:11px;color:#94A3B8;line-height:1.5;margin:0;">Aprueba y recibe acceso a la cuenta fondeada</p></div>
-            <div class="propfirm-step"><div class="step-num">4</div><div style="margin-bottom:8px;display:flex;justify-content:center;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.8)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></div><h4 style="font-size:13px;font-weight:700;color:#F1F5F9;margin:0 0 6px;">Retira</h4><p style="font-size:11px;color:#94A3B8;line-height:1.5;margin:0;">Opera con capital de la firma y retira hasta el 80%</p></div>
+            
+            <div class="propfirm-step">
+              <div class="step-num">1</div>
+              <div style="margin-bottom:8px;display:flex;justify-content:center;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.8)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="13" y2="16"/></svg></div>
+              <h4 style="font-size:13px;font-weight:700;color:#F1F5F9;margin:0 0 6px;">Aplica</h4>
+              <p style="font-size:11px;color:#94A3B8;line-height:1.5;margin:0;">Completa el formulario de evaluación y elige tu tamaño de cuenta</p>
+            </div>
+            <div class="propfirm-step">
+              <div class="step-num">2</div>
+              <div style="margin-bottom:8px;display:flex;justify-content:center;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.8)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg></div>
+              <h4 style="font-size:13px;font-weight:700;color:#F1F5F9;margin:0 0 6px;">Evalúate</h4>
+              <p style="font-size:11px;color:#94A3B8;line-height:1.5;margin:0;">Demuestra tu consistencia cumpliendo los objetivos de profit y drawdown</p>
+            </div>
+            <div class="propfirm-step">
+              <div class="step-num">3</div>
+              <div style="margin-bottom:8px;display:flex;justify-content:center;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.8)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div>
+              <h4 style="font-size:13px;font-weight:700;color:#F1F5F9;margin:0 0 6px;">Fondéate</h4>
+              <p style="font-size:11px;color:#94A3B8;line-height:1.5;margin:0;">Aprueba la evaluación y recibe acceso a la cuenta fondeada</p>
+            </div>
+            <div class="propfirm-step">
+              <div class="step-num">4</div>
+              <div style="margin-bottom:8px;display:flex;justify-content:center;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.8)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></div>
+              <h4 style="font-size:13px;font-weight:700;color:#F1F5F9;margin:0 0 6px;">Retira</h4>
+              <p style="font-size:11px;color:#94A3B8;line-height:1.5;margin:0;">Opera con el capital de la firma y retira hasta el 80% de tus ganancias</p>
+            </div>
           </div>
           <div style="text-align:center;">
-            <a href="https://trading.bridgemarkets.global//register?ref=6af2c3f6-2fdd-47&branchUuid=6bdab320-a2b8-43a5-a218-f" target="_blank" rel="noopener sponsored" style="display:inline-flex;align-items:center;gap:8px;background:linear-gradient(135deg,#7C3AED,#2563EB);color:#fff;font-weight:700;font-size:14px;padding:13px 32px;border-radius:12px;text-decoration:none;box-shadow:0 4px 24px rgba(124,58,237,.35);">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-              Quiero el Prop Firm
+            <a href="https://trading.bridgemarkets.global//register?ref=6af2c3f6-2fdd-47&branchUuid=6bdab320-a2b8-43a5-a218-f" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:8px;background:linear-gradient(135deg,#7C3AED,#2563EB);color:#fff;font-weight:700;font-size:14px;padding:13px 32px;border-radius:12px;text-decoration:none;box-shadow:0 4px 24px rgba(124,58,237,.35);">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:6px;"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>Quiero el Prop Firm
               <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
             </a>
           </div>
@@ -1315,18 +1228,18 @@ window.addEventListener('load', () => {
         <!-- FINAL CTA -->
         <div style="background:linear-gradient(135deg,#0F172A,#131A26);border:1px solid rgba(37,99,235,.2);border-radius:16px;padding:36px;text-align:center;margin-bottom:8px;">
           <p style="font-size:22px;font-weight:800;color:#F1F5F9;margin:0 0 10px;">¿Listo para operar sin límites?</p>
-          <p style="font-size:14px;color:#64748B;margin:0 0 24px;">Únete a BridgeMarkets hoy. Cuenta demo gratis, mercado abierto 24/7.</p>
-          <a href="https://trading.bridgemarkets.global//register?ref=6af2c3f6-2fdd-47&branchUuid=6bdab320-a2b8-43a5-a218-f" target="_blank" rel="noopener sponsored" style="display:inline-flex;align-items:center;gap:10px;background:linear-gradient(135deg,#2563EB,#1D4ED8);color:#fff;font-weight:700;font-size:15px;padding:15px 36px;border-radius:14px;text-decoration:none;box-shadow:0 6px 28px rgba(37,99,235,.45);">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg>
-            Crear Cuenta en BridgeMarkets
+          <p style="font-size:14px;color:#64748B;margin:0 0 24px;">Únete a BridgeMarkets hoy. Cuenta demo gratis, spreads desde 0 y mercado abierto las 24 horas.</p>
+          <a href="https://trading.bridgemarkets.global//register?ref=6af2c3f6-2fdd-47&branchUuid=6bdab320-a2b8-43a5-a218-f" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:10px;background:linear-gradient(135deg,#2563EB,#1D4ED8);color:#fff;font-weight:700;font-size:15px;padding:15px 36px;border-radius:14px;text-decoration:none;box-shadow:0 6px 28px rgba(37,99,235,.45);transition:all .2s;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:6px;"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg>Crear Cuenta en BridgeMarkets
           </a>
-          <p style="font-size:11px;color:#334155;margin:14px 0 0;">¹ Al registrarte a través de este enlace, FlowTrade Suite puede recibir una comisión de afiliado de BridgeMarkets. Esto no afecta tu experiencia ni costes.</p>
+          <p style="font-size:11px;color:#334155;margin:14px 0 0;">Al registrarte usas el enlace de referido de FlowTrade Suite</p>
         </div>
 
+      </div>
       <!-- ████ END INICIO ████ -->
 
       <!-- DASHBOARD -->
-      <div id="section-dashboard" class="hidden">
+      <div id="section-dashboard">
         <div class="mb-5 flex items-center justify-between">
           <div><h1 class="text-xl font-bold">Dashboard</h1><p class="text-xs mt-0.5" style="color:#94A3B8;">Resumen de tu actividad de trading</p></div>
           <button onclick="toggleWidgetEditMode()" id="widgetEditBtn" class="btn-outline text-xs px-3 py-1.5 rounded-lg">Widgets</button>
@@ -1930,7 +1843,7 @@ window.addEventListener('load', () => {
       <div id="section-calculadora" class="hidden">
         <div class="mb-5">
           <h1 class="text-xl font-bold">🧮 Calculadora de Riesgo Global</h1>
-          <p class="text-xs mt-0.5" style="color:#94A3B8;">Pip values reales por activo — Forex, Metales, Índices Sintéticos, Deriv/Weltrade</p>
+          <p class="text-xs mt-0.5" style="color:#94A3B8;">Pip values reales por activo — Forex, Metales, Índices, Sintéticos Deriv/Weltrade/BridgeMarkets</p>
         </div>
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
           <div class="glass-card rounded-xl p-5">
@@ -2018,20 +1931,20 @@ window.addEventListener('load', () => {
                     <option value="XRPUSD">XRPUSD (Ripple)</option>
                     <option value="BNBUSD">BNBUSD (BNB)</option>
                   </optgroup>
-                  <optgroup label="Índices Sintéticos — VorteX (Volatilidad Fija)">
+                  <optgroup label="BridgeMarkets — VorteX (Volatilidad Fija)">
                     <option value="VorteX20.">VorteX20 — Volatilidad 20%</option>
                     <option value="VorteX40.">VorteX40 — Volatilidad 40%</option>
                     <option value="VorteX60.">VorteX60 — Volatilidad 60%</option>
                     <option value="VorteX80.">VorteX80 — Volatilidad 80%</option>
                     <option value="VorteX100.">VorteX100 — Volatilidad 100%</option>
                   </optgroup>
-                  <optgroup label="Índices Sintéticos — Fortune (Step Fijo)">
+                  <optgroup label="BridgeMarkets — Fortune (Step Fijo)">
                     <option value="Fortune100.">Fortune100 — Step 0.1</option>
                     <option value="Fortune250.">Fortune250 — Step 0.25</option>
                     <option value="Fortune500.">Fortune500 — Step 0.5</option>
                     <option value="Fortune1000.">Fortune1000 — Step 1</option>
                   </optgroup>
-                  <optgroup label="Índices Sintéticos — FortuneX (Step Aleatorio)">
+                  <optgroup label="BridgeMarkets — FortuneX (Step Aleatorio)">
                     <option value="FortuneX200.">FortuneX200 — Multiplicador x2</option>
                     <option value="FortuneX300.">FortuneX300 — Multiplicador x3</option>
                     <option value="FortuneX500.">FortuneX500 — Multiplicador x5</option>
@@ -2803,7 +2716,7 @@ async function idbGetAllTrades() { return idbGetAll(); }
 // ═══════════════════════════════════════════════════════════════
 // JOURNAL + DASHBOARD
 // ═══════════════════════════════════════════════════════════════
-async async function loadJournal() {
+async function loadJournal() {
   journalTrades = await idbGetAll();
   journalTrades.sort((a,b)=>new Date(b.fecha)-new Date(a.fecha));
   updateDashboardMetrics();
@@ -2882,7 +2795,6 @@ async function toggleMaintenanceMode() {
 let currentUser     = null;
 let currentPerfil   = null;
 let isAdmin         = false;
-let _appBootstrapping = false; // prevents double loadAppForUser on reload
 let allUsersCache   = [];
 let maintenanceActive = false;
 
@@ -2921,7 +2833,7 @@ function showSection(id) {
   try { if (id==='descargas')  loadDescargasToken(); } catch(_){}
   try { if (id==='dashboard')  updateDashboardMetrics(); } catch(_){}
   try { if (id==='perfil')     loadProfile(); }       catch(_){}
-  try { if (id==='admin')    { loadAllUsers(); loadPagos(); checkMaintenanceModeStatus(); const pp=document.getElementById('adminPushPanel'); if(pp&&isAdmin)pp.style.display=''; } } catch(_){}
+  try { if (id==='admin')    { loadAllUsers(); loadPagos(); checkMaintenanceModeStatus(); } } catch(_){}
   try { if (id==='noticias') { renderNewsCalendar(); updateSessionClocks(); } } catch(_){}
   try { if (id==='conectarmt5') loadMt5Metrics(); }  catch(_){}
   try { if (id==='diario')     loadJournal(); }       catch(_){}
@@ -2930,7 +2842,7 @@ function showSection(id) {
 // ═══════════════════════════════════════════════════════════════
 // LOAD APP FOR AUTHENTICATED USER
 // ═══════════════════════════════════════════════════════════════
-async async function loadAppForUser(user) {
+async function loadAppForUser(user) {
   currentUser = user;
   window.currentUser = user;
   // Mostrar app inmediatamente con datos básicos del session
@@ -3611,7 +3523,7 @@ const PIP_VALUE_TABLE = {
   HK50:0.13,HK33:0.13,
   // Criptomonedas (contratos micro/mini)
   BTCUSD:1,ETHUSD:0.1,LTCUSD:0.05,XRPUSD:0.01,BNBUSD:0.05,
-  // ── Índices Sintéticos ──────────────────────────────────────────────────────
+  // ── Sintéticos BridgeMarkets ────────────────────────────────────────────────
   // VorteX — Volatilidad fija (pip proporcional a % volatilidad)
   'VorteX20.':0.2,'VORTEX20':0.2,
   'VorteX40.':0.4,'VORTEX40':0.4,
@@ -4970,35 +4882,7 @@ let pendingAdminImage = null;
 // UI HELPERS
 // ═══════════════════════════════════════════════════════════════
 function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
-async function sendAdminPush() {
-  const title = document.getElementById('pushTitle').value.trim();
-  const body  = document.getElementById('pushBody').value.trim();
-  if (!title || !body) { toast('Rellena título y mensaje','info'); return; }
-  const status = document.getElementById('pushSendStatus');
-  status.textContent = 'Enviando...'; status.classList.remove('hidden');
-  try {
-    const { data: { session } } = await sb.auth.getSession();
-    const res = await fetch('/api/send-push', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + session?.access_token },
-      body: JSON.stringify({ title, body, url: '/' })
-    });
-    const json = await res.json();
-    status.textContent = json.sent ? '✅ Enviado a ' + json.sent + ' dispositivos' : '⚠️ ' + (json.error || 'Error');
-  } catch(e) { status.textContent = '❌ Error de red'; }
-}
 function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
-function closeAllOverlays() {
-  ['modalLogout','modalMt5','modalPago','modalAddTrade','modalTradeDetail','modalChat',
-   'modalPrivacy','modalCookies','modalTerms','newsExpandOverlay','authOverlay'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el && !el.classList.contains('hidden')) el.classList.add('hidden');
-  });
-  closeChatbot && closeChatbot();
-}
-document.addEventListener('keydown', (e) => {
-  if (e.key === 'Escape') closeAllOverlays();
-});
 function toggleUserMenu() { document.getElementById('userMenu').classList.toggle('hidden'); }
 function closeUserMenu() { document.getElementById('userMenu').classList.add('hidden'); }
 function copyToken() { const t=(currentPerfil?.token_licencia||''). trim(); if(!t) return toast('Token no disponible','error'); navigator.clipboard.writeText(t).then(()=>toast('Token copiado ✓','success')).catch(()=>toast('No se pudo copiar','error')); }
@@ -5628,912 +5512,11 @@ async function mt5SimulateReceive() {
   await updateDashboardMetrics();
 }
 
-
-  // ═══════════════════════════════════════════════════════════════
-  // MISSING FUNCTIONS — FIXED (audit)
-  // ═══════════════════════════════════════════════════════════════
-
-  // ── Auth: non-overlay login form ──
-  async function handleLogin() {
-    const email = (document.getElementById('loginEmail')?.value || '').trim();
-    const pass  = document.getElementById('loginPassword')?.value || '';
-    const msg   = document.getElementById('authMsg');
-    const btn   = document.getElementById('btnLogin');
-    if (!email || !pass) { if(msg){msg.textContent='Rellena el email y la contraseña.';msg.classList.remove('hidden');} return; }
-    if(btn){btn.disabled=true;btn.textContent='Verificando...';}
-    if(msg) msg.classList.add('hidden');
-    const _t = setTimeout(()=>{ if(btn){btn.disabled=false;btn.textContent='Entrar a la plataforma';} if(msg){msg.textContent='⏱ La conexión tardó demasiado. Inténtalo de nuevo.';msg.classList.remove('hidden');} }, 20000);
-    try {
-      const { data, error } = await Promise.race([
-        sb.auth.signInWithPassword({ email, password: pass }),
-        new Promise((_,rej)=>setTimeout(()=>rej(new Error('timeout')),19000))
-      ]);
-      if (error) {
-        clearTimeout(_t);
-        if(msg){msg.textContent=error.message;msg.classList.remove('hidden');}
-        if(btn){btn.disabled=false;btn.textContent='Entrar a la plataforma';}
-        return;
-      }
-      clearTimeout(_t);
-      // Auth state listener (onAuthStateChange) handles redirect
-    } catch(e) {
-      clearTimeout(_t);
-      if(msg){msg.textContent='Error de conexión. Comprueba tu internet.';msg.classList.remove('hidden');}
-      if(btn){btn.disabled=false;btn.textContent='Entrar a la plataforma';}
-    }
-  }
-
-  async function handleRegister() {
-    const nombre  = (document.getElementById('regNombre')?.value || '').trim();
-    const email   = (document.getElementById('regEmail')?.value || '').trim();
-    const pass    = document.getElementById('regPassword')?.value || '';
-    const refCode = (document.getElementById('regRefCode')?.value || '').trim();
-    const msg     = document.getElementById('regMsg');
-    const btn     = document.getElementById('btnRegister');
-    if (!nombre || !email || !pass) { if(msg){msg.style.cssText='background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.3);color:#FCA5A5;';msg.textContent='Rellena todos los campos.';msg.classList.remove('hidden');} return; }
-    if(!email.includes('@')){ if(msg){msg.textContent='Escribe un email válido.';msg.classList.remove('hidden');} return; }
-    if(pass.length<8){ if(msg){msg.textContent='La contraseña debe tener mínimo 8 caracteres.';msg.classList.remove('hidden');} return; }
-    if(btn){btn.disabled=true;btn.textContent='Creando cuenta...';}
-    try {
-      let referenteId = null;
-      if (refCode) {
-        const { data: rp } = await sb.from('perfiles').select('id').eq('token_licencia', refCode).single().catch(()=>({data:null}));
-        if (rp) referenteId = rp.id;
-      }
-      const { data, error } = await sb.auth.signUp({ email, password: pass, options:{ data:{ nombre } } });
-      if (error) { if(msg){msg.style.cssText='background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.3);color:#FCA5A5;';msg.textContent=error.message;msg.classList.remove('hidden');} if(btn){btn.disabled=false;btn.textContent='Crear cuenta';} return; }
-      if (referenteId && data?.user) { await sb.from('referidos').insert({ referente_id: referenteId, referido_id: data.user.id }).catch(()=>{}); }
-      if(msg){msg.style.cssText='background:rgba(37,99,235,.12);border:1px solid rgba(37,99,235,.3);color:#93C5FD;';msg.innerHTML='📧 Confirma tu email en <strong>'+email+'</strong>. Revisa la carpeta de spam.';msg.classList.remove('hidden');}
-      if(btn){btn.disabled=false;btn.textContent='Crear cuenta';}
-    } catch(e) {
-      if(msg){msg.textContent='Error inesperado. Inténtalo de nuevo.';msg.classList.remove('hidden');}
-      if(btn){btn.disabled=false;btn.textContent='Crear cuenta';}
-    }
-  }
-
-  async function handleForgotPassword() {
-    const email = (document.getElementById('loginEmail')?.value || '').trim();
-    const msg   = document.getElementById('authMsg');
-    if (!email) { if(msg){msg.textContent='Escribe tu email primero.';msg.classList.remove('hidden');} return; }
-    const { error } = await sb.auth.resetPasswordForEmail(email).catch(e=>({error:e}));
-    if (error) { if(msg){msg.textContent='No se pudo enviar: '+error.message;msg.classList.remove('hidden');} return; }
-    if(msg){msg.style.cssText='background:rgba(37,99,235,.12);border:1px solid rgba(37,99,235,.3);color:#93C5FD;';msg.innerHTML='📧 Email de recuperación enviado a <strong>'+email+'</strong>. Revisa spam.';msg.classList.remove('hidden');}
-  }
-
-  async function handleResendConfirmation() {
-    const email = (document.getElementById('loginEmail')?.value || '').trim();
-    const msg   = document.getElementById('authMsg');
-    const btn   = document.getElementById('btnResend');
-    if (!email) { if(msg){msg.textContent='Escribe tu email primero.';msg.classList.remove('hidden');} return; }
-    if(btn){btn.disabled=true;btn.textContent='Enviando...';}
-    const { error } = await sb.auth.resend({ type:'signup', email }).catch(e=>({error:e}));
-    if (error) { if(msg){msg.textContent='Error: '+error.message;msg.classList.remove('hidden');} }
-    else { if(msg){msg.style.cssText='background:rgba(37,99,235,.12);border:1px solid rgba(37,99,235,.3);color:#93C5FD;';msg.textContent='📧 Email de confirmación reenviado a '+email;msg.classList.remove('hidden');} }
-    if(btn){btn.disabled=false;btn.textContent='📧 Reenviar email de confirmación';}
-  }
-
-  // ── Logout confirm ──
-  async function confirmLogout() {
-    closeModal('modalLogout');
-    try { await sb.auth.signOut(); } catch(_) {}
-    currentUser = null; window.currentUser = null; currentPerfil = null; window.currentPerfil = null;
-    const mainApp=document.getElementById('mainApp'), landing=document.getElementById('landingPage');
-    const cb=document.getElementById('chatBubble'), hb=document.getElementById('helpBubble');
-    if(mainApp) mainApp.classList.add('hidden');
-    if(landing) landing.classList.remove('hidden');
-    if(cb) cb.classList.add('hidden');
-    if(hb) hb.classList.add('hidden');
-    toast('Sesión cerrada', 'info', 2500);
-  }
-
-  // ── Journal render + pagination + filters ──
-  let _jPage = 0;
-  const _jPageSize = 20;
-
-  function renderJournal() {
-    const trades = journalTrades || [];
-    const fActivo  = (document.getElementById('filterActivo')?.value || '').toLowerCase().trim();
-    const fResult  = document.getElementById('filterResult')?.value || 'all';
-    const fFrom    = document.getElementById('filterFrom')?.value || '';
-    const fTo      = document.getElementById('filterTo')?.value || '';
-    let filtered = trades.filter(t => {
-      if (fActivo && !(t.activo||'').toLowerCase().includes(fActivo)) return false;
-      if (fResult === 'win'  && !(parseFloat(t.resultadoUSD||0) > 0)) return false;
-      if (fResult === 'loss' && !(parseFloat(t.resultadoUSD||0) < 0)) return false;
-      if (fFrom) { const d=(t.fecha||'').slice(0,10); if(d<fFrom) return false; }
-      if (fTo)   { const d=(t.fecha||'').slice(0,10); if(d>fTo)   return false; }
-      return true;
-    });
-    const total = filtered.length;
-    const pages = Math.max(1, Math.ceil(total / _jPageSize));
-    if (_jPage >= pages) _jPage = pages - 1;
-    const slice = filtered.slice(_jPage * _jPageSize, (_jPage + 1) * _jPageSize);
-    const tbody = document.getElementById('journalTableBody');
-    if (!tbody) return;
-    if (!slice.length) {
-      const empty = (total===0 && !fActivo && fResult==='all' && !fFrom && !fTo)
-        ? 'Sin trades aún. Importa un CSV/HTML o añade uno manualmente.'
-        : 'Sin resultados con estos filtros.';
-      tbody.innerHTML = '<tr><td colspan="10" class="text-center py-12" style="color:#475569;">'+empty+'</td></tr>';
-      const info = document.getElementById('journalPageInfo');
-      if(info) info.textContent = total ? (filtered.length+' trades filtrados') : 'Sin trades';
-      return;
-    }
-    tbody.innerHTML = slice.map(t => {
-      const pnl = parseFloat(t.resultadoUSD||0);
-      const color = pnl>0?'#2563EB':pnl<0?'#EF4444':'#94A3B8';
-      let fechaStr = '—';
-      try { fechaStr = new Date(t.fecha).toLocaleString('es-ES',{day:'2-digit',month:'2-digit',year:'2-digit',hour:'2-digit',minute:'2-digit'}); } catch(_){}
-      return '<tr style="border-bottom:1px solid rgba(30,41,59,.4);">'
-        +'<td class="px-4 py-3 mono" style="color:#94A3B8;white-space:nowrap;">'+esc(fechaStr)+'</td>'
-        +'<td class="px-4 py-3 font-semibold mono">'+esc(t.activo||'—')+'</td>'
-        +'<td class="px-4 py-3"><span style="color:'+(t.tipo==='Compra'?'#2563EB':'#EF4444')+'">'+esc(t.tipo||'—')+'</span></td>'
-        +'<td class="px-4 py-3 text-right mono">'+(t.lotes||'—')+'</td>'
-        +'<td class="px-4 py-3 text-right mono">'+(t.entrada||'—')+'</td>'
-        +'<td class="px-4 py-3 text-right mono">'+(t.salida||'—')+'</td>'
-        +'<td class="px-4 py-3 text-right mono" style="color:'+color+';">'+(pnl>=0?'+':'')+parseFloat(t.pips||0).toFixed(1)+'</td>'
-        +'<td class="px-4 py-3 text-right mono font-bold" style="color:'+color+';">'+(pnl>=0?'+':'')+'
-      const _loaderFailsafe = setTimeout(() => {
-        const ldr = document.getElementById('appLoader');
-        if (ldr) { ldr.classList.add('fade-out'); setTimeout(()=>{ ldr.style.display='none'; }, 350); }
-        const landing = document.getElementById('landingPage');
-        if (landing) landing.classList.remove('hidden');
-      }, 12000);
-      function showLanding() {
-      document.getElementById('landingPage').classList.remove('hidden');
-      document.getElementById('authScreen').classList.add('hidden');
-      document.getElementById('mainApp').classList.add('hidden');
-      document.getElementById('chatBubble').classList.add('hidden');
-      document.getElementById('helpBubble').classList.add('hidden');
-    }
-    try { await openIDB(); } catch(e) {}
-    let session = null;
-    try {
-      const result = await sb.auth.getSession();
-      session = result?.data?.session ?? null;
-    } catch(e) {
-      showLanding();
-      const ldrE = document.getElementById('appLoader');
-      if (ldrE) { ldrE.classList.add('fade-out'); setTimeout(()=>{ ldrE.style.display='none'; }, 350); }
-      return;
-    }
-    const _hideLoader = () => {
-          clearTimeout(_loaderFailsafe);
-          const ldr = document.getElementById('appLoader');
-          if (ldr) { ldr.classList.add('fade-out'); setTimeout(()=>{ ldr.style.display='none'; }, 350); }
-        };
-      if (!session) {
-        showLanding();
-        _hideLoader();
-      } else if (!_appBootstrapping) {
-        _appBootstrapping = true;
-        try {
-          await loadAppForUser(session.user);
-          document.getElementById('landingPage').classList.add('hidden');
-          document.getElementById('authOverlay').classList.add('hidden');
-          const _savedSection = localStorage.getItem('flowtrade_last_section');
-          const _validSections = ['inicio','dashboard','diario','planes','perfil','admin',
-            'calculadora','calc-mt5','noticias','referidos','ranking','logros','descargas','conectarmt5'];
-          showSection((_savedSection && _validSections.includes(_savedSection)) ? _savedSection : 'inicio');
-        } catch(e) {
-          showLanding();
-        } finally {
-          _hideLoader();
-        }
-      }
-    try { updatePayInstructions(); } catch(e) {}
-    // Check maintenance on load (public check)
-    try {
-      const {data}=await sb.from('configuracion_plataforma').select('valor').eq('clave','modo_mantenimiento').single();
-      if (data?.valor==='true' && !session) {
-        document.getElementById('modalMaintenance').classList.remove('hidden');
-      }
-    } catch(e){}
-    // Cookie banner
-    if (!localStorage.getItem('cookiesAccepted')) {
-      setTimeout(function(){ document.getElementById('cookieBanner').classList.remove('hidden'); }, 1500);
-    }
-  })();
-
-function acceptCookies() {
-  localStorage.setItem('cookiesAccepted', 'true');
-  document.getElementById('cookieBanner').classList.add('hidden');
-}
-
-
-function toggleTheme() {
-  const html = document.documentElement;
-  const isLight = html.getAttribute('data-theme') === 'light';
-  html.setAttribute('data-theme', isLight ? 'dark' : 'light');
-  localStorage.setItem('ft_theme', isLight ? 'dark' : 'light');
-  const btn = document.getElementById('themeToggleBtn');
-  if (btn) btn.innerHTML = isLight
-    ? '<svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>Claro'
-    : '<svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>Oscuro';
-}
-// Apply saved theme on load
-(function(){
-  const saved = localStorage.getItem('ft_theme') || 'dark';
-  document.documentElement.setAttribute('data-theme', saved);
-  window.addEventListener('DOMContentLoaded', () => {
-    const btn = document.getElementById('themeToggleBtn');
-    if (!btn) return;
-    if (saved === 'light') btn.innerHTML = '<svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>Claro';
-  });
-})();
-
 // ═══════════════════════════════════════════════════════════════
-// WEB PUSH NOTIFICATIONS
-// ═══════════════════════════════════════════════════════════════
-const VAPID_PUBLIC_KEY = 'BDjdlulAsa13yWbgL1lxorpk9ZEHCjFe2r3_fPoDzw6h3tzyXLPu984jFLms6zFuUGwuYKfSxGf4g-fV2DorLyo';
-
-function urlBase64ToUint8Array(base64String) {
-  const padding = '='.repeat((4 - base64String.length % 4) % 4);
-  const base64  = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
-  const raw     = window.atob(base64);
-  return new Uint8Array([...raw].map(c => c.charCodeAt(0)));
-}
-
-let _swRegistration = null;
-
-async function initServiceWorker() {
-  if (!('serviceWorker' in navigator) || !('PushManager' in window)) return;
-  try {
-    _swRegistration = await navigator.serviceWorker.register('/sw.js', { scope: '/' });
-    // Show "Activate alerts" button if permission not yet granted
-    const perm = Notification.permission;
-    if (perm === 'default') {
-      const btn = document.getElementById('notifPermBtn');
-      if (btn) btn.classList.remove('hidden');
-    }
-    // Auto-subscribe if already granted
-    if (perm === 'granted') {
-      await ensurePushSubscription();
-    }
-  } catch(e) { console.warn('SW register failed:', e); }
-}
-
-async function ensurePushSubscription() {
-  if (!_swRegistration || !currentUser) return;
-  try {
-    const existing = await _swRegistration.pushManager.getSubscription();
-    if (existing) { await savePushSubscription(existing); return; }
-    const sub = await _swRegistration.pushManager.subscribe({
-      userVisibleOnly: true,
-      applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY)
-    });
-    await savePushSubscription(sub);
-  } catch(e) { console.warn('Push subscribe error:', e); }
-}
-
-async function savePushSubscription(sub) {
-  if (!currentUser || !sub) return;
-  const subJson = sub.toJSON();
-  await sb.from('push_subscriptions').upsert({
-    user_id: currentUser.id,
-    endpoint: subJson.endpoint,
-    p256dh:  subJson.keys?.p256dh,
-    auth:    subJson.keys?.auth,
-    updated_at: new Date().toISOString()
-  }, { onConflict: 'user_id' }).catch(() => {});
-}
-
-async function requestPushPermission() {
-  if (!('Notification' in window)) { toast('Tu navegador no soporta notificaciones', 'info'); return; }
-  const perm = await Notification.requestPermission().catch(() => 'denied');
-  const btn  = document.getElementById('notifPermBtn');
-  if (perm === 'granted') {
-    if (btn) btn.classList.add('hidden');
-    await ensurePushSubscription();
-    toast('🔔 Notificaciones push activadas', 'success', 3000);
-  } else {
-    toast('⚠️ Permite las notificaciones en tu navegador', 'info', 4000);
-  }
-}
-
-async function unsubscribePush() {
-  if (!_swRegistration) return;
-  const sub = await _swRegistration.pushManager.getSubscription().catch(() => null);
-  if (sub) await sub.unsubscribe().catch(() => {});
-  if (currentUser) {
-    await sb.from('push_subscriptions').delete().eq('user_id', currentUser.id).catch(() => {});
-  }
-}
-
-// Init SW on DOMContentLoaded
-document.addEventListener('DOMContentLoaded', () => {
-  setTimeout(initServiceWorker, 1000);
-});
-
-function toggleLandingFAQ(btn) {
-  const item = btn.closest('.faq-item');
-  const isOpen = item.classList.contains('open');
-  document.querySelectorAll('.faq-item.open').forEach(el => el.classList.remove('open'));
-  if (!isOpen) item.classList.add('open');
-}
-
-function showAuthFromLanding(tab) {
-  document.getElementById('landingPage').classList.add('hidden');
-  document.getElementById('authOverlay').classList.remove('hidden');
-  switchOverlayTab(tab || 'login');
-}
-
-function switchOverlayTab(tab) {
-  const loginTab = document.getElementById('overlayTabLogin');
-  const registerTab = document.getElementById('overlayTabRegister');
-  const loginForm = document.getElementById('overlayFormLogin');
-  const registerForm = document.getElementById('overlayFormRegister');
-  if (tab === 'login') {
-    loginTab.style.background = '#131A26'; loginTab.style.color = '#E2E8F0';
-    registerTab.style.background = 'transparent'; registerTab.style.color = '#94A3B8';
-    loginForm.classList.remove('hidden');
-    registerForm.classList.add('hidden');
-  } else {
-    registerTab.style.background = '#131A26'; registerTab.style.color = '#E2E8F0';
-    loginTab.style.background = 'transparent'; loginTab.style.color = '#94A3B8';
-    registerForm.classList.remove('hidden');
-    loginForm.classList.add('hidden');
-  }
-}
-
-function closeAuthOverlay() {
-  document.getElementById('authOverlay').classList.add('hidden');
-  document.getElementById('landingPage').classList.remove('hidden');
-}
-
-async function handleOverlayLogin() {
-  const email = document.getElementById('overlayLoginEmail').value.trim();
-  const pass  = document.getElementById('overlayLoginPassword').value;
-  const msg   = document.getElementById('overlayAuthMsg');
-  if (!email || !pass) { msg.textContent = 'Rellena el email y la contraseña.'; msg.classList.remove('hidden'); return; }
-  const btn = document.getElementById('btnOverlayLogin');
-  btn.disabled = true; btn.textContent = 'Verificando...';
-  msg.classList.add('hidden');
-
-  // Safety timeout: always reset button after 20 seconds
-  const _loginTimeout = setTimeout(() => {
-    btn.disabled = false; btn.textContent = 'Entrar a la plataforma';
-    msg.textContent = '⏱ La conexión tardó demasiado. Comprueba tu internet y vuelve a intentarlo.';
-    msg.classList.remove('hidden');
-  }, 20000);
-
-  try {
-    const timeout20s = new Promise((_, rej) => setTimeout(() => rej(new Error('timeout')), 19000));
-    const loginResult = await Promise.race([
-      sb.auth.signInWithPassword({ email, password: pass }),
-      timeout20s,
-    ]);
-    const { data, error } = loginResult;
-    if (error) {
-      clearTimeout(_loginTimeout);
-      msg.textContent = error.message;
-      msg.classList.remove('hidden');
-      btn.disabled = false; btn.textContent = 'Entrar a la plataforma';
-      return;
-    }
-    // Quick blocked-check (with timeout)
-    let bloqueado = false;
-    try {
-      const bResult = await Promise.race([
-        sb.from('perfiles').select('bloqueado').eq('id', data.user.id).single(),
-        new Promise((_, rej) => setTimeout(() => rej(new Error('timeout')), 8000)),
-      ]);
-      bloqueado = bResult?.data?.bloqueado || false;
-    } catch(_) { /* ignore timeout on blocked check — let user in */ }
-
-    if (bloqueado) {
-      clearTimeout(_loginTimeout);
-      await sb.auth.signOut();
-      msg.textContent = '⛔ Cuenta suspendida. Contacta con nuestro equipo.';
-      msg.classList.remove('hidden');
-      btn.disabled = false; btn.textContent = 'Entrar a la plataforma';
-      return;
-    }
-    clearTimeout(_loginTimeout);
-    await loadAppForUser(data.user);
-    showSection('inicio');
-  } catch(e) {
-    clearTimeout(_loginTimeout);
-    if (e.message === 'timeout') {
-      msg.textContent = '⏱ La conexión tardó demasiado. Comprueba tu internet y vuelve a intentarlo.';
-    } else {
-      msg.textContent = '🌐 Error de red. Comprueba tu conexión.';
-    }
-    msg.classList.remove('hidden');
-  } finally {
-    clearTimeout(_loginTimeout);
-    btn.disabled = false; btn.textContent = 'Entrar a la plataforma';
-  }
-}
-
-async function handleOverlayRegister() {
-  const nombre  = document.getElementById('overlayRegNombre').value.trim();
-  const email   = document.getElementById('overlayRegEmail').value.trim();
-  const pass    = document.getElementById('overlayRegPassword').value;
-  const refCode = document.getElementById('overlayRegRefCode').value.trim();
-  const msg     = document.getElementById('overlayRegMsg');
-  if (!nombre || !email || !pass) {
-    msg.style.cssText = 'background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.3);color:#FCA5A5;';
-    msg.textContent = 'Rellena todos los campos.'; msg.classList.remove('hidden'); return;
-  }
-  if (!email.includes('@')) { msg.textContent = 'Escribe un email válido.'; msg.classList.remove('hidden'); return; }
-  if (pass.length < 8) { msg.textContent = '🔒 La contraseña debe tener mínimo 8 caracteres.'; msg.classList.remove('hidden'); return; }
-  const btn = document.getElementById('btnOverlayRegister');
-  btn.disabled = true; btn.textContent = 'Creando cuenta...';
-  try {
-    let referenteId = null;
-    if (refCode) {
-      const { data: refPerfil } = await sb.from('perfiles').select('id').eq('token_licencia', refCode).single();
-      if (refPerfil) referenteId = refPerfil.id;
-    }
-    const { data, error } = await sb.auth.signUp({ email, password: pass, options: { data: { nombre } } });
-    if (error) { msg.textContent = error.message; msg.classList.remove('hidden'); btn.disabled = false; btn.textContent = 'Crear cuenta'; return; }
-    if (referenteId && data.user) {
-      await sb.from('perfiles').update({ referido_por: referenteId }).eq('id', data.user.id);
-    }
-    if (!data.session) {
-      msg.style.cssText = 'background:rgba(37,99,235,.12);border:1px solid rgba(37,99,235,.3);color:#93C5FD;';
-      msg.innerHTML = '✅ ¡Cuenta creada! Revisa tu bandeja en <strong>' + email + '</strong> y confirma el enlace.';
-      msg.classList.remove('hidden');
-    } else {
-      toast('¡Bienvenido a FlowTrade Pro!', 'success');
-    }
-  } catch(e) { msg.textContent = '🌐 Error de red.'; msg.classList.remove('hidden'); }
-  finally { btn.disabled = false; btn.textContent = 'Crear cuenta'; }
-}
-
-async function handleOverlayForgotPassword() {
-  const email = document.getElementById('overlayLoginEmail').value.trim();
-  const msg   = document.getElementById('overlayAuthMsg');
-  if (!email) { msg.textContent = 'Escribe tu email primero.'; msg.classList.remove('hidden'); return; }
-  const { error } = await sb.auth.resetPasswordForEmail(email);
-  if (error) { msg.textContent = 'No se pudo enviar: ' + error.message; msg.classList.remove('hidden'); return; }
-  msg.style.cssText = 'background:rgba(37,99,235,.12);border:1px solid rgba(37,99,235,.3);color:#93C5FD;';
-  msg.innerHTML = '📧 Email de recuperación enviado a <strong>' + email + '</strong>. Revisa spam.';
-  msg.classList.remove('hidden');
-}
-
-// ═══════════════════════════════════════════════════════════════
-// BOTONES FLOTANTES ARRASTRABLES
-// ═══════════════════════════════════════════════════════════════
-(function() {
-  function makeDraggable(el, storageKey, defaultBottom, defaultRight) {
-    let dragging = false, moved = false;
-    let startX, startY, startLeft, startTop;
-
-    function getInitialPos() {
-      const saved = localStorage.getItem(storageKey);
-      if (saved) {
-        try { return JSON.parse(saved); } catch(_) {}
-      }
-      return {
-        left: window.innerWidth  - defaultRight - el.offsetWidth,
-        top:  window.innerHeight - defaultBottom - el.offsetHeight
-      };
-    }
-
-    function applyPos(left, top) {
-      const maxL = window.innerWidth  - el.offsetWidth  - 4;
-      const maxT = window.innerHeight - el.offsetHeight - 4;
-      left = Math.max(4, Math.min(left, maxL));
-      top  = Math.max(4, Math.min(top,  maxT));
-      el.style.left   = left + 'px';
-      el.style.top    = top  + 'px';
-      el.style.right  = 'auto';
-      el.style.bottom = 'auto';
-    }
-
-    function onStart(e) {
-      dragging = true; moved = false;
-      const touch = e.touches ? e.touches[0] : e;
-      startX = touch.clientX; startY = touch.clientY;
-      const r = el.getBoundingClientRect();
-      startLeft = r.left; startTop = r.top;
-      el.style.transition = 'none';
-      e.preventDefault();
-    }
-
-    function onMove(e) {
-      if (!dragging) return;
-      const touch = e.touches ? e.touches[0] : e;
-      const dx = touch.clientX - startX;
-      const dy = touch.clientY - startY;
-      if (Math.abs(dx) > 4 || Math.abs(dy) > 4) moved = true;
-      if (moved) applyPos(startLeft + dx, startTop + dy);
-    }
-
-    function onEnd(e) {
-      if (!dragging) return;
-      dragging = false;
-      el.style.transition = '';
-      if (moved) {
-        const r = el.getBoundingClientRect();
-        localStorage.setItem(storageKey, JSON.stringify({ left: r.left, top: r.top }));
-        e.stopImmediatePropagation();
-        e.preventDefault();
-      }
-    }
-
-    el.addEventListener('mousedown',  onStart, { passive: false });
-    el.addEventListener('touchstart', onStart, { passive: false });
-    document.addEventListener('mousemove',  onMove);
-    document.addEventListener('touchmove',  onMove, { passive: false });
-    document.addEventListener('mouseup',    onEnd,  true);
-    document.addEventListener('touchend',   onEnd,  true);
-
-    // Aplicar posición guardada cuando el elemento sea visible
-    const obs = new MutationObserver(() => {
-      if (!el.classList.contains('hidden')) {
-        const pos = getInitialPos();
-        applyPos(pos.left, pos.top);
-      }
-    });
-    obs.observe(el, { attributeFilter: ['class'] });
-  }
-
-  makeDraggable(document.getElementById('chatBubble'), 'floatPos_chat', 24, 24);
-  makeDraggable(document.getElementById('helpBubble'), 'floatPos_help', 86, 24);
-})();
-
-// ═══════════════════════════════════════════════════════════════
-// AUTH ACTIONS
-// ═══════════════════════════════════════════════════════════════
-async function handleLogout() {
-  try { await sb.auth.signOut({ scope: 'local' }); } catch(_) {}
-  Object.keys(localStorage).forEach(k => { if (k.startsWith('sb-')) localStorage.removeItem(k); });
-  localStorage.removeItem('flowtrade_last_section');
-  currentUser   = null;
-  currentPerfil = null;
-  isAdmin       = false;
-  window.location.reload();
-}
-
-function resumeSession() {
-  const banner = document.getElementById('sessionResumeBanner');
-  if (banner) banner.classList.add('hidden');
-  // Session is already in localStorage — just reload to re-initialize
-  window.location.reload();
-}
-
-function forceClearSession() {
-  Object.keys(localStorage).forEach(k => { if (k.startsWith('sb-')) localStorage.removeItem(k); });
-  const banner = document.getElementById('sessionResumeBanner');
-  if (banner) banner.classList.add('hidden');
-  window.location.reload();
-}
-
-// ═══════════════════════════════════════════════════════════════
-// AUTO-LOGOUT POR INACTIVIDAD
-// ═══════════════════════════════════════════════════════════════
-(function() {
-  const INACTIVITY_LIMIT = 30 * 60 * 1000;
-  const WARNING_BEFORE   = 5  * 60 * 1000;
-  let inactivityTimer, warningTimer, warningToastId;
-
-  function resetTimers() {
-    if (!currentUser) return;
-    clearTimeout(inactivityTimer);
-    clearTimeout(warningTimer);
-    warningTimer = setTimeout(() => {
-      toast('⚠️ Cerrarás sesión en 5 minutos por inactividad.', 'info', 5 * 60 * 1000);
-    }, INACTIVITY_LIMIT - WARNING_BEFORE);
-    inactivityTimer = setTimeout(async () => {
-      toast('🔒 Sesión cerrada por inactividad.', 'info', 4000);
-      await new Promise(r => setTimeout(r, 1000));
-      try { await sb.auth.signOut({ scope: 'local' }); } catch(_) {}
-      Object.keys(localStorage).forEach(k => { if (k.startsWith('sb-')) localStorage.removeItem(k); });
-      window.location.href = '/';
-    }, INACTIVITY_LIMIT);
-  }
-
-  ['mousemove','mousedown','keydown','touchstart','scroll','click'].forEach(ev =>
-    document.addEventListener(ev, resetTimers, { passive: true })
-  );
-
-  sb.auth.onAuthStateChange(async (event, session) => {
-    if (session?.user) {
-      resetTimers();
-      if ((event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED' || event === 'INITIAL_SESSION') && !currentUser && !_appBootstrapping) {
-        _appBootstrapping = true;
-        await loadAppForUser(session.user);
-        if (event !== 'TOKEN_REFRESHED') showSection('inicio');
-      }
-    } else {
-      clearTimeout(inactivityTimer);
-      clearTimeout(warningTimer);
-      currentUser = null; currentPerfil = null; isAdmin = false;
-    }
-  });
-})();
-</script>
-
-<!-- Modal: Politica de Privacidad -->
-<div id="modalPrivacy" class="modal-bg hidden">
-  <div class="modal-box modal-box-lg" style="max-width:680px;">
-    <div class="flex items-center justify-between mb-5">
-      <h3 class="text-base font-bold">&#128274; Politica de Privacidad</h3>
-      <button onclick="closeModal('modalPrivacy')" class="btn-ghost"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
-    </div>
-    <div class="space-y-4 text-sm overflow-y-auto" style="color:#94A3B8;line-height:1.7;max-height:65vh;">
-      <div><h4 class="font-semibold mb-2" style="color:#E2E8F0;">1. Responsable del tratamiento</h4><p>FlowTrade Suite, proyecto independiente. Contacto: erosabalfernandez@gmail.com</p></div>
-      <div><h4 class="font-semibold mb-2" style="color:#E2E8F0;">2. Datos que recopilamos</h4>
-        <ul style="list-style:disc;margin-left:16px;line-height:2;">
-          <li><b style="color:#E2E8F0;">Datos de registro:</b> nombre, email y contrasena (encriptada por Supabase Auth).</li>
-          <li><b style="color:#E2E8F0;">Datos de perfil:</b> numero de cuenta MT5, servidor, preferencias de notificaciones y plan contratado.</li>
-          <li><b style="color:#E2E8F0;">Datos de licencias:</b> tipo de EA, cuenta MT5 asociada y timestamps de heartbeat.</li>
-          <li><b style="color:#E2E8F0;">Datos de pagos:</b> metodo, monto e ID de transaccion (solo para verificacion manual).</li>
-          <li><b style="color:#E2E8F0;">Trades del diario:</b> almacenados <b style="color:#2563EB;">exclusivamente en tu navegador</b> (IndexedDB). No se transmiten a nuestros servidores.</li>
-        </ul>
-      </div>
-      <div><h4 class="font-semibold mb-2" style="color:#E2E8F0;">3. Finalidad del tratamiento</h4><p>Gestionar tu cuenta, verificar licencias de EAs, procesar pagos manuales, enviarte notificaciones del servicio y mantener el sistema de referidos. No usamos tus datos para marketing de terceros ni los vendemos.</p></div>
-      <div><h4 class="font-semibold mb-2" style="color:#E2E8F0;">4. Base legal</h4><p>La ejecucion del contrato de servicio (Art. 6.1.b RGPD) y el consentimiento explicito al registrarte.</p></div>
-      <div><h4 class="font-semibold mb-2" style="color:#E2E8F0;">5. Almacenamiento y seguridad</h4><p>Los datos de perfil y licencias se almacenan en Supabase (PostgreSQL), con cifrado en transito (TLS 1.3) y en reposo. Las contrasenas son gestionadas por Supabase Auth (bcrypt). Los trades solo existen en tu dispositivo (IndexedDB).</p></div>
-      <div><h4 class="font-semibold mb-2" style="color:#E2E8F0;">6. Tus derechos</h4><p>Puedes solicitar acceso, rectificacion, supresion o portabilidad de tus datos escribiendo a erosabalfernandez@gmail.com. Atendemos solicitudes en maximo 30 dias.</p></div>
-      <div><h4 class="font-semibold mb-2" style="color:#E2E8F0;">7. Transferencias internacionales</h4><p>Supabase puede almacenar datos en servidores de la UE o EE.UU. bajo mecanismos legales adecuados (SCCs). Finnhub recibe solo peticiones de datos de mercado publicos, sin datos personales.</p></div>
-      <div><h4 class="font-semibold mb-2" style="color:#E2E8F0;">8. Conservacion de datos</h4><p>Conservamos tus datos mientras tu cuenta este activa. Al eliminarla, tus datos se borran de nuestros servidores en un plazo de 30 dias.</p></div>
-      <p class="text-xs" style="color:#475569;">Ultima actualizacion: Mayo 2026</p>
-    </div>
-  </div>
-</div>
-
-<!-- Modal: Politica de Cookies -->
-<div id="modalCookies" class="modal-bg hidden">
-  <div class="modal-box" style="max-width:580px;">
-    <div class="flex items-center justify-between mb-5">
-      <h3 class="text-base font-bold">&#127850; Politica de Cookies</h3>
-      <button onclick="closeModal('modalCookies')" class="btn-ghost"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
-    </div>
-    <div class="space-y-4 text-sm" style="color:#94A3B8;line-height:1.7;">
-      <div><h4 class="font-semibold mb-2" style="color:#E2E8F0;">Que almacenamos?</h4>
-        <p>FlowTrade Suite usa <b style="color:#E2E8F0;">exclusivamente almacenamiento tecnico imprescindible</b>. No usamos cookies de rastreo, publicidad ni analisis de terceros.</p>
-      </div>
-      <div class="space-y-3">
-        <div class="p-3 rounded-xl" style="background:rgba(30,41,59,.5);"><p class="font-semibold text-xs mb-1" style="color:#E2E8F0;">IndexedDB &mdash; Diario de trading</p><p class="text-xs">Almacena tus trades, historial de calculos y configuracion de widgets. Solo existe en tu dispositivo. No se transmite a servidores externos.</p></div>
-        <div class="p-3 rounded-xl" style="background:rgba(30,41,59,.5);"><p class="font-semibold text-xs mb-1" style="color:#E2E8F0;">localStorage &mdash; Preferencias de la app</p><p class="text-xs">Guarda preferencias de notificaciones, widgets ocultos, cache de noticias (Finnhub) y estado de aceptacion de cookies.</p></div>
-        <div class="p-3 rounded-xl" style="background:rgba(30,41,59,.5);"><p class="font-semibold text-xs mb-1" style="color:#E2E8F0;">Cookies de sesion &mdash; Supabase Auth</p><p class="text-xs">Supabase establece cookies de sesion seguras (HttpOnly) para mantener tu inicio de sesion. Expiran al cerrar sesion o tras 7 dias de inactividad.</p></div>
-      </div>
-      <div><h4 class="font-semibold mb-2" style="color:#E2E8F0;">Cookies de terceros</h4><p>No usamos Google Analytics, Facebook Pixel ni ninguna herramienta de rastreo o publicidad. Las unicas conexiones externas son Supabase (base de datos) y Finnhub (noticias economicas).</p></div>
-      <div><h4 class="font-semibold mb-2" style="color:#E2E8F0;">Control de cookies</h4><p>Puedes borrar el almacenamiento local desde la configuracion de tu navegador. Esto cerrara tu sesion y eliminara tu diario local. Exporta antes de hacerlo.</p></div>
-      <div class="flex gap-3 pt-2">
-        <button onclick="acceptCookies();closeModal('modalCookies')" class="btn-green flex-1 py-2.5 rounded-xl text-sm font-semibold">Aceptar</button>
-        <button onclick="closeModal('modalCookies')" class="btn-outline flex-1 py-2.5 rounded-xl text-sm">Cerrar</button>
-      </div>
-      <p class="text-xs" style="color:#475569;">Ultima actualizacion: Mayo 2026</p>
-    </div>
-  </div>
-</div>
-
-</body>
-</html>
-+Math.abs(pnl).toFixed(2)+'</td>'
-        +'<td class="px-4 py-3 text-center">'+(t.screenshot?'📷':'')+'</td>'
-        +'<td class="px-4 py-3 text-right"><button onclick="deleteTrade('+JSON.stringify(t.id)+')" style="background:rgba(239,68,68,.1);border:none;cursor:pointer;color:#EF4444;padding:3px 8px;border-radius:6px;font-size:11px;">✕</button></td>'
-        +'</tr>';
-    }).join('');
-    const info = document.getElementById('journalPageInfo');
-    if(info) info.textContent = 'Mostrando '+(_jPage*_jPageSize+1)+'–'+Math.min((_jPage+1)*_jPageSize,total)+' de '+total+' trades';
-  }
-
-  function journalPage(dir) {
-    const total = (journalTrades||[]).length;
-    const pages = Math.max(1, Math.ceil(total / _jPageSize));
-    _jPage = Math.max(0, Math.min(pages-1, _jPage+dir));
-    renderJournal();
-  }
-
-  function clearFilters() {
-    ['filterActivo'].forEach(id=>{ const e=document.getElementById(id); if(e) e.value=''; });
-    const fRes=document.getElementById('filterResult'); if(fRes) fRes.value='all';
-    ['filterFrom','filterTo'].forEach(id=>{ const e=document.getElementById(id); if(e) e.value=''; });
-    _jPage=0;
-    renderJournal();
-  }
-
-  async function deleteTrade(id) {
-    if(!confirm('¿Eliminar este trade del diario local?')) return;
-    await idbDelete(id);
-    journalTrades = await idbGetAll();
-    journalTrades.sort((a,b)=>new Date(b.fecha)-new Date(a.fecha));
-    renderJournal();
-    updateDashboardMetrics();
-    toast('Trade eliminado','info',2000);
-  }
-
-  // ── Add / Save trade ──
-  function openAddTradeModal() {
-    const now=new Date(), pad=n=>String(n).padStart(2,'0');
-    const local=now.getFullYear()+'-'+pad(now.getMonth()+1)+'-'+pad(now.getDate())+'T'+pad(now.getHours())+':'+pad(now.getMinutes());
-    const el=document.getElementById('trFecha'); if(el&&!el.value) el.value=local;
-    openModal('modalAddTrade');
-  }
-
-  async function saveManualTrade() {
-    const fecha  = document.getElementById('trFecha')?.value;
-    const activo = (document.getElementById('trActivo')?.value||'').trim().toUpperCase();
-    const tipo   = document.getElementById('trTipo')?.value||'Compra';
-    const lotes  = parseFloat(document.getElementById('trLotes')?.value||'0');
-    const entrada= parseFloat(document.getElementById('trEntrada')?.value||'0');
-    const salida = parseFloat(document.getElementById('trSalida')?.value||'0');
-    const usd    = parseFloat(document.getElementById('trUSD')?.value||'0');
-    const pips   = parseFloat(document.getElementById('trPips')?.value||'0');
-    const notas  = (document.getElementById('trNotas')?.value||'').trim();
-    if(!fecha||!activo){ toast('Rellena al menos fecha y activo','error'); return; }
-    const trade={ id:Date.now(), fecha:new Date(fecha).toISOString(), activo, tipo, lotes, entrada, salida, resultadoUSD:usd, pips, notas, source:'manual' };
-    await idbPut(trade);
-    ['trFecha','trActivo','trLotes','trEntrada','trSalida','trUSD','trPips','trNotas'].forEach(id=>{ const e=document.getElementById(id); if(e) e.value=''; });
-    closeModal('modalAddTrade');
-    journalTrades = await idbGetAll();
-    journalTrades.sort((a,b)=>new Date(b.fecha)-new Date(a.fecha));
-    renderJournal();
-    updateDashboardMetrics();
-    toast('✅ Trade guardado correctamente','success');
-  }
-
-  // ── Export ──
-  function _dlBlob(data, mime, name) {
-    const b=new Blob([data],{type:mime}), u=URL.createObjectURL(b), a=document.createElement('a');
-    a.href=u; a.download=name; a.click(); setTimeout(()=>URL.revokeObjectURL(u),3000);
-  }
-  function _dtag(){ const d=new Date(); return d.getFullYear()+String(d.getMonth()+1).padStart(2,'0')+String(d.getDate()).padStart(2,'0'); }
-
-  function exportCSV() {
-    const trades=journalTrades||[];
-    if(!trades.length){ toast('No hay trades para exportar','info'); return; }
-    const hdr='Fecha,Activo,Tipo,Lotes,Entrada,Salida,Pips,ResultadoUSD,Notas';
-    const rows=trades.map(t=>[t.fecha||'',t.activo||'',t.tipo||'',t.lotes||'',t.entrada||'',t.salida||'',t.pips||'',t.resultadoUSD||'',(t.notas||'').replace(/"/g,'""')].map(v=>'"'+v+'"').join(','));
-    _dlBlob([hdr,...rows].join('\r\n'),'text/csv','flowtrade-journal-'+_dtag()+'.csv');
-    toast('✅ CSV exportado','success');
-  }
-
-  function exportJSON() {
-    const trades=journalTrades||[];
-    if(!trades.length){ toast('No hay trades para exportar','info'); return; }
-    _dlBlob(JSON.stringify(trades,null,2),'application/json','flowtrade-backup-'+_dtag()+'.json');
-    toast('✅ Respaldo JSON exportado','success');
-  }
-
-  function exportPDF() {
-    const plan=window.currentPerfil?.plan||'gratis';
-    if(plan!=='elite'){ toast('⭐ El export PDF es exclusivo del plan Elite','info',4000); return; }
-    toast('Generando PDF... (próximamente)','info',3000);
-  }
-
-  // ── Import ──
-  async function importFile(event) {
-    const file=event.target.files?.[0]; if(!file) return;
-    event.target.value='';
-    const text=await file.text();
-    const isHTML=file.name.toLowerCase().match(/\.html?$/);
-    let added=0;
-    if(isHTML) {
-      const parser=new DOMParser(), doc=parser.parseFromString(text,'text/html');
-      const rows=[...doc.querySelectorAll('tr')];
-      for(const row of rows) {
-        const cells=[...row.querySelectorAll('td')].map(td=>td.textContent.trim());
-        if(cells.length<4) continue;
-        const pnl=parseFloat((cells[cells.length-1]||'').replace(/[, ]/g,''));
-        if(isNaN(pnl)) continue;
-        await idbPut({ id:Date.now()+Math.random(), fecha:cells[0]?new Date(cells[0]).toISOString():new Date().toISOString(), activo:cells[2]||'DESCONOCIDO', tipo:(cells[3]||'').toLowerCase().includes('buy')?'Compra':'Venta', lotes:parseFloat(cells[4]||'0')||0, entrada:parseFloat((cells[5]||'0').replace(',','.'))||0, salida:parseFloat((cells[6]||'0').replace(',','.'))||0, resultadoUSD:pnl, pips:0, notas:'[Importado HTML]', source:'import_html' });
-        added++;
-      }
-    } else {
-      const lines=text.split('\n').filter(l=>l.trim());
-      for(const line of lines.slice(1)) {
-        const cols=line.split(',').map(c=>c.trim().replace(/^"|"$/g,''));
-        if(cols.length<4) continue;
-        const pnl=parseFloat(cols[7]||cols[6]||'0');
-        if(isNaN(pnl)&&!cols[1]) continue;
-        await idbPut({ id:Date.now()+Math.random(), fecha:cols[0]?new Date(cols[0]).toISOString():new Date().toISOString(), activo:cols[1]||'DESCONOCIDO', tipo:(cols[2]||'').toLowerCase().match(/buy|compra/)?'Compra':'Venta', lotes:parseFloat(cols[3]||'0')||0, entrada:parseFloat(cols[4]||'0')||0, salida:parseFloat(cols[5]||'0')||0, resultadoUSD:isNaN(pnl)?0:pnl, pips:parseFloat(cols[6]||'0')||0, notas:cols[8]||'', source:'import_csv' });
-        added++;
-      }
-    }
-    journalTrades=await idbGetAll(); journalTrades.sort((a,b)=>new Date(b.fecha)-new Date(a.fecha));
-    renderJournal(); updateDashboardMetrics();
-    toast('✅ '+added+' trades importados','success',4000);
-  }
-
-  async function importJSON(event) {
-    const file=event.target.files?.[0]; if(!file) return;
-    event.target.value='';
-    try {
-      const data=JSON.parse(await file.text());
-      const arr=Array.isArray(data)?data:(data.trades||[]);
-      if(!arr.length){ toast('El JSON no contiene trades','error'); return; }
-      for(const t of arr) { if(t.activo||t.resultadoUSD!==undefined) await idbPut({...t,id:t.id||Date.now()+Math.random()}); }
-      journalTrades=await idbGetAll(); journalTrades.sort((a,b)=>new Date(b.fecha)-new Date(a.fecha));
-      renderJournal(); updateDashboardMetrics();
-      toast('✅ '+arr.length+' trades importados desde JSON','success',4000);
-    } catch(e){ toast('❌ Error al leer el JSON: '+e.message,'error',4000); }
-  }
-
-  // ── MT5 License Test ──
-  async function testLicenseConnection() {
-    const el=document.getElementById('licenseTestResult'); if(!el) return;
-    const token=window.currentPerfil?.token_licencia;
-    if(!token){ el.style.cssText='background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.3);color:#FCA5A5;'; el.textContent='No tienes un token de licencia. Actualiza tu perfil.'; el.classList.remove('hidden'); return; }
-    el.style.cssText='background:rgba(37,99,235,.12);border:1px solid rgba(37,99,235,.3);color:#93C5FD;';
-    el.textContent='🔄 Probando conexión...'; el.classList.remove('hidden');
-    try {
-      const res=await fetch('/api/validar-licencia',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({token,cuenta_mt5:window.currentPerfil?.mt5_cuenta||'TEST'})});
-      const data=await res.json();
-      if(data.valid||data.success){
-        el.style.cssText='background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.3);color:#86EFAC;';
-        el.innerHTML='✅ <strong>Conexión exitosa.</strong> El EA puede comunicarse con la plataforma.<br><small>Token activo · Plan: '+(data.plan||window.currentPerfil?.plan||'—')+'</small>';
-      } else {
-        el.style.cssText='background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.3);color:#FCA5A5;';
-        el.textContent='❌ '+(data.message||data.error||'Token no reconocido');
-      }
-    } catch(e){ el.style.cssText='background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.3);color:#FCA5A5;'; el.textContent='❌ Error de red: '+e.message; }
-  }
-
-  // ── Widgets ──
-  const _WPREFS='ft_widget_prefs';
-  function _getWPrefs(){ try{ return JSON.parse(localStorage.getItem(_WPREFS)||'{}'); }catch(_){ return {}; } }
-  function _saveWPrefs(p){ localStorage.setItem(_WPREFS,JSON.stringify(p)); }
-
-  function toggleWidget(id) {
-    const card=document.getElementById('widget-'+id); if(!card) return;
-    const p=_getWPrefs(), hidden=!p[id]; p[id]=hidden; _saveWPrefs(p);
-    card.style.display=hidden?'none':'';
-    const btn=card.querySelector('.widget-toggle-btn'); if(btn) btn.textContent=hidden?'✓':'✕';
-  }
-
-  function toggleWidgetEditMode() {
-    const btn=document.getElementById('widgetEditBtn');
-    const inEdit=btn?.dataset.editing==='1';
-    const toggleBtns=document.querySelectorAll('.widget-toggle-btn');
-    if(inEdit) {
-      if(btn){ btn.dataset.editing='0'; btn.textContent='Widgets'; }
-      toggleBtns.forEach(b=>b.style.display='none');
-      const p=_getWPrefs();
-      document.querySelectorAll('.widget-card').forEach(card=>{
-        const id=card.id?.replace('widget-','');
-        if(id) card.style.display=p[id]?'none':'';
-      });
-    } else {
-      if(btn){ btn.dataset.editing='1'; btn.textContent='✓ Listo'; }
-      toggleBtns.forEach(b=>b.style.display='flex');
-      document.querySelectorAll('.widget-card').forEach(c=>c.style.display='');
-      const p=_getWPrefs();
-      toggleBtns.forEach(b=>{
-        const card=b.closest('.widget-card');
-        if(card){ const id=card.id?.replace('widget-',''); b.textContent=p[id]?'✓ Restaurar':'✕'; }
-      });
-    }
-  }
-
-  // ── Browser Cleanup Tools ──
-  async function clearAppCache() {
-    try {
-      if('serviceWorker' in navigator){ const regs=await navigator.serviceWorker.getRegistrations(); for(const r of regs) await r.unregister(); }
-      if('caches' in window){ const keys=await caches.keys(); for(const k of keys) await caches.delete(k); }
-      toast('✅ Caché limpiado. Recargando...','success',2000);
-      setTimeout(()=>window.location.reload(true),2100);
-    } catch(e){ toast('Error: '+e.message,'error'); }
-  }
-
-  async function hardResetApp() {
-    if(!confirm('⚠️ RESET COMPLETO: Se borrarán todos tus datos locales (trades del diario, caché, sesiones). Los datos guardados en la nube no se afectan.\n\n¿Continuar?')) return;
-    try {
-      localStorage.clear(); sessionStorage.clear();
-      if('serviceWorker' in navigator){ const regs=await navigator.serviceWorker.getRegistrations(); for(const r of regs) await r.unregister(); }
-      if('caches' in window){ const keys=await caches.keys(); for(const k of keys) await caches.delete(k); }
-      await new Promise((res,rej)=>{ const r=indexedDB.deleteDatabase('FlowTradeDB'); r.onsuccess=res; r.onerror=rej; r.onblocked=res; }).catch(()=>{});
-      window.location.reload(true);
-    } catch(e){ alert('Error en limpieza: '+e.message+'\nRecarga manualmente.'); }
-  }
-
-  // ═══════════════════════════════════════════════════════════════
 // INIT
 // ═══════════════════════════════════════════════════════════════
 (async()=>{
-      const _loaderFailsafe = setTimeout(() => {
-        const ldr = document.getElementById('appLoader');
-        if (ldr) { ldr.classList.add('fade-out'); setTimeout(()=>{ ldr.style.display='none'; }, 350); }
-        const landing = document.getElementById('landingPage');
-        if (landing) landing.classList.remove('hidden');
-      }, 12000);
-      function showLanding() {
+    function showLanding() {
       document.getElementById('landingPage').classList.remove('hidden');
       document.getElementById('authScreen').classList.add('hidden');
       document.getElementById('mainApp').classList.add('hidden');
@@ -6547,34 +5530,23 @@ function forceClearSession() {
       session = result?.data?.session ?? null;
     } catch(e) {
       showLanding();
-      const ldrE = document.getElementById('appLoader');
-      if (ldrE) { ldrE.classList.add('fade-out'); setTimeout(()=>{ ldrE.style.display='none'; }, 350); }
       return;
     }
-    const _hideLoader = () => {
-          clearTimeout(_loaderFailsafe);
-          const ldr = document.getElementById('appLoader');
-          if (ldr) { ldr.classList.add('fade-out'); setTimeout(()=>{ ldr.style.display='none'; }, 350); }
-        };
-      if (!session) {
+    if (!session) {
+      showLanding();
+    } else {
+      try {
+        await loadAppForUser(session.user);
+        document.getElementById('landingPage').classList.add('hidden');
+        document.getElementById('authOverlay').classList.add('hidden');
+        const _savedSection = localStorage.getItem('flowtrade_last_section');
+        const _validSections = ['inicio','dashboard','diario','planes','perfil','admin',
+          'calculadora','calc-mt5','noticias','referidos','ranking','logros','descargas','conectarmt5'];
+        showSection((_savedSection && _validSections.includes(_savedSection)) ? _savedSection : 'inicio');
+      } catch(e) {
         showLanding();
-        _hideLoader();
-      } else if (!_appBootstrapping) {
-        _appBootstrapping = true;
-        try {
-          await loadAppForUser(session.user);
-          document.getElementById('landingPage').classList.add('hidden');
-          document.getElementById('authOverlay').classList.add('hidden');
-          const _savedSection = localStorage.getItem('flowtrade_last_section');
-          const _validSections = ['inicio','dashboard','diario','planes','perfil','admin',
-            'calculadora','calc-mt5','noticias','referidos','ranking','logros','descargas','conectarmt5'];
-          showSection((_savedSection && _validSections.includes(_savedSection)) ? _savedSection : 'inicio');
-        } catch(e) {
-          showLanding();
-        } finally {
-          _hideLoader();
-        }
       }
+    }
     try { updatePayInstructions(); } catch(e) {}
     // Check maintenance on load (public check)
     try {
@@ -6593,111 +5565,6 @@ function acceptCookies() {
   localStorage.setItem('cookiesAccepted', 'true');
   document.getElementById('cookieBanner').classList.add('hidden');
 }
-
-
-function toggleTheme() {
-  const html = document.documentElement;
-  const isLight = html.getAttribute('data-theme') === 'light';
-  html.setAttribute('data-theme', isLight ? 'dark' : 'light');
-  localStorage.setItem('ft_theme', isLight ? 'dark' : 'light');
-  const btn = document.getElementById('themeToggleBtn');
-  if (btn) btn.innerHTML = isLight
-    ? '<svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>Claro'
-    : '<svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>Oscuro';
-}
-// Apply saved theme on load
-(function(){
-  const saved = localStorage.getItem('ft_theme') || 'dark';
-  document.documentElement.setAttribute('data-theme', saved);
-  window.addEventListener('DOMContentLoaded', () => {
-    const btn = document.getElementById('themeToggleBtn');
-    if (!btn) return;
-    if (saved === 'light') btn.innerHTML = '<svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>Claro';
-  });
-})();
-
-// ═══════════════════════════════════════════════════════════════
-// WEB PUSH NOTIFICATIONS
-// ═══════════════════════════════════════════════════════════════
-const VAPID_PUBLIC_KEY = 'BDjdlulAsa13yWbgL1lxorpk9ZEHCjFe2r3_fPoDzw6h3tzyXLPu984jFLms6zFuUGwuYKfSxGf4g-fV2DorLyo';
-
-function urlBase64ToUint8Array(base64String) {
-  const padding = '='.repeat((4 - base64String.length % 4) % 4);
-  const base64  = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
-  const raw     = window.atob(base64);
-  return new Uint8Array([...raw].map(c => c.charCodeAt(0)));
-}
-
-let _swRegistration = null;
-
-async function initServiceWorker() {
-  if (!('serviceWorker' in navigator) || !('PushManager' in window)) return;
-  try {
-    _swRegistration = await navigator.serviceWorker.register('/sw.js', { scope: '/' });
-    // Show "Activate alerts" button if permission not yet granted
-    const perm = Notification.permission;
-    if (perm === 'default') {
-      const btn = document.getElementById('notifPermBtn');
-      if (btn) btn.classList.remove('hidden');
-    }
-    // Auto-subscribe if already granted
-    if (perm === 'granted') {
-      await ensurePushSubscription();
-    }
-  } catch(e) { console.warn('SW register failed:', e); }
-}
-
-async function ensurePushSubscription() {
-  if (!_swRegistration || !currentUser) return;
-  try {
-    const existing = await _swRegistration.pushManager.getSubscription();
-    if (existing) { await savePushSubscription(existing); return; }
-    const sub = await _swRegistration.pushManager.subscribe({
-      userVisibleOnly: true,
-      applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY)
-    });
-    await savePushSubscription(sub);
-  } catch(e) { console.warn('Push subscribe error:', e); }
-}
-
-async function savePushSubscription(sub) {
-  if (!currentUser || !sub) return;
-  const subJson = sub.toJSON();
-  await sb.from('push_subscriptions').upsert({
-    user_id: currentUser.id,
-    endpoint: subJson.endpoint,
-    p256dh:  subJson.keys?.p256dh,
-    auth:    subJson.keys?.auth,
-    updated_at: new Date().toISOString()
-  }, { onConflict: 'user_id' }).catch(() => {});
-}
-
-async function requestPushPermission() {
-  if (!('Notification' in window)) { toast('Tu navegador no soporta notificaciones', 'info'); return; }
-  const perm = await Notification.requestPermission().catch(() => 'denied');
-  const btn  = document.getElementById('notifPermBtn');
-  if (perm === 'granted') {
-    if (btn) btn.classList.add('hidden');
-    await ensurePushSubscription();
-    toast('🔔 Notificaciones push activadas', 'success', 3000);
-  } else {
-    toast('⚠️ Permite las notificaciones en tu navegador', 'info', 4000);
-  }
-}
-
-async function unsubscribePush() {
-  if (!_swRegistration) return;
-  const sub = await _swRegistration.pushManager.getSubscription().catch(() => null);
-  if (sub) await sub.unsubscribe().catch(() => {});
-  if (currentUser) {
-    await sb.from('push_subscriptions').delete().eq('user_id', currentUser.id).catch(() => {});
-  }
-}
-
-// Init SW on DOMContentLoaded
-document.addEventListener('DOMContentLoaded', () => {
-  setTimeout(initServiceWorker, 1000);
-});
 
 function toggleLandingFAQ(btn) {
   const item = btn.closest('.faq-item');
@@ -6987,10 +5854,9 @@ function forceClearSession() {
   sb.auth.onAuthStateChange(async (event, session) => {
     if (session?.user) {
       resetTimers();
-      if ((event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED' || event === 'INITIAL_SESSION') && !currentUser && !_appBootstrapping) {
-        _appBootstrapping = true;
+      if ((event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED' || event === 'INITIAL_SESSION') && !currentUser) {
         await loadAppForUser(session.user);
-        if (event !== 'TOKEN_REFRESHED') showSection('inicio');
+        showSection('inicio');
       }
     } else {
       clearTimeout(inactivityTimer);
