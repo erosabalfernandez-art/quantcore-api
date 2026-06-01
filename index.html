@@ -2845,7 +2845,8 @@ async function loadAppForUser(user) {
   try {
     const {data:p} = await sb.from('perfiles').select('*').eq('id', user.id).single();
     currentPerfil = p || null;
-    isAdmin = (p && p.rol === 'admin') || false;
+    const {data:adminRow} = await sb.from('admins').select('user_id').eq('user_id', user.id).maybeSingle();
+    isAdmin = !!adminRow;
 
     // ── Admin nav ──
     const adminNav = document.getElementById('nav-admin');
@@ -3105,7 +3106,7 @@ async function loadLicencias() {
   if (data?.length) {
     const ids=[...new Set(data.map(l=>l.usuario_id).filter(Boolean))];
     if (ids.length) {
-      const {data:prfs}=await sb.from('perfiles').select('id,nombre,email').in('id',ids);
+      const {data:prfs}=await sb.from('perfiles').select('id,nombre').in('id',ids);
       const pm=Object.fromEntries((prfs||[]).map(p=>[p.id,p]));
       data.forEach(l=>{ l.perfiles=pm[l.usuario_id]||null; });
     }
@@ -3154,7 +3155,7 @@ async function loadAlertasFraude() {
   const tb = document.getElementById('alertasFraudeTable');
   if (!tb) return;
   tb.innerHTML = '<tr><td colspan="6" class="text-center py-8" style="color:#94A3B8;">Cargando...</td></tr>';
-  const { data, error } = await sb.from('alertas_fraude').select('*,perfiles(nombre,email)').order('fecha',{ascending:false}).limit(100);
+  const { data, error } = await sb.from('alertas_fraude').select('*,perfiles(nombre)').order('fecha',{ascending:false}).limit(100);
   if (error) { tb.innerHTML = '<tr><td colspan="6" class="text-center py-8" style="color:#EF4444;">Error: '+esc(error.message)+'</td></tr>'; return; }
   if (!data||!data.length) { tb.innerHTML = '<tr><td colspan="6" class="text-center py-8" style="color:#10B981;">Sin alertas — todo en orden</td></tr>'; return; }
   tb.innerHTML = data.map(function(a) {
@@ -3174,7 +3175,7 @@ async function loadMt5Vinculadas() {
   var tb = document.getElementById('mt5VinculadasTable');
   if (!tb) return;
   tb.innerHTML = '<tr><td colspan="7" class="text-center py-8" style="color:#94A3B8;">Cargando...</td></tr>';
-  var { data: perfs, error } = await sb.from('perfiles').select('id,nombre,email,plan,mt5_cuenta,mt5_cuenta_bloqueada,fecha_registro_mt5').not('mt5_cuenta','is',null).order('fecha_registro_mt5',{ascending:false}).limit(100);
+  var { data: perfs, error } = await sb.from('perfiles').select('id,nombre,plan,mt5_cuenta,mt5_cuenta_bloqueada,fecha_registro_mt5').not('mt5_cuenta','is',null).order('fecha_registro_mt5',{ascending:false}).limit(100);
   if (error) { tb.innerHTML = '<tr><td colspan="7" class="text-center py-8" style="color:#EF4444;">Error: '+esc(error.message)+'</td></tr>'; return; }
   if (!perfs||!perfs.length) { tb.innerHTML = '<tr><td colspan="7" class="text-center py-8" style="color:#94A3B8;">Ningún usuario ha vinculado cuenta MT5 aún</td></tr>'; return; }
   var ids = perfs.map(function(p){return p.id;});
