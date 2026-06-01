@@ -1401,19 +1401,15 @@ select.input-dark option{background:#131A26;color:#E2E8F0;}
           <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
             <div class="p-4 rounded-xl text-center" style="background:rgba(30,41,59,.5);">
               <div class="text-2xl mb-2">💚</div><div class="font-semibold text-xs mb-1">PIX</div>
-              <div id="infoPixKey" class="text-xs mono" style="color:#94A3B8;word-break:break-all;">—</div>
             </div>
             <div class="p-4 rounded-xl text-center" style="background:rgba(30,41,59,.5);">
               <div class="text-2xl mb-2">💙</div><div class="font-semibold text-xs mb-1">PayPal</div>
-              <div id="infoPaypalEmail" class="text-xs mono" style="color:#94A3B8;word-break:break-all;">—</div>
             </div>
             <div class="p-4 rounded-xl text-center" style="background:rgba(30,41,59,.5);">
               <div class="text-2xl mb-2">💚</div><div class="font-semibold text-xs mb-1">USDT TRC20</div>
-              <div id="infoUsdtWallet" class="text-xs mono" style="color:#94A3B8;word-break:break-all;">—</div>
             </div>
             <div class="p-4 rounded-xl text-center" style="background:rgba(30,41,59,.5);">
               <div class="text-2xl mb-2">💵</div><div class="font-semibold text-xs mb-1">USDC TRC20</div>
-              <div class="text-xs mono" style="color:#94A3B8;">Igual que USDT</div>
             </div>
           </div>
           <div class="flex gap-3 flex-wrap">
@@ -3536,11 +3532,6 @@ function updatePayInstructions() {
     usdc:`USDC TRC20: <strong>${PAYMENT_INFO.usdc}</strong><br>Envía exactamente ${precio} USDC`,
   };
   if (instrEl) instrEl.innerHTML = info[metodo]||'';
-  ['infoPixKey','infoPaypalEmail','infoUsdtWallet'].forEach((id,i)=>{
-    const el=document.getElementById(id);
-    const vals=[PAYMENT_INFO.pix,PAYMENT_INFO.paypal,PAYMENT_INFO.usdt];
-    if(el) el.textContent=vals[i];
-  });
 }
 async function submitPago() {
   if (!currentUser) return toast('Inicia sesión primero','error');
