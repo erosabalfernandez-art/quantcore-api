@@ -208,20 +208,21 @@ select.input-dark option{background:#131A26;color:#E2E8F0;}
 .inicio-section-divider{text-align:center;padding:12px 0 6px;font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#475569;}
 
 /* ── LIGHT MODE ── */
-html[data-theme="light"] {
+html[data-theme="light"] body {
   filter: invert(1) hue-rotate(180deg);
 }
-html[data-theme="light"] img,
-html[data-theme="light"] canvas,
-html[data-theme="light"] video,
-html[data-theme="light"] .hero-chart-svg,
-html[data-theme="light"] [style*="background:url"],
-html[data-theme="light"] [style*="background-image"] {
+html[data-theme="light"] body img,
+html[data-theme="light"] body canvas,
+html[data-theme="light"] body video,
+html[data-theme="light"] body .hero-chart-svg,
+html[data-theme="light"] body [style*="background:url"],
+html[data-theme="light"] body [style*="background-image"],
+html[data-theme="light"] body .goog-te-banner-frame {
   filter: invert(1) hue-rotate(180deg);
 }
 /* Fix: backdrop-filter breaks under filter:invert on parent */
-html[data-theme="light"] .glass-card,
-html[data-theme="light"] .glass-nav {
+html[data-theme="light"] body .glass-card,
+html[data-theme="light"] body .glass-nav {
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
 }
@@ -239,6 +240,12 @@ html[data-theme="light"] .glass-nav {
   transition: all .15s;
 }
 #themeToggleBtn:hover { border-color: rgba(148,163,184,.6); color: #E2E8F0; }
+/* ── GOOGLE TRANSLATE FIXES ── */
+.goog-te-banner-frame.skiptranslate { display: none !important; }
+body { top: 0 !important; }
+.goog-te-gadget-icon { display: none; }
+#goog-gt-tt, .goog-te-balloon-frame { display: none !important; }
+.goog-text-highlight { background: none !important; box-shadow: none !important; }
 
 @keyframes ft-spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
   #appLoader{position:fixed;inset:0;z-index:99999;background:#0B0F17;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:14px}
@@ -258,18 +265,28 @@ function googleTranslateElementInit() {
   }, 'google_translate_element');
 }
 function translatePage(lang, _retries) {
+  localStorage.setItem('ft_lang', lang);
+  const label = lang === 'en' ? 'ES' : 'EN';
+  const b1 = document.getElementById('langToggleBtn');
+  const b2 = document.getElementById('langToggleBtnLanding');
+  if (b1) b1.textContent = label;
+  if (b2) b2.textContent = label;
+  if (lang === 'es') {
+    document.cookie = 'googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/';
+    document.cookie = 'googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=' + window.location.hostname;
+    window.location.reload();
+    return;
+  }
   const sel = document.querySelector('.goog-te-combo');
   if (sel) {
     sel.value = lang;
     sel.dispatchEvent(new Event('change'));
-    localStorage.setItem('ft_lang', lang);
-    const label = lang === 'en' ? 'ES' : 'EN';
-    const b1 = document.getElementById('langToggleBtn');
-    const b2 = document.getElementById('langToggleBtnLanding');
-    if (b1) b1.textContent = label;
-    if (b2) b2.textContent = label;
-  } else if ((_retries||0) < 20) {
-    setTimeout(() => translatePage(lang, (_retries||0)+1), 500);
+  } else if ((_retries||0) < 30) {
+    setTimeout(() => translatePage(lang, (_retries||0)+1), 400);
+  } else {
+    document.cookie = 'googtrans=/es/' + lang + '; path=/';
+    document.cookie = 'googtrans=/es/' + lang + '; path=/; domain=' + window.location.hostname;
+    window.location.reload();
   }
 }
 window.addEventListener('load', () => {
