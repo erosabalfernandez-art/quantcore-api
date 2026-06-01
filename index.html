@@ -3682,7 +3682,7 @@ async function toggleBan(uid,ban) {
   loadAllUsers();
 }
 function showAdminTab(tab) {
-  ['usuarios','membresia','pagos','chats','licencias','logslic','estadisticas','referidos'].forEach(t=>{
+  ['usuarios','membresia','pagos','chats','licencias','logslic','estadisticas','referidos','mt5security'].forEach(t=>{
     document.getElementById('adminContent-'+t)?.classList.toggle('hidden',t!==tab);
     const btn=document.getElementById('adminTab-'+t);
     if (!btn) return;
@@ -3696,6 +3696,7 @@ function showAdminTab(tab) {
   if (tab==='logslic') loadLogsLic();
   if (tab==='estadisticas') loadAdminStats();
   if (tab==='referidos') loadAdminReferidos();
+  if (tab==='mt5security') { loadAlertasFraude(); loadMt5Vinculadas(); }
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -3752,6 +3753,68 @@ async function loadLogsLic() {
 // ═══════════════════════════════════════════════════════════════
 // ADMIN: ESTADÍSTICAS
 // ═══════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════
+// ADMIN: SEGURIDAD MT5
+// ═══════════════════════════════════════════════════════════════
+async function loadAlertasFraude() {
+  const tb = document.getElementById('alertasFraudeTable');
+  if (!tb) return;
+  tb.innerHTML = '<tr><td colspan="6" class="text-center py-8" style="color:#94A3B8;">Cargando...</td></tr>';
+  const { data, error } = await sb.from('alertas_fraude').select('*,perfiles(nombre,email)').order('fecha',{ascending:false}).limit(100);
+  if (error) { tb.innerHTML = '<tr><td colspan="6" class="text-center py-8" style="color:#EF4444;">Error: '+esc(error.message)+'</td></tr>'; return; }
+  if (!data||!data.length) { tb.innerHTML = '<tr><td colspan="6" class="text-center py-8" style="color:#10B981;">Sin alertas — todo en orden</td></tr>'; return; }
+  tb.innerHTML = data.map(function(a) {
+    var f = a.fecha ? new Date(a.fecha).toLocaleString('es-ES',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}) : '—';
+    var user = (a.perfiles && a.perfiles.nombre) ? a.perfiles.nombre : (a.usuario_id||'—').substring(0,8);
+    var tipoBadge = '<span style="background:rgba(239,68,68,.1);color:#EF4444;padding:2px 8px;border-radius:6px;font-weight:600;">'+esc(a.tipo||'—')+'</span>';
+    var revBtn = a.revisado ? '<span style="color:#10B981;">✓ Revisada</span>' : '<button onclick="markAlertaRevisada('+a.id+')" class="btn-outline text-xs px-2 py-1 rounded-lg" style="border-color:rgba(16,185,129,.3);color:#10B981;">✓ Revisada</button>';
+    return '<tr class="table-row"><td class="px-4 py-3 mono">'+f+'</td><td class="px-4 py-3">'+esc(user)+'</td><td class="px-4 py-3">'+tipoBadge+'</td><td class="px-4 py-3" style="max-width:280px;word-break:break-all;">'+esc(a.detalle||'—')+'</td><td class="px-4 py-3 mono">'+esc(a.ip||'—')+'</td><td class="px-4 py-3 text-right">'+revBtn+'</td></tr>';
+  }).join('');
+}
+async function markAlertaRevisada(id) {
+  var e2 = await sb.from('alertas_fraude').update({ revisado: true }).eq('id', id);
+  if (e2.error) return toast('Error: '+e2.error.message,'error');
+  toast('Alerta marcada como revisada','success'); loadAlertasFraude();
+}
+async function loadMt5Vinculadas() {
+  var tb = document.getElementById('mt5VinculadasTable');
+  if (!tb) return;
+  tb.innerHTML = '<tr><td colspan="7" class="text-center py-8" style="color:#94A3B8;">Cargando...</td></tr>';
+  var { data: perfs, error } = await sb.from('perfiles').select('id,nombre,email,plan,mt5_cuenta,mt5_cuenta_bloqueada,fecha_registro_mt5').not('mt5_cuenta','is',null).order('fecha_registro_mt5',{ascending:false}).limit(100);
+  if (error) { tb.innerHTML = '<tr><td colspan="7" class="text-center py-8" style="color:#EF4444;">Error: '+esc(error.message)+'</td></tr>'; return; }
+  if (!perfs||!perfs.length) { tb.innerHTML = '<tr><td colspan="7" class="text-center py-8" style="color:#94A3B8;">Ningún usuario ha vinculado cuenta MT5 aún</td></tr>'; return; }
+  var ids = perfs.map(function(p){return p.id;});
+  var { data: lics } = await sb.from('licencias_ea').select('usuario_id,ultimo_heartbeat,hwid').in('usuario_id',ids).eq('ea_tipo','data_bridge');
+  var licMap = {}; (lics||[]).forEach(function(l){licMap[l.usuario_id]=l;});
+  var now = Date.now();
+  tb.innerHTML = perfs.map(function(p) {
+    var lic = licMap[p.id];
+    var hb = lic && lic.ultimo_heartbeat ? new Date(lic.ultimo_heartbeat) : null;
+    var minAgo = hb ? Math.round((now-hb.getTime())/60000) : null;
+    var hbStr = hb ? hb.toLocaleString('es-ES',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}) : '—';
+    var onlineBadge = !hb ? '<span style="color:#475569;">Sin datos</span>' : (minAgo<75 ? '<span style="color:#2563EB;font-weight:700;">● Online</span>' : '<span style="color:#F59E0B;">○ '+minAgo+'min atrás</span>');
+    var lockBadge = p.mt5_cuenta_bloqueada ? '<span style="background:rgba(239,68,68,.1);color:#EF4444;padding:2px 6px;border-radius:5px;font-weight:600;">Bloqueada</span>' : '<span style="color:#10B981;">Libre</span>';
+    var regDate = p.fecha_registro_mt5 ? new Date(p.fecha_registro_mt5).toLocaleDateString('es-ES') : '—';
+    var unlockBtn = '<button onclick="adminUnlockMt5(\''+p.id+'\',\''+esc(p.nombre||'Usuario')+'\')" class="btn-outline text-xs px-2 py-1 rounded-lg" style="border-color:rgba(251,191,36,.3);color:#FBBF24;">Desbloquear</button>';
+    return '<tr class="table-row"><td class="px-4 py-3">'+esc(p.nombre||'—')+'<br><span style="color:#475569;font-size:10px;">'+esc(p.email||'—')+'</span></td><td class="px-4 py-3"><span class="badge-'+( p.plan||'gratis')+'">'+((p.plan||'gratis').toUpperCase())+'</span></td><td class="px-4 py-3 mono font-semibold">'+esc(p.mt5_cuenta||'—')+'</td><td class="px-4 py-3">'+lockBadge+'</td><td class="px-4 py-3">'+regDate+'</td><td class="px-4 py-3">'+onlineBadge+'<br><span class="mono" style="font-size:10px;color:#475569;">'+hbStr+'</span></td><td class="px-4 py-3 text-right">'+unlockBtn+'</td></tr>';
+  }).join('');
+}
+async function adminUnlockMt5(usuarioId, nombre) {
+  var motivo = prompt('Desbloquear MT5 de "'+nombre+'"\nMotivo (requerido):');
+  if (!motivo || !motivo.trim()) return;
+  var { data: { session } } = await sb.auth.getSession();
+  if (!session) return toast('Sin sesión activa','error');
+  var res = await fetch('https://quantcore-api.vercel.app/api/admin-unlock-mt5', {
+    method: 'POST',
+    headers: {'Content-Type':'application/json','Authorization':'Bearer '+session.access_token},
+    body: JSON.stringify({usuario_id:usuarioId, accion:'desbloquear_mt5', motivo_admin:motivo}),
+  });
+  var json = await res.json();
+  if (!res.ok || !json.ok) { toast('Error: '+(json.motivo||res.status),'error'); return; }
+  toast('Cuenta MT5 desbloqueada. El usuario puede vincular una nueva.','success');
+  loadMt5Vinculadas();
+}
+
 async function loadAdminStats() {
   if (!isAdmin) return;
 
