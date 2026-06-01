@@ -2845,7 +2845,7 @@ function showSection(id) {
   const navEl = document.getElementById('nav-' + id);
   if (navEl) navEl.classList.add('active');
   window.scrollTo(0, 0);
-  localStorage.setItem('flowtrade_last_section', id);
+  // No guardamos la última sección — siempre arranca en 'inicio' para evitar cargas infinitas
   try { if (id==='ranking')    loadRanking(); }       catch(_){}
   try { if (id==='referidos')  loadReferralData(); }  catch(_){}
   try { if (id==='logros')     loadAchievements(); }  catch(_){}
