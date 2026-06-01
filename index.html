@@ -2445,7 +2445,10 @@ select.input-dark option{background:#131A26;color:#E2E8F0;}
         <!-- Metrics from received trades -->
         <div class="mb-3 flex items-center justify-between">
           <h3 class="font-semibold text-sm">Métricas recibidas de MT5</h3>
-          <button onclick="loadMt5Metrics()" class="btn-outline text-xs px-3 py-1.5 rounded-lg">↺ Recalcular</button>
+          <div class="flex gap-2">
+            <button id="btnSyncTrades" onclick="syncTradesFromServer()" class="btn-blue text-xs px-3 py-1.5 rounded-lg font-semibold">⬇ Sincronizar Trades</button>
+            <button onclick="loadMt5Metrics()" class="btn-outline text-xs px-3 py-1.5 rounded-lg">↺ Recalcular</button>
+          </div>
         </div>
         <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-5">
           <div class="glass-card metric-card rounded-xl p-4">
@@ -2995,13 +2998,16 @@ async function grantMembership() {
 }
 async function loadPagos() {
   if (!isAdmin) return;
-  const {data,error}=await sb.from('pagos').select('*,perfiles(nombre)').eq('estado','pendiente').order('creado_en',{ascending:false});
+  const {data,error}=await sb.from('pagos').select('*').eq('estado','pendiente').order('creado_en',{ascending:false});
   const tb=document.getElementById('pagosTable');
   if (error) { tb.innerHTML=`<tr><td colspan="6" class="text-center py-8" style="color:#EF4444;">Error al cargar</td></tr>`; return; }
   if (!data?.length) { tb.innerHTML=`<tr><td colspan="6" class="text-center py-10" style="color:#475569;">Sin solicitudes pendientes</td></tr>`; return; }
+  const _pagoUids=[...new Set(data.filter(p=>p.usuario_id).map(p=>p.usuario_id))];
+  const _pagoNames={};
+  if(_pagoUids.length){const{data:_pp}=await sb.from('perfiles').select('id,nombre').in('id',_pagoUids);(_pp||[]).forEach(p=>_pagoNames[p.id]=p.nombre);}
   tb.innerHTML=data.map(p=>`
     <tr class="table-row">
-      <td class="px-4 py-3 text-xs">${esc(p.perfiles?.nombre||p.usuario_id?.slice(0,10))}</td>
+      <td class="px-4 py-3 text-xs">${esc(_pagoNames[p.usuario_id]||p.usuario_id?.slice(0,10))}</td>
       <td class="px-4 py-3"><span class="text-xs px-2 py-0.5 rounded-full" style="background:rgba(59,130,246,.15);color:#3B82F6;">${(p.metodo||'').toUpperCase()}</span></td>
       <td class="px-4 py-3 font-semibold mono text-xs profit">${p.monto||0}</td>
       <td class="px-4 py-3 text-xs capitalize">${esc(p.plan||'—')}</td>
@@ -3155,12 +3161,15 @@ async function loadAlertasFraude() {
   const tb = document.getElementById('alertasFraudeTable');
   if (!tb) return;
   tb.innerHTML = '<tr><td colspan="6" class="text-center py-8" style="color:#94A3B8;">Cargando...</td></tr>';
-  const { data, error } = await sb.from('alertas_fraude').select('*,perfiles(nombre)').order('fecha',{ascending:false}).limit(100);
+  const { data, error } = await sb.from('alertas_fraude').select('*').order('fecha',{ascending:false}).limit(100);
   if (error) { tb.innerHTML = '<tr><td colspan="6" class="text-center py-8" style="color:#EF4444;">Error: '+esc(error.message)+'</td></tr>'; return; }
   if (!data||!data.length) { tb.innerHTML = '<tr><td colspan="6" class="text-center py-8" style="color:#10B981;">Sin alertas — todo en orden</td></tr>'; return; }
+  var _fraudeUids = [...new Set(data.filter(function(a){return a.usuario_id;}).map(function(a){return a.usuario_id;}))];
+  var _fraudeNames = {};
+  if (_fraudeUids.length) { var {data:_fp}=await sb.from('perfiles').select('id,nombre').in('id',_fraudeUids); (_fp||[]).forEach(function(p){_fraudeNames[p.id]=p.nombre;}); }
   tb.innerHTML = data.map(function(a) {
     var f = a.fecha ? new Date(a.fecha).toLocaleString('es-ES',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}) : '—';
-    var user = (a.perfiles && a.perfiles.nombre) ? a.perfiles.nombre : (a.usuario_id||'—').substring(0,8);
+    var user = _fraudeNames[a.usuario_id] || (a.usuario_id||'—').substring(0,8);
     var tipoBadge = '<span style="background:rgba(239,68,68,.1);color:#EF4444;padding:2px 8px;border-radius:6px;font-weight:600;">'+esc(a.tipo||'—')+'</span>';
     var revBtn = a.revisado ? '<span style="color:#10B981;">✓ Revisada</span>' : '<button onclick="markAlertaRevisada('+a.id+')" class="btn-outline text-xs px-2 py-1 rounded-lg" style="border-color:rgba(16,185,129,.3);color:#10B981;">✓ Revisada</button>';
     return '<tr class="table-row"><td class="px-4 py-3 mono">'+f+'</td><td class="px-4 py-3">'+esc(user)+'</td><td class="px-4 py-3">'+tipoBadge+'</td><td class="px-4 py-3" style="max-width:280px;word-break:break-all;">'+esc(a.detalle||'—')+'</td><td class="px-4 py-3 mono">'+esc(a.ip||'—')+'</td><td class="px-4 py-3 text-right">'+revBtn+'</td></tr>';
@@ -5184,6 +5193,16 @@ async function loadMt5Metrics() {
     if (sync) { sync.textContent = '—'; }
   }
 
+  // Show linked MT5 account from perfil
+  if (window.currentPerfil && window.currentPerfil.mt5_cuenta) {
+    const accEl = document.getElementById('mt5LinkedAccountNum');
+    const noteEl = document.getElementById('mt5LinkedAccountNote');
+    const lockEl = document.getElementById('mt5LockIcon');
+    if (accEl) accEl.textContent = window.currentPerfil.mt5_cuenta;
+    if (noteEl) noteEl.textContent = window.currentPerfil.mt5_cuenta_bloqueada ? 'Cuenta vinculada — bloqueada a este token' : 'Cuenta registrada';
+    if (lockEl) lockEl.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>';
+  }
+
   if (closed.length === 0) {
     const els = ['mt5NetProfit','mt5WinRate','mt5Drawdown','mt5PerDay'];
     els.forEach(id => { const e=document.getElementById(id); if(e) e.textContent='—'; });
@@ -5249,6 +5268,72 @@ async function loadMt5Metrics() {
       },
     },
   });
+}
+
+// ═══════════════════════════════════════════════════════════════
+// SYNC TRADES FROM SERVER (DataBridge → Diario)
+// ═══════════════════════════════════════════════════════════════
+async function syncTradesFromServer() {
+  if (!window.currentUser) { toast('Inicia sesión para sincronizar','error'); return; }
+  const btn = document.getElementById('btnSyncTrades');
+  if (btn) { btn.disabled = true; btn.textContent = '⏳ Sincronizando...'; }
+  try {
+    const { data: serverTrades, error } = await sb
+      .from('trades_recibidos')
+      .select('*')
+      .eq('usuario_id', window.currentUser.id)
+      .order('fecha', { ascending: false })
+      .limit(500);
+
+    if (error) { toast('Error al sincronizar: ' + error.message, 'error'); return; }
+    if (!serverTrades || !serverTrades.length) {
+      toast('No hay trades en el servidor aún. Asegúrate de que el DataBridge EA está activo.', 'info', 4000);
+      return;
+    }
+
+    let added = 0, skipped = 0;
+    for (const t of serverTrades) {
+      const existing = await idbGetTrade && idbGetTrade(t.ticket) || null;
+      if (existing) { skipped++; continue; }
+      const trade = {
+        id: t.ticket ? parseInt(String(t.ticket).replace(/D/g,'').slice(0,13)) || Date.now() : Date.now(),
+        fecha: t.fecha || t.recibido_en,
+        activo: (t.activo || '').toUpperCase(),
+        tipo: t.tipo === 'BUY' || t.tipo === 'buy' || t.tipo === 'Compra' ? 'Compra' : (t.tipo === 'SELL' || t.tipo === 'sell' || t.tipo === 'Venta' ? 'Venta' : (t.tipo || 'Compra')),
+        lotes: parseFloat(t.lotes) || 0,
+        entrada: parseFloat(t.precio_entrada) || 0,
+        salida: parseFloat(t.precio_salida) || 0,
+        pips: parseFloat(t.pips) || 0,
+        resultadoUSD: parseFloat(t.resultado_usd) || 0,
+        notas: '[DataBridge]',
+        source: 'databridge',
+        ticket: String(t.ticket || ''),
+      };
+      await idbPut(trade);
+      added++;
+    }
+
+    toast('✅ ' + added + ' trades importados, ' + skipped + ' ya existían', 'success', 4000);
+
+    // Update linked account display
+    if (serverTrades.length && serverTrades[0].mt5_cuenta) {
+      const accEl = document.getElementById('mt5LinkedAccountNum');
+      const noteEl = document.getElementById('mt5LinkedAccountNote');
+      const lockEl = document.getElementById('mt5LockIcon');
+      if (accEl) accEl.textContent = serverTrades[0].mt5_cuenta;
+      if (noteEl) noteEl.textContent = 'Cuenta vinculada — bloqueada a este token de licencia';
+      if (lockEl) lockEl.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>';
+    }
+
+    await loadMt5Metrics();
+    try { await updateDashboardMetrics(); } catch(_) {}
+    try { loadJournal(); } catch(_) {}
+  } catch(e) {
+    console.error('[syncTradesFromServer]', e);
+    toast('Error inesperado al sincronizar', 'error');
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = '⬇ Sincronizar Trades'; }
+  }
 }
 
 async function mt5SimulateReceive() {
@@ -5580,7 +5665,7 @@ function forceClearSession() {
   sb.auth.onAuthStateChange(async (event, session) => {
     if (session?.user) {
       resetTimers();
-      if (event === 'SIGNED_IN' && !currentUser) {
+      if ((event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED' || event === 'INITIAL_SESSION') && !currentUser) {
         await loadAppForUser(session.user);
         showSection('inicio');
       }
