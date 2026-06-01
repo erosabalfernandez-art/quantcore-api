@@ -75,14 +75,21 @@
       if (errL || !lic) return res.status(404).json({ ok: false, motivo: 'Licencia no encontrada. Reinicia el EA.' });
       if (!lic.activo) return res.status(403).json({ ok: false, motivo: 'Licencia desactivada por el administrador' });
 
-      // HWID check
+      // HWID check — si cambia en heartbeat → BLOQUEO AUTOMÁTICO
       if (hwid && lic.hwid && lic.hwid !== hwid) {
         await sb.from('alertas_fraude').insert({
           usuario_id: perfil.id,
           tipo: 'hwid_heartbeat_diferente',
-          detalle: `HWID registrado: ${lic.hwid} | HWID heartbeat: ${hwid} | Cuenta: ${mt5_account}`,
+          detalle: `HWID registrado: ${lic.hwid} | HWID heartbeat: ${hwid} | Cuenta: ${mt5_account} — LICENCIA DESACTIVADA`,
           ip, fecha: new Date().toISOString(), revisado: false,
         }).catch(() => {});
+        // BLOQUEO: desactivar licencia inmediatamente
+        await sb.from('licencias_ea').update({ activo: false }).eq('id', lic.id).catch(() => {});
+        return res.status(403).json({
+          ok: false,
+          motivo: 'Dispositivo no autorizado detectado. La licencia ha sido desactivada automáticamente. Contacta al administrador.',
+          hwid_bloqueado: true,
+        });
       }
 
       if (lic.ultimo_heartbeat) {
