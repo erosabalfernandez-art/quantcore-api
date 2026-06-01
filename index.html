@@ -332,7 +332,7 @@ select.input-dark option{background:#131A26;color:#E2E8F0;}
         <div class="feature-card">
           <div class="feature-icon" style="background:rgba(37,99,235,.12);"><svg width="22" height="22" fill="none" stroke="#2563EB" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div>
           <h3 style="font-weight:600;font-size:14px;margin-bottom:8px;">Sistema de Referidos</h3>
-          <p style="font-size:12px;color:#94A3B8;line-height:1.6;">Enlace unico de referido. Gana 5-15% de comision por cada referido con plan verificado.</p>
+          <p style="font-size:12px;color:#94A3B8;line-height:1.6;">Enlace unico de referido. Gana 20-60% de comision por cada referido con plan verificado.</p>
         </div>
       </div>
     </div>
@@ -458,11 +458,11 @@ select.input-dark option{background:#131A26;color:#E2E8F0;}
       <div class="glass-card" style="border-radius:20px;padding:8px 24px;">
         <div class="faq-item"><button class="faq-btn" onclick="toggleLandingFAQ(this)">Como instalo un EA en MetaTrader 5?<svg class="faq-arrow" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></button><div class="faq-answer">Descarga el .mq5 desde "EAs &amp; Descargas", copialo a MQL5/Experts/ de MT5, compila con F7 en MetaEditor. En MT5: Herramientas - Opciones - Expert Advisors, activa WebRequest y añade la URL de la API. Arrastra el EA al grafico y pega tu Token de Licencia.</div></div>
         <div class="faq-item"><button class="faq-btn" onclick="toggleLandingFAQ(this)">Que es el drawdown y como afecta a mi prop firm?<svg class="faq-arrow" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></button><div class="faq-answer">El drawdown es la caida maxima del capital desde un pico hasta el minimo siguiente. Las prop firms (FTMO, FundedNext) tienen limites de 5-10%. Superarlos implica perder la cuenta financiada. FlowTrade monitoriza tu drawdown en tiempo real.</div></div>
-        <div class="faq-item"><button class="faq-btn" onclick="toggleLandingFAQ(this)">Como funciona el pago del plan?<svg class="faq-arrow" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></button><div class="faq-answer">Los pagos son manuales verificados por nuestro equipo. Elige tu plan, realiza la transferencia por PIX, PayPal, USDT o USDC TRC20, y haz clic en "Notificar pago al equipo". La verificacion tarda menos de 24h y tu plan se activa automaticamente.</div></div>
+        <div class="faq-item"><button class="faq-btn" onclick="toggleLandingFAQ(this)">Como funciona el pago del plan?<svg class="faq-arrow" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></button><div class="faq-answer">Los pagos son manuales verificados por nuestro equipo. Elige tu plan, realiza la transferencia por PIX, PayPal, USDT BEP20 o USDC BEP20, y haz clic en "Notificar pago al equipo". La verificacion tarda menos de 24h y tu plan se activa automaticamente.</div></div>
         <div class="faq-item"><button class="faq-btn" onclick="toggleLandingFAQ(this)">Puedo usar indices sinteticos (Boom, Crash, Volatility)?<svg class="faq-arrow" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></button><div class="faq-answer">Si. La calculadora de riesgo y el diario soportan cualquier activo disponible en MT5, incluyendo indices sinteticos de Deriv (Boom 300, Crash 500, Volatility 75, etc.). Escribe el simbolo exacto del activo al anadir el trade.</div></div>
         <div class="faq-item"><button class="faq-btn" onclick="toggleLandingFAQ(this)">Donde se guardan mis trades? Estan seguros?<svg class="faq-arrow" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></button><div class="faq-answer">Tus trades se guardan en IndexedDB, el almacenamiento local de tu navegador. Nunca salen de tu dispositivo. Solo los datos de perfil y licencias se guardan en nuestra base de datos Supabase. Puedes exportar tu diario en CSV o JSON en cualquier momento.</div></div>
         <div class="faq-item"><button class="faq-btn" onclick="toggleLandingFAQ(this)">Cual es la formula del lotaje?<svg class="faq-arrow" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></button><div class="faq-answer">Lotaje = (Balance x % Riesgo) / (SL en pips x $10). Ejemplo: Balance $10,000, Riesgo 1%, SL 20 pips = (10000 x 0.01) / (20 x 10) = 0.50 lotes.</div></div>
-        <div class="faq-item"><button class="faq-btn" onclick="toggleLandingFAQ(this)">Como funciona el sistema de referidos?<svg class="faq-arrow" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></button><div class="faq-answer">Copia tu enlace unico desde el panel "Referidos". Cuando alguien se registre con tu enlace y adquiera un plan, recibes: 5% (plan Gratis), 10% (plan Premium) o 15% (plan Elite) del monto pagado.</div></div>
+        <div class="faq-item"><button class="faq-btn" onclick="toggleLandingFAQ(this)">Como funciona el sistema de referidos?<svg class="faq-arrow" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></button><div class="faq-answer">Copia tu enlace unico desde el panel "Referidos". Cuando alguien se registre con tu enlace y adquiera un plan, recibes: 20% (plan Gratis), 40% (plan Premium) o 60% (plan Elite) del monto pagado. Pagos manuales verificados por el equipo.</div></div>
         <div class="faq-item"><button class="faq-btn" onclick="toggleLandingFAQ(this)">Que es el Sharpe Ratio?<svg class="faq-arrow" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></button><div class="faq-answer">El Sharpe Ratio mide el rendimiento ajustado al riesgo. Un Sharpe mayor a 1 es aceptable, mayor a 2 es excelente. Se calcula como: media de retornos dividida entre la desviacion estandar. Un valor alto significa buenos resultados con bajo riesgo por operacion.</div></div>
         <div class="faq-item"><button class="faq-btn" onclick="toggleLandingFAQ(this)">Puedo cambiar mi cuenta MT5?<svg class="faq-arrow" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></button><div class="faq-answer">La cuenta MT5 solo puede ser cambiada por nuestro equipo por razones de seguridad. Envia un mensaje al soporte desde el chat de soporte (icono verde, esquina inferior derecha) solicitando el cambio con el número de tu nueva cuenta.</div></div>
         <div class="faq-item"><button class="faq-btn" onclick="toggleLandingFAQ(this)">La plataforma funciona con cuentas demo?<svg class="faq-arrow" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></button><div class="faq-answer">Si. Todos los EAs y el diario funcionan igual en cuentas demo y reales de MT5. Es recomendable empezar en demo para familiarizarte con la configuracion antes de usar los EAs en cuentas reales o de fondeo.</div></div>
@@ -1364,33 +1364,54 @@ select.input-dark option{background:#131A26;color:#E2E8F0;}
           <!-- Gratis -->
           <div class="plan-card">
             <div class="mb-4"><span class="badge-gratis text-xs font-bold px-3 py-1 rounded-full">GRATIS</span></div>
-            <p class="text-3xl font-bold mb-1">€0<span class="text-sm font-normal" style="color:#94A3B8;">/mes</span></p>
+            <p class="text-3xl font-bold mb-1">$0<span class="text-sm font-normal" style="color:#94A3B8;">/mes</span></p>
             <p class="text-xs mb-5" style="color:#94A3B8;">Para empezar</p>
             <ul class="space-y-2 text-xs mb-5" style="color:#94A3B8;">
-              <li>✓ Dashboard básico</li><li>✓ Diario (7 días)</li><li>✓ Calculadora de riesgo</li>
-              <li>✓ Calendario económico</li><li style="color:#475569;">✗ EAs</li><li style="color:#475569;">✗ Exportación PDF</li>
+              <li>✓ Dashboard con KPIs en tiempo real</li>
+              <li>✓ Diario (hasta 30 trades/mes)</li>
+              <li>✓ Calculadora de riesgo</li>
+              <li>✓ Calendario económico</li>
+              <li>✓ 1 activo en Calc. MT5 Personal</li>
+              <li style="color:#475569;">✗ Sin acceso al Ranking</li>
+              <li style="color:#475569;">✗ EAs desbloqueados</li>
+              <li style="color:#475569;">✗ Informe PDF mensual</li>
+              <li style="color:#475569;">✗ Análisis IA del diario</li>
             </ul>
             <button disabled class="w-full py-2.5 rounded-xl text-sm font-semibold" style="background:rgba(71,85,105,.2);color:#475569;border:1px solid rgba(71,85,105,.3);cursor:not-allowed;">Plan actual</button>
           </div>
           <!-- Premium -->
           <div class="plan-card featured">
             <div class="mb-4 flex items-center gap-2"><span class="badge-premium text-xs font-bold px-3 py-1 rounded-full">PREMIUM</span><span class="text-xs font-bold px-2 py-0.5 rounded-full" style="background:rgba(37,99,235,.2);color:#2563EB;">MÁS POPULAR</span></div>
-            <p class="text-3xl font-bold mb-1">€19<span class="text-sm font-normal" style="color:#94A3B8;">/mes</span></p>
+            <p class="text-3xl font-bold mb-1">$10<span class="text-sm font-normal" style="color:#94A3B8;">/mes</span></p>
             <p class="text-xs mb-5" style="color:#94A3B8;">Para traders activos</p>
             <ul class="space-y-2 text-xs mb-5" style="color:#94A3B8;">
-              <li>✓ Todo en Gratis</li><li>✓ Diario ilimitado (30 días)</li><li>✓ Risk Manager EA</li>
-              <li>✓ Auto-Journaling EA</li><li>✓ Capturas de pantalla</li><li style="color:#475569;">✗ Backtest Simulator</li>
+              <li>✓ Todo en Gratis</li>
+              <li>✓ Diario ilimitado + importación CSV/HTML</li>
+              <li>✓ Todos los EAs desbloqueados</li>
+              <li>✓ 📊 Informe PDF mensual automático</li>
+              <li>✓ 🤖 Análisis IA del diario</li>
+              <li>✓ 📈 Gráfico de equity curve</li>
+              <li>✓ 💬 Canal privado exclusivo</li>
+              <li>✓ Comisión referidos 40%</li>
+              <li style="color:#475569;">✗ Webhook Telegram</li>
+              <li style="color:#475569;">✗ PDF con tu marca</li>
             </ul>
             <button onclick="openPayModal('premium')" class="btn-green w-full py-2.5 rounded-xl text-sm font-semibold">Actualizar a Premium</button>
           </div>
           <!-- Elite -->
           <div class="plan-card" style="border-color:rgba(139,92,246,.3);">
             <div class="mb-4"><span class="badge-elite text-xs font-bold px-3 py-1 rounded-full">ELITE</span></div>
-            <p class="text-3xl font-bold mb-1">€39<span class="text-sm font-normal" style="color:#94A3B8;">/mes</span></p>
+            <p class="text-3xl font-bold mb-1">$20<span class="text-sm font-normal" style="color:#94A3B8;">/mes</span></p>
             <p class="text-xs mb-5" style="color:#94A3B8;">Para prop traders</p>
             <ul class="space-y-2 text-xs mb-5" style="color:#94A3B8;">
-              <li>✓ Todo en Premium</li><li>✓ Historial ilimitado</li><li>✓ Backtest Simulator</li>
-              <li>✓ Exportación PDF</li><li>✓ Métricas avanzadas</li><li>✓ Soporte prioritario</li>
+              <li>✓ Todo en Premium</li>
+              <li>✓ Historial ilimitado</li>
+              <li>✓ Backtest Simulator EA</li>
+              <li>✓ Exportación PDF + métricas avanzadas</li>
+              <li>✓ ⚡ Webhook a Telegram personal</li>
+              <li>✓ 🏷️ PDF exportado con tu marca</li>
+              <li>✓ Soporte prioritario 24h</li>
+              <li>✓ Comisión referidos 60%</li>
             </ul>
             <button onclick="openPayModal('elite')" class="btn-purple w-full py-2.5 rounded-xl text-sm font-semibold">Actualizar a Elite</button>
           </div>
@@ -1415,8 +1436,8 @@ select.input-dark option{background:#131A26;color:#E2E8F0;}
             </div>
           </div>
           <div class="flex gap-3 flex-wrap">
-            <button onclick="openPayModal('premium')" class="btn-green px-5 py-2.5 rounded-xl text-sm font-semibold">Notificar pago Premium (€19)</button>
-            <button onclick="openPayModal('elite')" class="btn-purple px-5 py-2.5 rounded-xl text-sm font-semibold">Notificar pago Elite (€39)</button>
+            <button onclick="openPayModal('premium')" class="btn-green px-5 py-2.5 rounded-xl text-sm font-semibold">Notificar pago Premium ($10)</button>
+            <button onclick="openPayModal('elite')" class="btn-purple px-5 py-2.5 rounded-xl text-sm font-semibold">Notificar pago Elite ($20)</button>
           </div>
         </div>
       </div>
@@ -2716,12 +2737,12 @@ function openPayModal(plan) {
 function updatePayInstructions() {
   const metodo = document.getElementById('pagoMetodo')?.value||'pix';
   const plan = document.getElementById('pagoSelectedPlan')?.value||'premium';
-  const precio = plan==='elite'?39:19;
+  const precio = plan==='elite'?20:10;
   const instrEl = document.getElementById('pagoInstrucciones');
   const copyBtn = `<button onclick="copyPayAddress()" style="margin-top:10px;padding:5px 12px;border-radius:8px;font-size:11px;font-weight:600;background:rgba(37,99,235,.15);color:#93C5FD;border:1px solid rgba(37,99,235,.3);cursor:pointer;display:inline-flex;align-items:center;gap:5px;">📋 Copiar dirección</button>`;
   const info = {
-    pix:`<div>PIX: <strong style="color:#E2E8F0;">${PAYMENT_INFO.pix}</strong><br>Envía ${precio}€ equivalente en BRL</div>${copyBtn}`,
-    paypal:`<div>PayPal: <strong style="color:#E2E8F0;">${PAYMENT_INFO.paypal}</strong><br>Envía ${precio}€ como "Friends &amp; Family"</div>${copyBtn}`,
+    pix:`<div>PIX: <strong style="color:#E2E8F0;">${PAYMENT_INFO.pix}</strong><br>Envía ${precio} USD equivalente en BRL</div>${copyBtn}`,
+    paypal:`<div>PayPal: <strong style="color:#E2E8F0;">${PAYMENT_INFO.paypal}</strong><br>Envía $${precio} como "Friends &amp; Family"</div>${copyBtn}`,
     usdt_bep20:`<div>USDT BEP20 (BSC):<br><strong style="color:#E2E8F0;word-break:break-all;font-size:11px;">${PAYMENT_INFO.usdt_bep20}</strong><br>Envía exactamente ${precio} USDT — Red BEP20/BSC</div>${copyBtn}`,
     usdc_bep20:`<div>USDC BEP20 (BSC):<br><strong style="color:#E2E8F0;word-break:break-all;font-size:11px;">${PAYMENT_INFO.usdc_bep20}</strong><br>Envía exactamente ${precio} USDC — Red BEP20/BSC</div>${copyBtn}`,
   };
@@ -2829,7 +2850,7 @@ async function loadPagos() {
     <tr class="table-row">
       <td class="px-4 py-3 text-xs">${esc(p.perfiles?.nombre||p.usuario_id?.slice(0,10))}</td>
       <td class="px-4 py-3"><span class="text-xs px-2 py-0.5 rounded-full" style="background:rgba(59,130,246,.15);color:#3B82F6;">${(p.metodo||'').toUpperCase()}</span></td>
-      <td class="px-4 py-3 font-semibold mono text-xs profit">€${p.monto||0}</td>
+      <td class="px-4 py-3 font-semibold mono text-xs profit">${p.monto||0}</td>
       <td class="px-4 py-3 text-xs capitalize">${esc(p.plan||'—')}</td>
       <td class="px-4 py-3 text-xs" style="color:#94A3B8;">${p.creado_en?new Date(p.creado_en).toLocaleDateString('es-ES'):'—'}</td>
       <td class="px-4 py-3 text-right flex gap-1 justify-end items-center">
@@ -2854,9 +2875,9 @@ async function verifyPago(id, userId, plan) {
   const {data:perfil}=await sb.from('perfiles').select('referido_por,plan').eq('id',userId).single();
   if (perfil?.referido_por) {
     const {data:referente}=await sb.from('perfiles').select('plan').eq('id',perfil.referido_por).single();
-    const tasas={'gratis':0.05,'premium':0.10,'elite':0.15};
-    const tasa=tasas[referente?.plan||'gratis']||0.05;
-    const precio=plan==='elite'?39:19;
+    const tasas={'gratis':0.20,'premium':0.40,'elite':0.60};
+    const tasa=tasas[referente?.plan||'gratis']||0.20;
+    const precio=plan==='elite'?20:10;
     const comision=parseFloat((precio*tasa).toFixed(2));
     await sb.from('referidos').insert({referente_id:perfil.referido_por,referido_id:userId,plan_adquirido:plan,monto_pago:precio,comision_calculada:comision,pagada:false});
   }
@@ -3699,7 +3720,7 @@ async function loadReferralData() {
     <tr class="table-row">
       <td class="px-4 py-3 text-xs">${r.fecha?new Date(r.fecha).toLocaleDateString('es-ES'):'—'}</td>
       <td class="px-4 py-3"><span class="badge-${r.plan_adquirido||'gratis'} px-2 py-0.5 rounded-full text-xs font-bold">${cap(r.plan_adquirido||'—')}</span></td>
-      <td class="px-4 py-3 text-xs mono">€${r.monto_pago||0}</td>
+      <td class="px-4 py-3 text-xs mono">${r.monto_pago||0}</td>
       <td class="px-4 py-3 font-semibold text-xs mono profit">€${r.comision_calculada||0}</td>
       <td class="px-4 py-3">${r.pagada?'<span style="color:#2563EB;">✓ Pagada</span>':'<span style="color:#FBBF24;">⏳ Pendiente</span>'}</td>
     </tr>`).join('');
@@ -3826,46 +3847,55 @@ async function checkAchievementsTrigger() {
 let aiHistory = [];
 let _selectedAiProvider = null, _selectedAiModel = null;
 
-const AI_SYSTEM_PROMPT = `Eres FlowTrade AI, el asistente inteligente integrado en Samtrader Pro Suite (también llamado FlowTrade Pro Suite), una plataforma profesional de trading para MetaTrader 5. Tienes conocimiento profundo de TODAS las funciones de la plataforma y ayudas a los usuarios a sacarle el máximo partido.
+const AI_SYSTEM_PROMPT = `Eres FlowTrade AI, el asistente inteligente integrado en FlowTrade Pro Suite, una plataforma profesional de trading para MetaTrader 5. Tienes conocimiento profundo de TODAS las funciones de la plataforma y ayudas a los usuarios a sacarle el máximo partido.
 
 ═══════════════════════════════════════════
 IDENTIDAD DE LA PLATAFORMA
 ═══════════════════════════════════════════
-Nombre: Samtrader Pro Suite / FlowTrade Pro Suite
+Nombre: FlowTrade Pro Suite
 Propósito: Suite integral para traders de MetaTrader 5 — diario automatizado, calculadora de riesgo, Expert Advisors con licencia, análisis avanzado, calendario económico y soporte.
 URL de la app: accesible desde el navegador, sin instalación.
 Compatible con: cualquier broker que use MT5 (FTMO, FundedNext, MyForexFunds, Deriv, XM, IC Markets, Pepperstone, etc.)
 Activos: Forex (todos los pares), índices (SPX, NAS100, DAX, etc.), commodities (oro, petróleo), criptomonedas y sintéticos de Deriv (Boom 300/500/1000, Crash 300/500/1000, Volatility 10/25/50/75/100).
 
 ═══════════════════════════════════════════
-PLANES Y PRECIOS
+PLANES Y PRECIOS (actualizados)
 ═══════════════════════════════════════════
-GRATIS:
-- Diario de trading básico (hasta 50 trades/mes)
+GRATIS ($0/mes):
+- Dashboard con KPIs en tiempo real
+- Diario de trading (hasta 30 trades/mes)
 - Calculadora de riesgo
 - Calendario económico
-- 1 EA básico (limitado)
-- Sin acceso a backtesting avanzado
+- 1 activo en Calculadora MT5 Personal
+- Sin acceso al Ranking público
+- Sin EAs desbloqueados
+- Sin informe PDF mensual
+- Sin análisis IA del diario
+- Comisión de referidos: 20%
 
-PREMIUM (€19/mes):
+PREMIUM ($10/mes):
 - Todo lo de Gratis
 - Diario ilimitado + importación CSV/HTML desde MT5
-- Todos los EAs desbloqueados
-- Backtesting avanzado
-- Señales de trading
-- Análisis avanzado
-- Soporte prioritario por chat
+- Todos los EAs desbloqueados (Risk Manager, Auto-Journaling, DataBridge, Backtest)
+- 📊 Informe PDF mensual automático al cierre de cada mes
+- 🤖 Análisis IA del diario (la IA analiza tus trades y da feedback)
+- 📈 Gráfico de equity curve en Dashboard
+- 💬 Acceso al canal privado exclusivo
+- Comisión de referidos: 40%
 
-ELITE (€39/mes):
+ELITE ($20/mes):
 - Todo lo de Premium
-- Sincronización automática de trades via EA DataBridge
-- Acceso a la API completa
-- Estadísticas del ranking público
-- Soporte personalizado
-- Funciones beta exclusivas
-- Comisiones de referidos del 15%
+- Historial de trades ilimitado
+- Backtest Simulator EA
+- Exportación PDF con tu marca personal
+- Métricas avanzadas (Sharpe Ratio, Profit Factor, Drawdown detallado)
+- ⚡ Webhook a Telegram personal (recibe alertas en tu Telegram)
+- 🏷️ PDF exportado con tu nombre/marca
+- Soporte prioritario 24h
+- Comisión de referidos: 60%
 
-MÉTODOS DE PAGO: PIX (Brasil), PayPal, USDT TRC20, USDC TRC20.
+MÉTODOS DE PAGO: PIX (Brasil), PayPal, USDT BEP20 (Red BSC), USDC BEP20 (Red BSC).
+DIRECCIÓN CRYPTO: 0x24252ef84f8b4665170c199595ce326bb4709a0f (BEP20/BSC)
 PROCESO: Elige plan → realiza el pago → haz clic en "Notificar pago al equipo" → el equipo verifica en menos de 24h → plan activado automáticamente.
 
 ═══════════════════════════════════════════
@@ -3945,13 +3975,14 @@ SECCIONES DE LA PLATAFORMA - GUÍA DETALLADA
 
 7. SISTEMA DE REFERIDOS
 - Tu enlace único: disponible en la sección "Referidos"
-- Cómo funciona: comparte tu enlace → cuando alguien se registra con él y adquiere un plan → recibes comisión
-- Comisiones:
-  - Plan Gratis del referido: 5% del pago
-  - Plan Premium del referido: 10% del pago (€1.90/mes por referido)
-  - Plan Elite del referido: 15% del pago (€5.85/mes por referido)
-- El pago de comisiones se realiza mensualmente al acumular el mínimo
-- Tus referidos se ven en el panel "Referidos" con fecha, nombre y comisión generada
+- Cómo funciona: comparte tu enlace → cuando alguien se registra con él y adquiere un plan → recibes comisión automática
+- Comisiones (según TU plan, no el del referido):
+  - Tú en plan Gratis: 20% del pago del referido
+  - Tú en plan Premium: 40% del pago del referido
+  - Tú en plan Elite: 60% del pago del referido
+- Ejemplo: si tienes Elite y tu referido paga Premium ($10) → recibes $6.00
+- El pago de comisiones se realiza manualmente una vez verificado el pago del referido
+- Tus referidos se ven en el panel "Referidos" con fecha, plan adquirido y comisión generada
 
 8. BACKTESTING
 - Simulación de estrategias con datos históricos
